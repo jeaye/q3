@@ -45,8 +45,8 @@ fn main() {
     check!(gl::enable(gl::CULL_FACE));
     check!(gl::clear_color(0.0, 0.0, 0.0, 1.0));
 
-    let map = map::Map::new("bin/q3ctf1.bsp");
-    //let map = map::Map::new("bin/map.bsp");
+    let map = map::Map::new("data/q3ctf1.bsp");
+    //let map = map::Map::new("data/map.bsp");
 
     /* Shader Creation. */
     let shader_vert_src =
