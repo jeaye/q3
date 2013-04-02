@@ -12,7 +12,6 @@
 extern mod std;
 extern mod opengles;
 extern mod glfw;
-use traits::*
 
 #[path = "gl/gl.rs"]
 mod gl;
@@ -24,8 +23,6 @@ mod math;
 #[path = "gl/check.rs"]
 mod check;
 
-#[path = "obj/traits.rs"]
-mod traits;
 #[path = "obj/bsp/map.rs"]
 mod map;
 
@@ -34,16 +31,21 @@ fn main() {
 
   do glfw::spawn {
     let window = glfw::Window::create(1024, 768, "Q^3", glfw::Windowed).unwrap();
-
-    let camera = @mut gl::Camera::new();
-
-    do window.set_size_callback |_, width, height|
-    {  camera.resize(width as i32, height as i32); }
-    window.set_key_callback(key_callback);
     window.make_context_current();
 
-    check!(gl::enable(gl::CULL_FACE));
-    check!(gl::clear_color(0.0, 0.0, 0.0, 1.0));
+    let camera = @mut gl::Camera::new();
+    camera.init_gl();
+
+    /* Setup callbacks. */
+    do window.set_size_callback |_, width, height|
+    { camera.resize(width as i32, height as i32); }
+    do window.set_cursor_pos_callback |_, x, y|
+    { camera.mouse_moved(x as i32, y as i32); }
+    do window.set_key_callback |window, key, action|
+    {
+      camera.key_action(key, action);
+      key_callback(window, key, action);
+    }
 
     let map = map::Map::new("data/q3ctf1.bsp");
     //let map = map::Map::new("data/map.bsp");
@@ -79,12 +81,8 @@ fn main() {
     let shader = gl::Shader::new(shader_vert_src, shader_frag_src);
     shader.bind();
 
-    camera.translate_to(camera.position);
-
     let proj_loc = shader.get_uniform_location(~"proj");
-
-    let world = 
-                math::Mat4x4::new_translation(0.0, -100.0, -100.0);
+    let world = math::Mat4x4::new_translation(0.0, -100.0, -100.0);
 
     let world_loc = shader.get_uniform_location(~"world");
     shader.update_uniform(world_loc, &world);
