@@ -34,9 +34,10 @@ fn main() {
     window.make_context_current();
 
     let camera = @mut gl::Camera::new();
-    camera.init_gl();
+    camera.init();
 
     /* Setup callbacks. */
+    window.set_input_mode(glfw::CURSOR_CAPTURED, glfw::TRUE);
     do window.set_size_callback |_, width, height|
     { camera.resize(width as i32, height as i32); }
     do window.set_cursor_pos_callback |_, x, y|

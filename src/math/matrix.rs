@@ -10,6 +10,8 @@
       for representing orientational data.
 */
 
+mod vec3;
+
 type Component = f32; /* TODO: Template. */
 
 struct Mat4x4
@@ -100,6 +102,24 @@ impl Mat4x4
     mat.data[3][0] = 0.0   ; mat.data[3][1] = 0.0    ; mat.data[3][2] = 0.0; mat.data[3][3] = 1.0;
 
     mat
+  }
+
+  pub fn new_lookat(position: vec3::Vec3<f32>, target: vec3::Vec3<f32>, up: vec3::Vec3<f32>) -> Mat4x4
+  {
+    let mut forward = target - position;
+    forward.normalize();
+
+    let mut left = forward.cross(up);
+    left.normalize();
+
+    let mut proper_up = left.cross(forward);
+    proper_up.normalize();
+
+    Mat4x4 { data:
+              [ left.x, left.y, left.z, 0.0,
+                proper_up.x, proper_up.y, proper_up.z, 0.0,
+                -forward.x, -forward.y, -forward.z, 0.0,
+                position.x, position.y, position.z, 1.0] }
   }
 
   pub fn get_width(&self) -> uint

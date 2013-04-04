@@ -16,13 +16,28 @@ pub struct Vec3<T>
   z: T
 }
 
-impl<T: num::Zero + Add<T, T> + Mul<T, T>> Vec3<T>
+impl<T: num::Zero + Add<T, T> + Mul<T, T> + Div<T, T>> Vec3<T>
 {
   pub fn new(nx: T, ny: T, nz: T) -> Vec3<T>
   { Vec3{ x: nx, y: ny, z: nz } }
 
   pub fn zero() -> Vec3<T>
   { Vec3{ x: num::Zero::zero(), y: num::Zero::zero(), z: num::Zero::zero() } }
+
+  pub fn normalize(&mut self)
+  {
+    let len = self.length();
+
+    if len.is_zero()
+    { len = 1.0; }
+
+    self.x /= len;
+    self.y /= len;
+    self.z /= len;
+  }
+
+  pub fn length(&self) -> T
+  { ((self.x * self.x) + (self.y * self.y) + (self.z * self.z)).sqrt() }
 
   pub unsafe fn to_ptr(&self) -> *Vec3<T>
   { ptr::addr_of(self) }
