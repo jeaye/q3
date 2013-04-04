@@ -105,7 +105,7 @@ fn main() {
       
       shader.update_uniform(world_loc, &(world * rot));
 
-      check!(gl::clear(gl::COLOR_BUFFER_BIT));
+      check!(gl::clear(gl::COLOR_BUFFER_BIT)); /* TODO: Clear depth buffer bit */
       {
         map.draw();
       } window.swap_buffers();
