@@ -65,7 +65,7 @@ macro_rules! declare
       {
         fn add(&self, rhs: &$Type) -> $Type
         {
-          $Type{ x: ( self.x + rhs.x ),
+          $Type{x: ( self.x + rhs.x ),
                 y: ( self.y + rhs.y ),
                 z: ( self.z + rhs.z ) }
         }
@@ -75,9 +75,19 @@ macro_rules! declare
       {
         fn sub(&self, rhs: &$Type) -> $Type
         {
-          $Type{ x: ( self.x - rhs.x ),
+          $Type{x: ( self.x - rhs.x ),
                 y: ( self.y - rhs.y ),
                 z: ( self.z - rhs.z ) }
+        }
+      }
+
+      impl Mul<$Component, $Type> for $Type
+      {
+        fn mul(&self, rhs: &$Component) -> $Type
+        {
+          $Type{x: ( self.x * *rhs ),
+                y: ( self.y * *rhs ),
+                z: ( self.z * *rhs ) }
         }
       }
 
@@ -85,7 +95,7 @@ macro_rules! declare
       {
         fn neg(&self) -> $Type
         {
-          $Type{ x: ( -self.x ),
+          $Type{x: ( -self.x ),
                 y: ( -self.y ),
                 z: ( -self.z ) }
         }

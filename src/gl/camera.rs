@@ -10,13 +10,13 @@
       projection, viewport sizing, etc.
 */
 
-extern mod glfw;
-extern mod opengles;
+use glfw;
 use gl = opengles::gl2;
+use math::vec2::Vec2;
+use math::vec3::Vec3f;
+use math::matrix::Mat4x4;
 
 mod util;
-#[path = "../math/math.rs"]
-mod math;
 
 #[macro_escape]
 mod check_internal;
@@ -33,36 +33,41 @@ static Down: u8 = 32;
 
 pub struct Camera
 {
-  position: math::Vec3f,
-  angles: math::Vec2<f32>,
+  position: Vec3f,
+  angles: Vec2<f32>,
   
   /* Projection. */
-  projection: @math::Mat4x4,
-  near_far: math::Vec2<f32>,
+  projection: @Mat4x4,
+  near_far: Vec2<f32>,
   fov: f32,
+  view: @Mat4x4,
 
   /* Mouse. */
-  mouse_speed: f32,
-  mouse_position: math::Vec2<i32>,
+  look_speed: f32,
 
   /* Keyboard. */
   move_to: u8,
+  move_speed: f32,
 
-  window_size: math::Vec2<i32>
+  /* Window. */
+  window: @glfw::Window,
+  window_size: Vec2<i32>
 }
 impl Camera
 {
-  pub fn new() -> Camera
+  pub fn new(win: @glfw::Window) -> Camera
   {
-    Camera {  position: math::Vec3f::zero(),
-              angles: math::Vec2::zero::<f32>(),
-              projection: @math::Mat4x4::new(),
-              near_far: math::Vec2::new::<f32>(1.0, 1000.0),
+    Camera {  position: Vec3f::zero(),
+              angles: Vec2::zero::<f32>(),
+              projection: @Mat4x4::new(),
+              near_far: Vec2::new::<f32>(1.0, 1000.0),
               fov: 100.0,
-              mouse_speed: 0.001,
-              mouse_position: math::Vec2::zero::<i32>(),
+              view: @Mat4x4::new(), /* TODO: s/new/identity/g */
+              look_speed: 0.001,
               move_to: 0,
-              window_size: math::Vec2::zero::<i32>()
+              move_speed: 0.01,
+              window: win,
+              window_size: Vec2::zero::<i32>()
     }
   }
 
@@ -84,20 +89,17 @@ impl Camera
   {
     check!(gl::viewport(0, 0, self.window_size.x, self.window_size.y));
 
-    self.projection = @math::Mat4x4::new_perspective_projection( 
-                                      self.fov,
-                                      (self.window_size.x / self.window_size.y) as f32,
-                                      self.near_far.x,
-                                      self.near_far.y);
+    /* Refresh view. */
+    self.mouse_moved(self.window_size.x / 2, self.window_size.y / 2); 
   }
 
   pub fn mouse_moved(&mut self, x: i32, y: i32) /* TODO: dx, dy */
   {
-    self.mouse_position.x = x;
-    self.mouse_position.y = y;
+    let dx = x - (self.window_size.x / 2);
+    let dy = y - (self.window_size.y / 2);
 
-    self.angles.x += x as f32 * self.mouse_speed;
-    self.angles.y += y as f32 * self.mouse_speed;
+    self.angles.x += dx as f32 * self.look_speed;
+    self.angles.y += dy as f32 * self.look_speed;
     
     /* Wrap X. */
     if self.angles.x < -f32::consts::pi
@@ -111,10 +113,7 @@ impl Camera
     else if self.angles.y > f32::consts::pi / 2.0
     { self.angles.y = f32::consts::pi / 2.0; }
 
-    let mut lookat = math::Vec3f::zero();
-    lookat.x = f32::sin(self.angles.x) * f32::cos(self.angles.y);
-    lookat.y = f32::sin(self.angles.y);
-    lookat.z = f32::cos(self.angles.x) * f32::cos(self.angles.y);
+    self.window.set_cursor_pos((self.window_size.x / 2) as int, (self.window_size.y / 2) as int);
   }
 
   pub fn key_action(&mut self, key: libc::c_int, action: libc::c_int) 
@@ -147,17 +146,49 @@ impl Camera
     }
   }
 
-  pub fn update(&mut self, dt: u64)
+  pub fn update(&mut self, dt: f32)
   {
+    if self.window_size.x == 0 || self.window_size.y == 0
+    { return; }
 
+    let forward = Vec3f::new(f32::sin(self.angles.x), 0.0, f32::cos(self.angles.x));
+    let right = Vec3f::new(-forward.z, 0.0, forward.x);
+
+    if self.move_to & Left > 0
+    { self.position -= right * self.move_speed * dt; }
+    if self.move_to & Right  > 0
+    { self.position += right * self.move_speed * dt; }
+    if self.move_to & Forward > 0
+    { self.position += forward * self.move_speed * dt; }
+    if self.move_to & Backward > 0
+    { self.position -= forward * self.move_speed * dt; }
+    if self.move_to & Up > 0
+    { self.position.y += self.move_speed * dt; }
+    if self.move_to & Down > 0
+    { self.position.y -= self.move_speed * dt; }
+
+    self.projection = @Mat4x4::new_perspective_projection( 
+                                      self.fov,
+                                      (self.window_size.x / self.window_size.y) as f32,
+                                      self.near_far.x,
+                                      self.near_far.y);
+
+    let mut lookat = Vec3f::zero();
+    lookat.x = f32::sin(self.angles.x) * f32::cos(self.angles.y);
+    lookat.y = f32::sin(self.angles.y);
+    lookat.z = f32::cos(self.angles.x) * f32::cos(self.angles.y);
+
+    self.view = @Mat4x4::new_lookat(self.position,
+                                    self.position + lookat, 
+                                    Vec3f::new(0.0, 1.0, 0.0));
   }
 }
 
 impl obj::traits::Movable for Camera
 {
-  pub fn translate(&mut self, _new_position: math::Vec3f) /* TODO: wtf */
+  pub fn translate(&mut self, _new_position: Vec3f) /* TODO: wtf */
   { }
-  pub fn translate_to(&mut self, _new_position: math::Vec3f)
+  pub fn translate_to(&mut self, _new_position: Vec3f)
   { }
 }
 

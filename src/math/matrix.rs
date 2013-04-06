@@ -10,7 +10,7 @@
       for representing orientational data.
 */
 
-mod vec3;
+use math::vec3::Vec3f;
 
 type Component = f32; /* TODO: Template. */
 
@@ -104,7 +104,7 @@ impl Mat4x4
     mat
   }
 
-  pub fn new_lookat(position: vec3::Vec3f, target: vec3::Vec3f, up: vec3::Vec3f) -> Mat4x4
+  pub fn new_lookat(position: Vec3f, target: Vec3f, up: Vec3f) -> Mat4x4
   {
     let mut forward = target - position;
     forward.normalize();
@@ -115,11 +115,19 @@ impl Mat4x4
     let mut proper_up = left.cross(&forward);
     proper_up.normalize();
 
-    Mat4x4 { data:
-              [ [ left.x, left.y, left.z, 0.0 ],
-                [ proper_up.x, proper_up.y, proper_up.z, 0.0 ],
-                [ -forward.x, -forward.y, -forward.z, 0.0 ] ,
-                [ position.x, position.y, position.z, 1.0 ] ] }
+    let mut mat = Mat4x4::new();
+    mat.data[0][0] = left.x; mat.data[0][1] = left.y; mat.data[0][2] = left.z; mat.data[0][3] = 0.0;
+    mat.data[1][0] = proper_up.x; mat.data[1][1] = proper_up.y; mat.data[1][2] = proper_up.z; mat.data[1][3] = 0.0;
+    mat.data[2][0] = -forward.x; mat.data[2][1] = -forward.y; mat.data[2][2] = -forward.z; mat.data[2][3] = 0.0;
+    //mat.data[3][0] = 0.0; mat.data[3][1] = 0.0; mat.data[3][2] = 0.0; mat.data[3][3] = 1.0;
+    mat.data[3][0] = position.x; mat.data[3][1] = position.y; mat.data[3][2] = position.z; mat.data[3][3] = 1.0;
+
+    //mat.data[0][0] = left.x; mat.data[0][1] = proper_up.x; mat.data[0][2] = -forward.x; mat.data[0][3] = position.x;
+    //mat.data[1][0] = left.y; mat.data[1][1] = proper_up.y; mat.data[1][2] = -forward.y; mat.data[1][3] = position.y;
+    //mat.data[2][0] = left.z; mat.data[2][1] = proper_up.z; mat.data[2][2] = -forward.z; mat.data[2][3] = position.z;
+    //mat.data[3][0] = 0.0; mat.data[3][1] = 0.0; mat.data[3][2] = position.z; mat.data[3][3] = 1.0;
+
+    mat
   }
 
   pub fn get_width(&self) -> uint

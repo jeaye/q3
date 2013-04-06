@@ -30,14 +30,14 @@ fn main() {
   glfw::set_error_callback(error_callback);
 
   do glfw::spawn {
-    let window = glfw::Window::create(1024, 768, "Q^3", glfw::Windowed).unwrap();
+    let window = @glfw::Window::create(1024, 768, "Q^3", glfw::Windowed).unwrap();
     window.make_context_current();
 
-    let camera = @mut gl::Camera::new();
+    let camera = @mut gl::Camera::new(window);
     camera.init();
 
     /* Setup callbacks. */
-    window.set_input_mode(glfw::CURSOR_CAPTURED, glfw::TRUE as int);
+    // TODO: glfw::disable(glfw::MOUSE_CURSOR);
     do window.set_size_callback |_, width, height|
     { camera.resize(width as i32, height as i32); }
     do window.set_cursor_pos_callback |_, x, y|
@@ -50,6 +50,7 @@ fn main() {
 
     let map = map::Map::new("data/q3ctf1.bsp");
     //let map = map::Map::new("data/map.bsp");
+    //let map = map::Map::new("data/dk.bsp");
 
     /* Shader Creation. */
     let shader_vert_src =
@@ -89,7 +90,7 @@ fn main() {
     shader.update_uniform(world_loc, &world);
     let mut deg = 0.0;
 
-    let mut cur_time = std::time::precise_time_ns() / 1000;
+    let mut cur_time = (std::time::precise_time_ns() / 100000) as f32; // Tenth of a second
     let mut last_time = cur_time;
 
     while !window.should_close() {
@@ -97,18 +98,19 @@ fn main() {
 
       let delta = cur_time - last_time;
       last_time = cur_time;
-      cur_time = std::time::precise_time_ns() / 1000;
+      cur_time = (std::time::precise_time_ns() / 100000) as f32;
 
       camera.update(delta);
 
       shader.update_uniform(proj_loc, camera.projection);
+      shader.update_uniform(world_loc, camera.view);
 
-      deg += 0.00005 * (delta as f32);
+      deg += 0.00005 * delta;
       let rot = math::Mat4x4::new_translation(0.0, 100.0, 100.0) * math::Mat4x4::new_rotation_y(deg) * math::Mat4x4::new_translation(0.0, -100.0, -100.0);
       
-      shader.update_uniform(world_loc, &(world * rot));
+      //shader.update_uniform(world_loc, &(world * rot));
 
-      check!(gl::clear(gl::COLOR_BUFFER_BIT)); /* TODO: Clear depth buffer bit */
+      check!(gl::clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT));
       {
         map.draw();
       } window.swap_buffers();
@@ -116,11 +118,6 @@ fn main() {
       std::timer::sleep(@std::uv::global_loop::get(), 16);
     }
   }
-}
-
-fn window_size_callback(_window: &glfw::Window, width: int, height: int)
-{
-  check!(gl::viewport(0, 0, width as gl::GLsizei, height as gl::GLsizei));
 }
 
 fn key_callback(window: &glfw::Window, key: libc::c_int, action: libc::c_int)
