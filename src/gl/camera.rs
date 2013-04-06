@@ -33,7 +33,7 @@ static Down: u8 = 32;
 
 pub struct Camera
 {
-  position: math::Vec3<f32>,
+  position: math::Vec3f,
   angles: math::Vec2<f32>,
   
   /* Projection. */
@@ -54,7 +54,7 @@ impl Camera
 {
   pub fn new() -> Camera
   {
-    Camera {  position: math::Vec3::zero::<f32>(),
+    Camera {  position: math::Vec3f::zero(),
               angles: math::Vec2::zero::<f32>(),
               projection: @math::Mat4x4::new(),
               near_far: math::Vec2::new::<f32>(1.0, 1000.0),
@@ -111,7 +111,7 @@ impl Camera
     else if self.angles.y > f32::consts::pi / 2.0
     { self.angles.y = f32::consts::pi / 2.0; }
 
-    let lookat = math::Vec3::zero::<f32>();
+    let mut lookat = math::Vec3f::zero();
     lookat.x = f32::sin(self.angles.x) * f32::cos(self.angles.y);
     lookat.y = f32::sin(self.angles.y);
     lookat.z = f32::cos(self.angles.x) * f32::cos(self.angles.y);
@@ -129,6 +129,7 @@ impl Camera
         glfw::KEY_D => { self.move_to |= Right; }
         glfw::KEY_Q => { self.move_to |= Down; }
         glfw::KEY_E => { self.move_to |= Up; }
+        _ => { }
       }
     }
     else
@@ -141,16 +142,22 @@ impl Camera
         glfw::KEY_D => { self.move_to &= !Right; }
         glfw::KEY_Q => { self.move_to &= !Down; }
         glfw::KEY_E => { self.move_to &= !Up; }
+        _ => { }
       }
     }
+  }
+
+  pub fn update(&mut self, dt: u64)
+  {
+
   }
 }
 
 impl obj::traits::Movable for Camera
 {
-  pub fn translate(&mut self, _new_position: math::Vec3<f32>) /* TODO: wtf */
+  pub fn translate(&mut self, _new_position: math::Vec3f) /* TODO: wtf */
   { }
-  pub fn translate_to(&mut self, _new_position: math::Vec3<f32>)
+  pub fn translate_to(&mut self, _new_position: math::Vec3f)
   { }
 }
 

@@ -17,22 +17,22 @@ mod math;
 pub trait Movable
 {
   /* Relative translate. */
-  pub fn translate(&mut self, new_position: math::Vec3<f32>);
+  pub fn translate(&mut self, new_position: math::Vec3f);
   /* Absolute translate. */
-  pub fn translate_to(&mut self, new_position: math::Vec3<f32>);
+  pub fn translate_to(&mut self, new_position: math::Vec3f);
 }
 
 pub trait Rotatable
 {
   /* Relative translate. */
-  pub fn rotate(&mut self, new_rotation: math::Vec3<f32>);
+  pub fn rotate(&mut self, new_rotation: math::Vec3f);
   /* Absolute translate. */
-  pub fn rotate_to(&mut self, new_rotation: math::Vec3<f32>);
+  pub fn rotate_to(&mut self, new_rotation: math::Vec3f);
 }
 
 pub trait Scalable
 {
   /* Relative scale. */
-  pub fn scale(&mut self, new_scale: math::Vec3<f32>);
+  pub fn scale(&mut self, new_scale: math::Vec3f);
 }
 

@@ -18,3 +18,5 @@ Voxelization
 #[cfg(foo)] and --cfg foo
   Error checking in check macro
 
+Rename folder modules to mod.rs
+

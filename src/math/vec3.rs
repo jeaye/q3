@@ -9,68 +9,90 @@
       A 3D vector with X, Y, and Z components.
 */
 
-pub struct Vec3<T>
-{
-  x: T,
-  y: T,
-  z: T
-}
+pub use self::macro::Vec3f;
 
-impl<T: num::Zero + Add<T, T> + Mul<T, T> + Div<T, T>> Vec3<T>
-{
-  pub fn new(nx: T, ny: T, nz: T) -> Vec3<T>
-  { Vec3{ x: nx, y: ny, z: nz } }
+macro_rules! declare
+(
+  ($Type:ident, $Component:ty) =>
+  (
+    mod macro
+    {
+      pub struct $Type
+      {
+        x: $Component,
+        y: $Component,
+        z: $Component
+      }
 
-  pub fn zero() -> Vec3<T>
-  { Vec3{ x: num::Zero::zero(), y: num::Zero::zero(), z: num::Zero::zero() } }
+      impl $Type
+      {
+        pub fn new(nx: $Component, ny: $Component, nz: $Component) -> $Type
+        { $Type{ x: nx, y: ny, z: nz } }
 
-  pub fn normalize(&mut self)
-  {
-    let len = self.length();
+        pub fn zero() -> $Type
+        { $Type{ x: 0 as $Component, y: 0 as $Component, z: 0 as $Component } }
 
-    if len.is_zero()
-    { len = 1.0; }
+        pub fn normalize(&mut self)
+        {
+          let mut len = self.length();
 
-    self.x /= len;
-    self.y /= len;
-    self.z /= len;
-  }
+          if len < 0.0001 as $Component && len > -0.0001 as $Component /* TODO: Egh, hack. */
+          { len = 1.0; }
 
-  pub fn length(&self) -> T
-  { ((self.x * self.x) + (self.y * self.y) + (self.z * self.z)).sqrt() }
+          self.x /= len;
+          self.y /= len;
+          self.z /= len;
+        }
 
-  pub unsafe fn to_ptr(&self) -> *Vec3<T>
-  { ptr::addr_of(self) }
-}
+        pub fn length(&self) -> $Component
+        { float::sqrt(( (self.x * self.x) + 
+                        (self.y * self.y) + 
+                        (self.z * self.z)) as float) as $Component }
 
-/***** Operator Overloads *****/
-impl<T: Add<T, T>> Add<Vec3<T>, Vec3<T>> for Vec3<T>
-{
-  fn add(&self, rhs: &Vec3<T>) -> Vec3<T>
-  {
-    Vec3{ x: ( self.x + rhs.x ),
-          y: ( self.y + rhs.y ),
-          z: ( self.z + rhs.z ) }
-  }
-}
+        pub fn cross(&self, rhs: &$Type) -> $Type
+        {
+          $Type { x: (self.y * rhs.z) - (self.z * rhs.y),
+                  y: (self.z * rhs.x) - (self.x * rhs.z),
+                  z: (self.x * rhs.y) - (self.y * rhs.x) }
+        }
 
-impl<T: Sub<T, T>> Sub<Vec3<T>, Vec3<T>> for Vec3<T>
-{
-  fn sub(&self, rhs: &Vec3<T>) -> Vec3<T>
-  {
-    Vec3{ x: ( self.x - rhs.x ),
-          y: ( self.y - rhs.y ),
-          z: ( self.z - rhs.z ) }
-  }
-}
+        pub unsafe fn to_ptr(&self) -> *$Type
+        { ptr::addr_of(self) }
+      }
 
-impl<T: Neg<T>> Neg<Vec3<T>> for Vec3<T>
-{
-  fn neg(&self) -> Vec3<T>
-  {
-    Vec3{ x: ( -self.x ),
-          y: ( -self.y ),
-          z: ( -self.z ) }
-  }
-}
+      /***** Operator Overloads *****/
+      impl Add<$Type, $Type> for $Type
+      {
+        fn add(&self, rhs: &$Type) -> $Type
+        {
+          $Type{ x: ( self.x + rhs.x ),
+                y: ( self.y + rhs.y ),
+                z: ( self.z + rhs.z ) }
+        }
+      }
+
+      impl Sub<$Type, $Type> for $Type
+      {
+        fn sub(&self, rhs: &$Type) -> $Type
+        {
+          $Type{ x: ( self.x - rhs.x ),
+                y: ( self.y - rhs.y ),
+                z: ( self.z - rhs.z ) }
+        }
+      }
+
+      impl Neg<$Type> for $Type
+      {
+        fn neg(&self) -> $Type
+        {
+          $Type{ x: ( -self.x ),
+                y: ( -self.y ),
+                z: ( -self.z ) }
+        }
+      }
+    }
+  );
+)
+
+declare!(Vec3f, f32)
 

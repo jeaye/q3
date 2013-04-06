@@ -84,7 +84,7 @@ pub struct Texture
 
 pub struct Plane
 {
-  normal: math::Vec3<f32>,
+  normal: math::Vec3f,
   /* Distance the plane is from the origin, along the normal. */
   distance: f32
 }
@@ -161,17 +161,17 @@ pub struct Brush_Side
 
 pub struct Vertex
 {
-  position: math::Vec3<f32>,
+  position: math::Vec3f,
   tex_coords: [math::Vec2<f32>, ..2], /* 0 = Surface; 1 = Lightmap */
-  normal: math::Vec3<f32>,
+  normal: math::Vec3f,
   color: math::Vec4<u8> 
 }
 impl Vertex
 {
   pub fn new() -> Vertex
-  { Vertex {  position: math::Vec3::zero::<f32>(),
+  { Vertex {  position: math::Vec3f::zero(),
               tex_coords: [math::Vec2::zero::<f32>(), ..2],
-              normal: math::Vec3::zero::<f32>(),
+              normal: math::Vec3f::zero(),
               color: math::Vec4::new::<u8>(1, 1, 1, 1) } }
 }
 
@@ -212,10 +212,10 @@ pub struct Face
   lightmap: i32,
   lightmap_corner: math::Vec2<i32>,
   lightmap_size: math::Vec2<i32>,
-  lightmap_origin: math::Vec3<f32>,
+  lightmap_origin: math::Vec3f,
   /* World-space s and t unit vectors. */
-  lightmap_vecs: [math::Vec3<f32>, ..2],
-  normal: math::Vec3<f32>,
+  lightmap_vecs: [math::Vec3f, ..2],
+  normal: math::Vec3f,
   /* Patch dimensions. */
   patch_size: math::Vec2<i32>,
 }
@@ -233,9 +233,9 @@ impl Face
             lightmap: 0,
             lightmap_corner: math::Vec2::zero::<i32>(),
             lightmap_size: math::Vec2::zero::<i32>(),
-            lightmap_origin: math::Vec3::zero::<f32>(),
-            lightmap_vecs: [math::Vec3::zero::<f32>(), ..2],
-            normal: math::Vec3::zero::<f32>(),
+            lightmap_origin: math::Vec3f::zero(),
+            lightmap_vecs: [math::Vec3f::zero(), ..2],
+            normal: math::Vec3f::zero(),
             patch_size: math::Vec2::zero::<i32>() } 
   }
 }

@@ -104,22 +104,22 @@ impl Mat4x4
     mat
   }
 
-  pub fn new_lookat(position: vec3::Vec3<f32>, target: vec3::Vec3<f32>, up: vec3::Vec3<f32>) -> Mat4x4
+  pub fn new_lookat(position: vec3::Vec3f, target: vec3::Vec3f, up: vec3::Vec3f) -> Mat4x4
   {
     let mut forward = target - position;
     forward.normalize();
 
-    let mut left = forward.cross(up);
+    let mut left = forward.cross(&up);
     left.normalize();
 
-    let mut proper_up = left.cross(forward);
+    let mut proper_up = left.cross(&forward);
     proper_up.normalize();
 
     Mat4x4 { data:
-              [ left.x, left.y, left.z, 0.0,
-                proper_up.x, proper_up.y, proper_up.z, 0.0,
-                -forward.x, -forward.y, -forward.z, 0.0,
-                position.x, position.y, position.z, 1.0] }
+              [ [ left.x, left.y, left.z, 0.0 ],
+                [ proper_up.x, proper_up.y, proper_up.z, 0.0 ],
+                [ -forward.x, -forward.y, -forward.z, 0.0 ] ,
+                [ position.x, position.y, position.z, 1.0 ] ] }
   }
 
   pub fn get_width(&self) -> uint

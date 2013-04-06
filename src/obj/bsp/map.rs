@@ -9,6 +9,8 @@
       Loader and handler of BSP maps.
 */
 
+pub use self::math::*;
+
 #[path = "lump.rs"]
 mod lump;
 #[path = "../../math/math.rs"]
@@ -27,7 +29,7 @@ pub struct Map
   faces: ~[lump::Face],
   mesh_verts: ~[lump::Mesh_Vert],
   vbo: ~[gl::GLuint],
-  position: math::Vec3<f32>, /* TODO: Trait for positional objects. */
+  position: math::Vec3f, /* TODO: Trait for positional objects. */
   bb: math::BB3
 }
 
@@ -41,7 +43,7 @@ impl Map
                         faces: ~[],
                         mesh_verts: ~[],
                         vbo: ~[],
-                        position: math::Vec3::zero::<f32>(),
+                        position: math::Vec3f::zero(),
                         bb: math::BB3::zero()
                         };
 
@@ -218,7 +220,7 @@ impl Map
     check!(gl::disable_vertex_attrib_array(1));
   }
 
-  pub fn center(&self) -> math::Vec3<f32>
+  pub fn center(&self) -> math::Vec3f
   { self.bb.center_with_offset(self.position) }
 }
 

@@ -37,7 +37,7 @@ fn main() {
     camera.init();
 
     /* Setup callbacks. */
-    window.set_input_mode(glfw::CURSOR_CAPTURED, glfw::TRUE);
+    window.set_input_mode(glfw::CURSOR_CAPTURED, glfw::TRUE as int);
     do window.set_size_callback |_, width, height|
     { camera.resize(width as i32, height as i32); }
     do window.set_cursor_pos_callback |_, x, y|
@@ -93,11 +93,13 @@ fn main() {
     let mut last_time = cur_time;
 
     while !window.should_close() {
+      glfw::poll_events();
+
       let delta = cur_time - last_time;
       last_time = cur_time;
       cur_time = std::time::precise_time_ns() / 1000;
 
-      glfw::poll_events();
+      camera.update(delta);
 
       shader.update_uniform(proj_loc, camera.projection);
 
