@@ -1,11 +1,6 @@
 Fix time step
   http://gafferongames.com/game-physics/fix-your-timestep/
 
-FPS Camera
-
-Mouse clamped in window?
-  Ask OS for deltas
-
 Colorful logger
   Check current module for tag?
 
