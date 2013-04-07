@@ -73,7 +73,7 @@ impl Camera
 
   pub fn init(&mut self)
   {
-    check!(gl::enable(gl::CULL_FACE));
+    //check!(gl::enable(gl::CULL_FACE));
     check!(gl::enable(gl::DEPTH_TEST));
     check!(gl::depth_func(gl::LEQUAL));
     check!(gl::clear_color(0.0, 0.0, 0.0, 1.0));
@@ -125,7 +125,7 @@ impl Camera
         _ => { }
       }
     }
-    else
+    else if action == glfw::RELEASE
     {
       match key
       {
