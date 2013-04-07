@@ -65,7 +65,7 @@ impl Camera
               view: @Mat4x4::new(), /* TODO: s/new/identity/g */
               look_speed: 0.001,
               move_to: 0,
-              move_speed: 0.01,
+              move_speed: 0.001,
               window: win,
               window_size: Vec2::zero::<i32>()
     }
@@ -74,6 +74,8 @@ impl Camera
   pub fn init(&mut self)
   {
     check!(gl::enable(gl::CULL_FACE));
+    check!(gl::enable(gl::DEPTH_TEST));
+    check!(gl::depth_func(gl::LEQUAL));
     check!(gl::clear_color(0.0, 0.0, 0.0, 1.0));
   }
 
@@ -82,24 +84,16 @@ impl Camera
     self.window_size.x = new_width;
     self.window_size.y = new_height;
 
-    self.refresh();
-  }
-  
-  pub fn refresh(&mut self)
-  {
     check!(gl::viewport(0, 0, self.window_size.x, self.window_size.y));
-
-    /* Refresh view. */
-    self.mouse_moved(self.window_size.x / 2, self.window_size.y / 2); 
   }
 
-  pub fn mouse_moved(&mut self, x: i32, y: i32) /* TODO: dx, dy */
+  pub fn mouse_moved(&mut self, x: i32, y: i32) 
   {
     let dx = x - (self.window_size.x / 2);
     let dy = y - (self.window_size.y / 2);
 
-    self.angles.x += dx as f32 * self.look_speed;
-    self.angles.y += dy as f32 * self.look_speed;
+    self.angles.x -= dx as f32 * self.look_speed;
+    self.angles.y -= dy as f32 * self.look_speed;
     
     /* Wrap X. */
     if self.angles.x < -f32::consts::pi
@@ -108,10 +102,10 @@ impl Camera
     { self.angles.x -= f32::consts::pi * 2.0; }
 
     /* Clamp Y. */
-    if self.angles.y < -f32::consts::pi / 2.0
-    { self.angles.y = -f32::consts::pi / 2.0; }
-    else if self.angles.y > f32::consts::pi / 2.0
-    { self.angles.y = f32::consts::pi / 2.0; }
+    if self.angles.y < -f32::consts::pi * 0.49
+    { self.angles.y = -f32::consts::pi * 0.49; }
+    else if self.angles.y > f32::consts::pi * 0.49
+    { self.angles.y = f32::consts::pi * 0.49; }
 
     self.window.set_cursor_pos((self.window_size.x / 2) as int, (self.window_size.y / 2) as int);
   }
@@ -151,8 +145,22 @@ impl Camera
     if self.window_size.x == 0 || self.window_size.y == 0
     { return; }
 
-    let forward = Vec3f::new(f32::sin(self.angles.x), 0.0, f32::cos(self.angles.x));
-    let right = Vec3f::new(-forward.z, 0.0, forward.x);
+    self.projection = @Mat4x4::new_perspective_projection( 
+                                      self.fov,
+                                      (self.window_size.x / self.window_size.y) as f32,
+                                      self.near_far.x,
+                                      self.near_far.y);
+
+    let mut lookat = Vec3f::zero();
+    lookat.x = f32::sin(self.angles.x) * f32::cos(self.angles.y);
+    lookat.y = f32::sin(self.angles.y);
+    lookat.z = f32::cos(self.angles.x) * f32::cos(self.angles.y);
+
+    self.view = @Mat4x4::new_lookat(self.position,
+                                    self.position + lookat, /* TODO: * focus for zoom */
+                                    Vec3f::new(0.0, 1.0, 0.0));
+    let forward = self.view.forward();
+    let right = self.view.right();
 
     if self.move_to & Left > 0
     { self.position -= right * self.move_speed * dt; }
@@ -167,20 +175,6 @@ impl Camera
     if self.move_to & Down > 0
     { self.position.y -= self.move_speed * dt; }
 
-    self.projection = @Mat4x4::new_perspective_projection( 
-                                      self.fov,
-                                      (self.window_size.x / self.window_size.y) as f32,
-                                      self.near_far.x,
-                                      self.near_far.y);
-
-    let mut lookat = Vec3f::zero();
-    lookat.x = f32::sin(self.angles.x) * f32::cos(self.angles.y);
-    lookat.y = f32::sin(self.angles.y);
-    lookat.z = f32::cos(self.angles.x) * f32::cos(self.angles.y);
-
-    self.view = @Mat4x4::new_lookat(self.position,
-                                    self.position + lookat, 
-                                    Vec3f::new(0.0, 1.0, 0.0));
   }
 }
 

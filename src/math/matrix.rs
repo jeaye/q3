@@ -34,13 +34,17 @@ impl Mat4x4
   {
     let mut mat = Mat4x4::new();
 
-    let z_range: Component = near - far;
-    let tan_half_fov: Component = f32::tan((3.14159 * (fov / 2.0)) / 180.0);
+    let rad = (3.1415 * fov) / 180.0;
+    let range = f32::tan(rad / 2.0) * near;
+    let left = -range * aspect_ratio;
+    let right = range * aspect_ratio;
+    let bottom = -range;
+    let top = range;
 
-    mat.data[0][0] = 1.0/(tan_half_fov * aspect_ratio); mat.data[0][1] = 0.0;mat.data[0][2] = 0.0;mat.data[0][3] = 0.0;
-    mat.data[1][0] = 0.0;mat.data[1][1] = 1.0/tan_half_fov; mat.data[1][2] = 0.0;mat.data[1][3] = 0.0;
-    mat.data[2][0] = 0.0;mat.data[2][1] = 0.0;mat.data[2][2] = (-near -far)/z_range ; mat.data[2][3] = 2.0 * far*near/z_range;
-    mat.data[3][0] = 0.0;mat.data[3][1] = 0.0;mat.data[3][2] = 1.0;mat.data[3][3] = 0.0;
+    mat.data[0][0] = (2.0 * near) / (right - left); mat.data[1][0] = 0.0; mat.data[2][0] = 0.0; mat.data[3][0] = 0.0; 
+    mat.data[0][1] = 0.0; mat.data[1][1] = (2.0 * near) / (top - bottom); mat.data[2][1] = 0.0; mat.data[3][1] = 0.0; 
+    mat.data[0][2] = 0.0; mat.data[1][2] = 0.0; mat.data[2][2] = -(far + near) / (far - near); mat.data[3][2] = -(2.0 * far * near) / (far - near); 
+    mat.data[0][3] = 0.0; mat.data[1][3] = 0.0; mat.data[2][3] = -1.0; mat.data[3][3] = 0.0;
 
     mat
   }
@@ -48,20 +52,22 @@ impl Mat4x4
   pub fn new_scale(x: Component, y: Component, z: Component) -> Mat4x4
   {
     let mut mat = Mat4x4::new();
-    mat.data[0][0] = x;      mat.data[0][1] = 0.0;   mat.data[0][2] = 0.0;   mat.data[0][3] = 0.0;
-    mat.data[1][0] = 0.0;   mat.data[1][1] = y;      mat.data[1][2] = 0.0;   mat.data[1][3] = 0.0;
-    mat.data[2][0] = 0.0;   mat.data[2][1] = 0.0;   mat.data[2][2] = z;      mat.data[2][3] = 0.0;
-    mat.data[3][0] = 0.0;   mat.data[3][1] = 0.0;   mat.data[3][2] = 0.0;   mat.data[3][3] = 1.0;
+    mat.data[0][0] = x;   mat.data[1][0] = 0.0; mat.data[2][0] = 0.0; mat.data[3][0] = 0.0;
+    mat.data[0][1] = 0.0; mat.data[1][1] = y;   mat.data[2][1] = 0.0; mat.data[3][1] = 0.0;
+    mat.data[0][2] = 0.0; mat.data[1][2] = 0.0; mat.data[2][2] = z;   mat.data[3][2] = 0.0;
+    mat.data[0][3] = 0.0; mat.data[1][3] = 0.0; mat.data[2][3] = 0.0; mat.data[3][3] = 1.0;
+  
     mat
   }
     
   pub fn new_translation(x: Component, y: Component, z: Component) -> Mat4x4
   {
     let mut mat = Mat4x4::new();
-    mat.data[0][0] = 1.0;      mat.data[0][1] = 0.0;   mat.data[0][2] = 0.0;   mat.data[0][3] = 0.0;
-    mat.data[1][0] = 0.0;   mat.data[1][1] = 1.0;      mat.data[1][2] = 0.0;   mat.data[1][3] = 0.0;
-    mat.data[2][0] = 0.0;   mat.data[2][1] = 0.0;   mat.data[2][2] = 1.0;      mat.data[2][3] = 0.0;
-    mat.data[3][0] = x;   mat.data[3][1] = y;   mat.data[3][2] = z;   mat.data[3][3] = 1.0;
+    mat.data[0][0] = 1.0; mat.data[1][0] = 0.0; mat.data[2][0] = 0.0; mat.data[3][0] = x; 
+    mat.data[0][1] = 0.0; mat.data[1][1] = 1.0; mat.data[2][1] = 0.0; mat.data[3][1] = y; 
+    mat.data[0][2] = 0.0; mat.data[1][2] = 0.0; mat.data[2][2] = 1.0; mat.data[3][2] = z; 
+    mat.data[0][3] = 0.0; mat.data[1][3] = 0.0; mat.data[2][3] = 0.0; mat.data[3][3] = 1.0;
+  
     mat
   }
   
@@ -70,11 +76,11 @@ impl Mat4x4
     let mut mat = Mat4x4::new();
     let rad: Component = (3.14159 * deg) / 180.0;
 
-    mat.data[0][0] = 1.0; mat.data[0][1] = 0.0   ; mat.data[0][2] = 0.0    ; mat.data[0][3] = 0.0;
-    mat.data[1][0] = 0.0; mat.data[1][1] = f32::cos(rad); mat.data[1][2] = -f32::sin(rad); mat.data[1][3] = 0.0;
-    mat.data[2][0] = 0.0; mat.data[2][1] = f32::sin(rad); mat.data[2][2] = f32::cos(rad) ; mat.data[2][3] = 0.0;
-    mat.data[3][0] = 0.0; mat.data[3][1] = 0.0   ; mat.data[3][2] = 0.0    ; mat.data[3][3] = 1.0;
-
+    mat.data[0][0] = 1.0; mat.data[1][0] = 0.0;            mat.data[2][0] = 0.0;           mat.data[3][0] = 0.0;
+    mat.data[0][1] = 0.0; mat.data[1][1] = f32::cos(rad);  mat.data[2][1] = f32::sin(rad); mat.data[3][1] = 0.0;
+    mat.data[0][2] = 0.0; mat.data[1][2] = -f32::sin(rad); mat.data[2][2] = f32::cos(rad); mat.data[3][2] = 0.0;
+    mat.data[0][3] = 0.0; mat.data[1][3] = 0.0;            mat.data[2][3] = 0.0;           mat.data[3][3] = 1.0;
+  
     mat
   }
 
@@ -83,11 +89,11 @@ impl Mat4x4
     let mut mat = Mat4x4::new();
     let rad: Component = (3.14159 * deg) / 180.0;
 
-    mat.data[0][0] = f32::cos(rad); mat.data[0][1] = 0.0; mat.data[0][2] = -f32::sin(rad); mat.data[0][3] = 0.0;
-    mat.data[1][0] = 0.0   ; mat.data[1][1] = 1.0; mat.data[1][2] = 0.0    ; mat.data[1][3] = 0.0;
-    mat.data[2][0] = f32::sin(rad); mat.data[2][1] = 0.0; mat.data[2][2] = f32::cos(rad) ; mat.data[2][3] = 0.0;
-    mat.data[3][0] = 0.0   ; mat.data[3][1] = 0.0; mat.data[3][2] = 0.0    ; mat.data[3][3] = 1.0;
-
+    mat.data[0][0] = f32::cos(rad);  mat.data[1][0] = 0.0; mat.data[2][0] = f32::sin(rad); mat.data[3][0] = 0.0;  
+    mat.data[0][1] = 0.0;            mat.data[1][1] = 1.0; mat.data[2][1] = 0.0;           mat.data[3][1] = 0.0;
+    mat.data[0][2] = -f32::sin(rad); mat.data[1][2] = 0.0; mat.data[2][2] = f32::cos(rad); mat.data[3][2] = 0.0;
+    mat.data[0][3] = 0.0;            mat.data[1][3] = 0.0; mat.data[2][3] = 0.0;           mat.data[3][3] = 1.0;
+    
     mat
   }
 
@@ -96,11 +102,11 @@ impl Mat4x4
     let mut mat = Mat4x4::new();
     let rad: Component = (3.14159 * deg) / 180.0;
 
-    mat.data[0][0] = f32::cos(rad); mat.data[0][1] = -f32::sin(rad); mat.data[0][2] = 0.0; mat.data[0][3] = 0.0;
-    mat.data[1][0] = f32::sin(rad); mat.data[1][1] = f32::cos(rad) ; mat.data[1][2] = 0.0; mat.data[1][3] = 0.0;
-    mat.data[2][0] = 0.0   ; mat.data[2][1] = 0.0    ; mat.data[2][2] = 1.0; mat.data[2][3] = 0.0;
-    mat.data[3][0] = 0.0   ; mat.data[3][1] = 0.0    ; mat.data[3][2] = 0.0; mat.data[3][3] = 1.0;
-
+    mat.data[0][0] = f32::cos(rad);  mat.data[1][0] = f32::sin(rad); mat.data[2][0] = 0.0; mat.data[3][0] = 0.0;
+    mat.data[0][1] = -f32::sin(rad); mat.data[1][1] = f32::cos(rad); mat.data[2][1] = 0.0; mat.data[3][1] = 0.0;
+    mat.data[0][2] = 0.0;            mat.data[1][2] = 0.0;           mat.data[2][2] = 1.0; mat.data[3][2] = 0.0;
+    mat.data[0][3] = 0.0;            mat.data[1][3] = 0.0;           mat.data[2][3] = 0.0; mat.data[3][3] = 1.0;
+  
     mat
   }
 
@@ -109,23 +115,17 @@ impl Mat4x4
     let mut forward = target - position;
     forward.normalize();
 
-    let mut left = forward.cross(&up);
-    left.normalize();
+    let mut side = forward.cross(&up);
+    side.normalize();
 
-    let mut proper_up = left.cross(&forward);
+    let mut proper_up = side.cross(&forward);
     proper_up.normalize();
 
     let mut mat = Mat4x4::new();
-    mat.data[0][0] = left.x; mat.data[0][1] = left.y; mat.data[0][2] = left.z; mat.data[0][3] = 0.0;
-    mat.data[1][0] = proper_up.x; mat.data[1][1] = proper_up.y; mat.data[1][2] = proper_up.z; mat.data[1][3] = 0.0;
-    mat.data[2][0] = -forward.x; mat.data[2][1] = -forward.y; mat.data[2][2] = -forward.z; mat.data[2][3] = 0.0;
-    //mat.data[3][0] = 0.0; mat.data[3][1] = 0.0; mat.data[3][2] = 0.0; mat.data[3][3] = 1.0;
-    mat.data[3][0] = position.x; mat.data[3][1] = position.y; mat.data[3][2] = position.z; mat.data[3][3] = 1.0;
-
-    //mat.data[0][0] = left.x; mat.data[0][1] = proper_up.x; mat.data[0][2] = -forward.x; mat.data[0][3] = position.x;
-    //mat.data[1][0] = left.y; mat.data[1][1] = proper_up.y; mat.data[1][2] = -forward.y; mat.data[1][3] = position.y;
-    //mat.data[2][0] = left.z; mat.data[2][1] = proper_up.z; mat.data[2][2] = -forward.z; mat.data[2][3] = position.z;
-    //mat.data[3][0] = 0.0; mat.data[3][1] = 0.0; mat.data[3][2] = position.z; mat.data[3][3] = 1.0;
+    mat.data[0][0] = side.x;      mat.data[1][0] = side.y;      mat.data[2][0] = side.z;      mat.data[3][0] = -side.dot(&position); 
+    mat.data[0][1] = proper_up.x; mat.data[1][1] = proper_up.y; mat.data[2][1] = proper_up.z; mat.data[3][1] = -proper_up.dot(&position);
+    mat.data[0][2] = -forward.x;  mat.data[1][2] = -forward.y;  mat.data[2][2] = -forward.z;  mat.data[3][2] = forward.dot(&position);
+    mat.data[0][3] = 0.0;         mat.data[1][3] = 0.0;         mat.data[2][3] = 0.0;         mat.data[3][3] = 1.0;
 
     mat
   }
@@ -134,6 +134,19 @@ impl Mat4x4
   { return 4; }
   pub fn get_height(&self) -> uint
   { return 4; }
+
+  pub fn up(&self) -> Vec3f
+  { Vec3f::new(self.data[0][1], self.data[1][1], self.data[2][1]) }
+  pub fn down(&self) -> Vec3f
+  { Vec3f::new(-self.data[0][1], -self.data[1][1], -self.data[2][1]) }
+  pub fn left(&self) -> Vec3f
+  { Vec3f::new(-self.data[0][0], -self.data[1][0], -self.data[2][0]) }
+  pub fn right(&self) -> Vec3f
+  { Vec3f::new(self.data[0][0], self.data[1][0], self.data[2][0]) }
+  pub fn forward(&self) -> Vec3f
+  { Vec3f::new(-self.data[0][2], -self.data[1][2], -self.data[2][2]) }
+  pub fn backward(&self) -> Vec3f
+  { Vec3f::new(self.data[0][2], self.data[1][2], self.data[2][2]) }
 
   pub fn identity(&mut self)
   {
@@ -148,19 +161,15 @@ impl Mat4x4
 
   pub fn show(&self)
   {
-    let mut y = 0, x;
     io::println("----------");
-    while y < 4
+    for i32::range(0, 4) |y|
     {
-      x = 0;
       io::print("|");
-      while x < 4
+      for i32::range(0, 4) |x|
       {
         io::print(f32::to_str(self.data[x][y]) + " ");
-        x += 1;
       }
       io::println("|");
-      y += 1;
     }
     io::println("----------");
   }
@@ -171,21 +180,17 @@ impl Mul<Mat4x4, Mat4x4> for Mat4x4
 {
   pub fn mul(&self, rhs: &Mat4x4) -> Mat4x4
   {
-    let mut mat = unsafe{ Mat4x4::new() };
+    let mut mat = Mat4x4::new();
 
-    let mut i = 0, j;
-    while i  < 4 /* TODO: f32::range */
+    for i32::range(0, 4) |i|
     {
-      j = 0;
-      while j < 4
+      for i32::range(0, 4) |j|
       {
         mat.data[i][j] =  self.data[i][0] * rhs.data[0][j] +
                           self.data[i][1] * rhs.data[1][j] +
                           self.data[i][2] * rhs.data[2][j] +
                           self.data[i][3] * rhs.data[3][j];
-        j += 1;
       }
-      i += 1;
     }
 
     mat

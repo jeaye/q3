@@ -37,7 +37,7 @@ fn main() {
     camera.init();
 
     /* Setup callbacks. */
-    // TODO: glfw::disable(glfw::MOUSE_CURSOR);
+    window.set_input_mode(glfw::CURSOR_MODE, glfw::CURSOR_CAPTURED as int);
     do window.set_size_callback |_, width, height|
     { camera.resize(width as i32, height as i32); }
     do window.set_cursor_pos_callback |_, x, y|
@@ -84,11 +84,7 @@ fn main() {
     shader.bind();
 
     let proj_loc = shader.get_uniform_location(~"proj");
-    let world = math::Mat4x4::new_translation(0.0, -100.0, -100.0);
-
     let world_loc = shader.get_uniform_location(~"world");
-    shader.update_uniform(world_loc, &world);
-    let mut deg = 0.0;
 
     let mut cur_time = (std::time::precise_time_ns() / 100000) as f32; // Tenth of a second
     let mut last_time = cur_time;
@@ -101,14 +97,8 @@ fn main() {
       cur_time = (std::time::precise_time_ns() / 100000) as f32;
 
       camera.update(delta);
-
       shader.update_uniform(proj_loc, camera.projection);
       shader.update_uniform(world_loc, camera.view);
-
-      deg += 0.00005 * delta;
-      let rot = math::Mat4x4::new_translation(0.0, 100.0, 100.0) * math::Mat4x4::new_rotation_y(deg) * math::Mat4x4::new_translation(0.0, -100.0, -100.0);
-      
-      //shader.update_uniform(world_loc, &(world * rot));
 
       check!(gl::clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT));
       {

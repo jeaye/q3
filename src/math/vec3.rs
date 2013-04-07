@@ -37,7 +37,7 @@ macro_rules! declare
           let mut len = self.length();
 
           if len < 0.0001 as $Component && len > -0.0001 as $Component /* TODO: Egh, hack. */
-          { len = 1.0; }
+          { len = 1.0; } /* TODO: Return? */
 
           self.x /= len;
           self.y /= len;
@@ -55,6 +55,9 @@ macro_rules! declare
                   y: (self.z * rhs.x) - (self.x * rhs.z),
                   z: (self.x * rhs.y) - (self.y * rhs.x) }
         }
+
+        pub fn dot(&self, rhs: &$Type) -> $Component
+        { (self.x * rhs.x) + (self.y * rhs.y) + (self.z * rhs.z) }
 
         pub unsafe fn to_ptr(&self) -> *$Type
         { ptr::addr_of(self) }
