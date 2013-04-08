@@ -178,8 +178,8 @@ impl Map
           for i32::range(0, n - 2) |i|
           {
             verts.push(self.verts[face.start_vertex]);
-            verts.push(self.verts[face.start_vertex + i + 1]);
             verts.push(self.verts[face.start_vertex + i + 2]);
+            verts.push(self.verts[face.start_vertex + i + 1]);
           }
         }
         /* Something else. */

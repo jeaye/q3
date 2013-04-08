@@ -3,7 +3,7 @@
     See licensing in LICENSE file, or at:
         http://www.opensource.org/licenses/BSD-3-Clause
 
-    File: math/math.rs
+    File: math/mod.rs
     Author: Jesse 'Jeaye' Wilkerson
     Description:
       An aggregator of math items.

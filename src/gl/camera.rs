@@ -120,8 +120,8 @@ impl Camera
         glfw::KEY_A => { self.move_to |= Left; }
         glfw::KEY_S => { self.move_to |= Backward; }
         glfw::KEY_D => { self.move_to |= Right; }
-        glfw::KEY_Q => { self.move_to |= Down; }
-        glfw::KEY_E => { self.move_to |= Up; }
+        glfw::KEY_LEFT_CONTROL => { self.move_to |= Down; }
+        glfw::KEY_SPACE => { self.move_to |= Up; }
         _ => { }
       }
     }
@@ -133,8 +133,8 @@ impl Camera
         glfw::KEY_A => { self.move_to &= !Left; }
         glfw::KEY_S => { self.move_to &= !Backward; }
         glfw::KEY_D => { self.move_to &= !Right; }
-        glfw::KEY_Q => { self.move_to &= !Down; }
-        glfw::KEY_E => { self.move_to &= !Up; }
+        glfw::KEY_LEFT_CONTROL => { self.move_to &= !Down; }
+        glfw::KEY_SPACE => { self.move_to &= !Up; }
         _ => { }
       }
     }

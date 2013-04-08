@@ -1,14 +1,11 @@
 Fix time step
   http://gafferongames.com/game-physics/fix-your-timestep/
 
-Colorful logger
-  Check current module for tag?
-
 TTF rendering
   See ArrowLib and wikibook
 
 Voxelization
-  Done on GPU? Geo shader?
+  Done on GPU? Geo shader? Nope.
 
 #[cfg(foo)] and --cfg foo
   Error checking in check macro
