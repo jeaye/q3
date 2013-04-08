@@ -69,16 +69,8 @@ fn main() {
                             in vec4 trans_color;
                             out vec4 out_color;
                             void main() {
-                              out_color = vec4(1.0, 1.0, 1.0, 1.0);
-                              //out_color = vec4( trans_color.y, 
-                              //                  5.0 - trans_color.z, 
-                              //                  0.5 - out_position.y, 
-                              //                  1.0);
-                              //out_color = vec4(trans_color, 1.0);
-                              out_color = trans_color;
-                              if(out_color.r > 1.0 && out_color.g > 1.0 && out_color.b > 1.0)
-                                out_color /= 255.0;
-                              out_color.a = 1.0;
+                              /* Colors come in as bytes right now. */
+                              out_color = trans_color / 255.0;
                             }";
     let shader = gl::Shader::new(shader_vert_src, shader_frag_src);
     shader.bind();
@@ -86,15 +78,16 @@ fn main() {
     let proj_loc = shader.get_uniform_location(~"proj");
     let world_loc = shader.get_uniform_location(~"world");
 
-    let mut cur_time = (std::time::precise_time_ns() / 100000) as f32; // Tenth of a second
+    let mut cur_time = (std::time::precise_time_ns() / 10000) as f32; // Hundredth of a second
     let mut last_time = cur_time;
 
     while !window.should_close() {
       glfw::poll_events();
 
+      /* Delta time. */
       let delta = cur_time - last_time;
       last_time = cur_time;
-      cur_time = (std::time::precise_time_ns() / 100000) as f32;
+      cur_time = (std::time::precise_time_ns() / 10000) as f32;
 
       camera.update(delta);
       shader.update_uniform(proj_loc, camera.projection);
@@ -105,7 +98,7 @@ fn main() {
         map.draw();
       } window.swap_buffers();
 
-      std::timer::sleep(@std::uv::global_loop::get(), 16);
+      std::timer::sleep(@std::uv::global_loop::get(), 1000 / (camera.target_frame_rate as uint));
     }
   }
 }

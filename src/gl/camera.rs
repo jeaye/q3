@@ -24,12 +24,12 @@ mod check_internal;
 #[path = "../obj/mod.rs"]
 mod obj;
 
-static Left: u8 = 1;
-static Right: u8 = 2;
-static Forward: u8 = 4;
-static Backward: u8 = 8;
-static Up: u8 = 16;
-static Down: u8 = 32;
+static Move_Left: u8 = 1;
+static Move_Right: u8 = 2;
+static Move_Forward: u8 = 4;
+static Move_Backward: u8 = 8;
+static Move_Up: u8 = 16;
+static Move_Down: u8 = 32;
 
 pub struct Camera
 {
@@ -49,6 +49,12 @@ pub struct Camera
   move_to: u8,
   move_speed: f32,
 
+  /* Frame rate. */ /* TODO: Frame rate regulator? */
+  target_frame_rate: f32,
+  frame_rate: f32,
+  frames_this_sec: f32,
+  this_sec: f32,
+
   /* Window. */
   window: @glfw::Window,
   window_size: Vec2<i32>
@@ -65,7 +71,11 @@ impl Camera
               view: @Mat4x4::new(), /* TODO: s/new/identity/g */
               look_speed: 0.001,
               move_to: 0,
-              move_speed: 0.001,
+              move_speed: 0.0001,
+              target_frame_rate: 125.0,
+              frame_rate: 0.0,
+              frames_this_sec: 0.0,
+              this_sec: 0.0,
               window: win,
               window_size: Vec2::zero::<i32>()
     }
@@ -73,7 +83,7 @@ impl Camera
 
   pub fn init(&mut self)
   {
-    //check!(gl::enable(gl::CULL_FACE));
+    //check!(gl::enable(gl::CULL_FACE)); /* TODO: Look into winding. */
     check!(gl::enable(gl::DEPTH_TEST));
     check!(gl::depth_func(gl::LEQUAL));
     check!(gl::clear_color(0.0, 0.0, 0.0, 1.0));
@@ -116,12 +126,12 @@ impl Camera
     {
       match key
       {
-        glfw::KEY_W => { self.move_to |= Forward; }
-        glfw::KEY_A => { self.move_to |= Left; }
-        glfw::KEY_S => { self.move_to |= Backward; }
-        glfw::KEY_D => { self.move_to |= Right; }
-        glfw::KEY_LEFT_CONTROL => { self.move_to |= Down; }
-        glfw::KEY_SPACE => { self.move_to |= Up; }
+        glfw::KEY_W => { self.move_to |= Move_Forward; }
+        glfw::KEY_A => { self.move_to |= Move_Left; }
+        glfw::KEY_S => { self.move_to |= Move_Backward; }
+        glfw::KEY_D => { self.move_to |= Move_Right; }
+        glfw::KEY_LEFT_CONTROL => { self.move_to |= Move_Down; }
+        glfw::KEY_SPACE => { self.move_to |= Move_Up; }
         _ => { }
       }
     }
@@ -129,12 +139,13 @@ impl Camera
     {
       match key
       {
-        glfw::KEY_W => { self.move_to &= !Forward; }
-        glfw::KEY_A => { self.move_to &= !Left; }
-        glfw::KEY_S => { self.move_to &= !Backward; }
-        glfw::KEY_D => { self.move_to &= !Right; }
-        glfw::KEY_LEFT_CONTROL => { self.move_to &= !Down; }
-        glfw::KEY_SPACE => { self.move_to &= !Up; }
+        glfw::KEY_W => { self.move_to &= !Move_Forward; }
+        glfw::KEY_A => { self.move_to &= !Move_Left; }
+        glfw::KEY_S => { self.move_to &= !Move_Backward; }
+        glfw::KEY_D => { self.move_to &= !Move_Right; }
+        glfw::KEY_LEFT_CONTROL => { self.move_to &= !Move_Down; }
+        glfw::KEY_SPACE => { self.move_to &= !Move_Up; }
+        glfw::KEY_F => { io::println(fmt!("FPS: %?", self.frame_rate)); }
         _ => { }
       }
     }
@@ -142,8 +153,20 @@ impl Camera
 
   pub fn update(&mut self, dt: f32)
   {
+    /* Avoid division by zero if the window is being fondled. */
     if self.window_size.x == 0 || self.window_size.y == 0
     { return; }
+
+    /* Frame rate. */
+    self.this_sec += dt;
+    if self.this_sec >= 100000f32
+    {
+      self.frame_rate = self.frames_this_sec;
+      self.frames_this_sec = 0f32;
+      self.this_sec -= 100000f32;
+    } else
+    { self.frames_this_sec += 1f32; }
+
 
     self.projection = @Mat4x4::new_perspective_projection( 
                                       self.fov,
@@ -151,30 +174,30 @@ impl Camera
                                       self.near_far.x,
                                       self.near_far.y);
 
+    /* Update where the camera is looking. */
     let mut lookat = Vec3f::zero();
     lookat.x = f32::sin(self.angles.x) * f32::cos(self.angles.y);
     lookat.y = f32::sin(self.angles.y);
     lookat.z = f32::cos(self.angles.x) * f32::cos(self.angles.y);
-
     self.view = @Mat4x4::new_lookat(self.position,
                                     self.position + lookat, /* TODO: * focus for zoom */
                                     Vec3f::new(0.0, 1.0, 0.0));
+
+    /* Move based on the keyboard input. */
     let forward = self.view.forward();
     let right = self.view.right();
-
-    if self.move_to & Left > 0
+    if self.move_to & Move_Left > 0
     { self.position -= right * self.move_speed * dt; }
-    if self.move_to & Right  > 0
+    if self.move_to & Move_Right  > 0
     { self.position += right * self.move_speed * dt; }
-    if self.move_to & Forward > 0
+    if self.move_to & Move_Forward > 0
     { self.position += forward * self.move_speed * dt; }
-    if self.move_to & Backward > 0
+    if self.move_to & Move_Backward > 0
     { self.position -= forward * self.move_speed * dt; }
-    if self.move_to & Up > 0
+    if self.move_to & Move_Up > 0
     { self.position.y += self.move_speed * dt; }
-    if self.move_to & Down > 0
+    if self.move_to & Move_Down > 0
     { self.position.y -= self.move_speed * dt; }
-
   }
 }
 

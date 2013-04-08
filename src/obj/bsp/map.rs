@@ -186,6 +186,7 @@ impl Map
     };
 
     self.verts = verts;
+    debug!("Trianglulated to %? faces.", self.verts.len());
   }
 
   priv fn upload(&mut self)
