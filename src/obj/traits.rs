@@ -11,28 +11,27 @@
       and scale.
 */
 
-#[path = "../math/math.rs"]
-mod math;
+use math::Vec3f;
 
 pub trait Movable
 {
   /* Relative translate. */
-  pub fn translate(&mut self, new_position: math::Vec3f);
+  pub fn translate(&mut self, new_position: Vec3f);
   /* Absolute translate. */
-  pub fn translate_to(&mut self, new_position: math::Vec3f);
+  pub fn translate_to(&mut self, new_position: Vec3f);
 }
 
 pub trait Rotatable
 {
   /* Relative translate. */
-  pub fn rotate(&mut self, new_rotation: math::Vec3f);
+  pub fn rotate(&mut self, new_rotation: Vec3f);
   /* Absolute translate. */
-  pub fn rotate_to(&mut self, new_rotation: math::Vec3f);
+  pub fn rotate_to(&mut self, new_rotation: Vec3f);
 }
 
 pub trait Scalable
 {
   /* Relative scale. */
-  pub fn scale(&mut self, new_scale: math::Vec3f);
+  pub fn scale(&mut self, new_scale: Vec3f);
 }
 

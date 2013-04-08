@@ -9,15 +9,13 @@
       Loader and handler of BSP maps.
 */
 
-pub use self::math::*;
+use math::{ Vec3f, Vec4, BB3 };
 
 #[path = "lump.rs"]
 mod lump;
-#[path = "../../math/math.rs"]
-mod math;
-
-#[path = "../../gl/gl.rs"]
+#[path = "../../gl/mod.rs"]
 mod gl;
+
 #[path = "../../gl/check.rs"]
 mod check;
 
@@ -29,8 +27,8 @@ pub struct Map
   faces: ~[lump::Face],
   mesh_verts: ~[lump::Mesh_Vert],
   vbo: ~[gl::GLuint],
-  position: math::Vec3f, /* TODO: Trait for positional objects. */
-  bb: math::BB3
+  position: Vec3f, /* TODO: Trait for positional objects. */
+  bb: BB3
 }
 
 impl Map
@@ -43,8 +41,8 @@ impl Map
                         faces: ~[],
                         mesh_verts: ~[],
                         vbo: ~[],
-                        position: math::Vec3f::zero(),
-                        bb: math::BB3::zero()
+                        position: Vec3f::zero(),
+                        bb: BB3::zero()
                         };
 
     let mut fio = io::file_reader(@path::PosixPath(file)).unwrap();
@@ -212,7 +210,7 @@ impl Map
     check!(gl::vertex_attrib_pointer_u8(1, 4, false, 
                 sys::size_of::<lump::Vertex>() as i32, 
                 sys::size_of::<lump::Vertex>() as u32 -
-                sys::size_of::<math::Vec4<u8>>() as u32));
+                sys::size_of::<Vec4<u8>>() as u32));
 
     check!(gl::draw_arrays(gl::TRIANGLES, 0, self.verts.len() as i32));
 
@@ -220,7 +218,7 @@ impl Map
     check!(gl::disable_vertex_attrib_array(1));
   }
 
-  pub fn center(&self) -> math::Vec3f
+  pub fn center(&self) -> Vec3f
   { self.bb.center_with_offset(self.position) }
 }
 

@@ -13,10 +13,10 @@ extern mod std;
 extern mod opengles;
 extern mod glfw;
 
-#[path = "gl/gl.rs"]
+#[path = "gl/mod.rs"]
 mod gl;
 
-#[path = "math/math.rs"]
+#[path = "math/mod.rs"]
 mod math;
 
 #[macro_escape]

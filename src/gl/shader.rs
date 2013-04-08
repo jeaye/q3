@@ -13,10 +13,9 @@
 extern mod std;
 extern mod opengles;
 use gl = opengles::gl2;
+use math::{ Mat4x4 };
 
 mod util;
-#[path = "../math/math.rs"]
-mod math;
 
 #[macro_escape]
 mod check_internal;
@@ -75,7 +74,7 @@ impl Shader
   pub fn get_uniform_location(&self, uniform: &str) -> gl::GLint
   { check!(gl::get_uniform_location(self.prog, uniform.to_owned())) }
 
-  pub fn update_uniform(&self, location: gl::GLint, mat: &math::Mat4x4)
+  pub fn update_uniform(&self, location: gl::GLint, mat: &Mat4x4)
   { 
     unsafe
     {
