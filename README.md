@@ -1,4 +1,5 @@
-q3
-==
+Q^3
+===
 
-Busted badness
+![Screenshot](pics/7_camera.png)
+
