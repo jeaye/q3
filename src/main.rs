@@ -26,6 +26,9 @@ mod check;
 #[path = "obj/bsp/map.rs"]
 mod map;
 
+#[path = "gl/ttf/font.rs"]
+mod font;
+
 fn main() {
   glfw::set_error_callback(error_callback);
 
@@ -47,6 +50,8 @@ fn main() {
       camera.key_action(key, action);
       key_callback(window, key, action);
     }
+
+    let font = font::Font::new();
 
     let map = map::Map::new("data/q3ctf1.bsp");
     //let map = map::Map::new("data/map.bsp");
