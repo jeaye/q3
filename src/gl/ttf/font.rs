@@ -46,10 +46,10 @@ impl Font /* TODO: Check macro for Freetype. */
       { ft::FT_New_Face(font.library, c_str, 0, &font.face); }
    
       ft::FT_Set_Pixel_Sizes(font.face, 0, size as c_uint);
+
+      let mut glyph = (*font.face).glyph;
     }
 
-    let mut glyph = Glyph::new();
-    glyph.offset.x = 0.0;
 
     font
   }

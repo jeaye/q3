@@ -51,7 +51,7 @@ fn main() {
       key_callback(window, key, action);
     }
 
-    let font = font::Font::new("test.ttf", 12);
+    let font = font::Font::new("data/test.ttf", 12);
 
     let map = map::Map::new("data/q3ctf1.bsp");
     //let map = map::Map::new("data/map.bsp");

@@ -9,7 +9,7 @@
       Wrappers for Freetype2 font loading.
 */
 
-use core::libc::{ c_void, c_char, c_int, c_uint, c_short, c_ushort, c_long };
+use core::libc::{ c_void, c_char, c_uchar, c_int, c_uint, c_short, c_ushort, c_long };
 pub use self::ll::*;
 
 #[nolink]
@@ -19,8 +19,8 @@ extern mod linkhack { }
 
 /* Types. */
 pub type Error = int;
-pub type Face = *c_void;
-pub type Glyph_Slot = *c_void;
+pub type Face = *Face_Rec;
+pub type Glyph_Slot = *Glyph_Slot_Rec;
 pub type Library = *c_void; /* NOTE: Each thread should have its own library. */
 pub type Size = *c_void;
 pub type Char_Map = *c_void;
@@ -28,6 +28,8 @@ pub type Driver = *c_void;
 pub type Memory = *c_void;
 pub type Stream = *c_void;
 pub type Face_Internal = *c_void;
+pub type Slot_Internal = *c_void;
+pub type Sub_Glyph = *c_void;
 struct Generic
 {
   data: *c_void,
@@ -38,10 +40,70 @@ struct BBox
   x_min: c_long, y_min: c_long,
   x_max: c_long, y_max: c_long
 }
+struct Vector
+{
+  x: c_long, y: c_long
+}
 struct List_Rec
 {
   head: *c_void,
   tail: *c_void
+}
+struct Glyph_Metrics
+{
+  width: c_long,
+  height: c_long,
+  horiBearingX: c_long,
+  horiBearingY: c_long,
+  horiAdvance: c_long,
+  vertBearingX: c_long,
+  vertBearingY: c_long,
+  vertAdvance: c_long
+}
+struct Bitmap
+{
+  rows: c_int,
+  width: c_int,
+  pitch: c_int,
+  buffer: *c_uchar,
+  num_grays: c_short,
+  pixel_mode: c_char,
+  palatte_mode: c_char,
+  palette: *c_void
+}
+struct Outline
+{
+  n_contours: c_short,
+  n_points: c_short,
+  points: *c_void,
+  tags: *c_void,
+  contours: *c_void,
+  flags: c_int
+}
+struct Glyph_Slot_Rec
+{
+  library: Library,
+  face: Face,
+  next: Glyph_Slot,
+  reserved: c_uint,
+  generic: Generic,
+  metrics: Glyph_Metrics,
+  linearHoriAdvance: c_long,
+  linearVertAdvance: c_long,
+  advance: Vector,
+  format: c_int,
+  bitmap: Bitmap,
+  bitmap_left: c_int,
+  bitmap_top: c_int,
+  outline: Outline,
+  num_subglyphs: c_uint,
+  subglyphs: Sub_Glyph,
+  control_data: *c_void,
+  control_len: c_long,
+  lsb_delta: c_long,
+  rsb_delta: c_long,
+  other: *c_void,
+  internal: Slot_Internal
 }
 struct Face_Rec
 {
@@ -66,7 +128,7 @@ struct Face_Rec
   max_advance_height: c_short,
   underline_position: c_short,
   underline_thickness: c_short,
-  glyph: Glyph_Slot, /* Literally the only one we care about. */
+  glyph: *Glyph_Slot_Rec, /* Literally the only one we care about. */
   size: Size,
   charmap: Char_Map,
   driver: Driver,
