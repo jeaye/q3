@@ -9,7 +9,7 @@
       Wrappers for Freetype2 font loading.
 */
 
-use core::libc::{ c_void, c_char, c_int, c_uint };
+use core::libc::{ c_void, c_char, c_int, c_uint, c_short, c_ushort, c_long };
 pub use self::ll::*;
 
 #[nolink]
@@ -22,6 +22,61 @@ pub type Error = int;
 pub type Face = *c_void;
 pub type Glyph_Slot = *c_void;
 pub type Library = *c_void; /* NOTE: Each thread should have its own library. */
+pub type Size = *c_void;
+pub type Char_Map = *c_void;
+pub type Driver = *c_void;
+pub type Memory = *c_void;
+pub type Stream = *c_void;
+pub type Face_Internal = *c_void;
+struct Generic
+{
+  data: *c_void,
+  finalizer: *c_void
+}
+struct BBox
+{
+  x_min: c_long, y_min: c_long,
+  x_max: c_long, y_max: c_long
+}
+struct List_Rec
+{
+  head: *c_void,
+  tail: *c_void
+}
+struct Face_Rec
+{
+  num_faces: c_long,
+  face_index: c_long,
+  face_flags: c_long,
+  style_flags: c_long,
+  num_glyphs: c_long,
+  family_name: *c_char,
+  style_name: *c_char,
+  num_fixed_sizes: c_int,
+  available_sizes: *c_void,
+  num_charmaps: c_int,
+  charmaps: *c_void,
+  generic: Generic,
+  bbox: BBox,
+  units_per_EM: c_ushort,
+  ascender: c_short,
+  descender: c_short,
+  height: c_short,
+  max_advance_width: c_short,
+  max_advance_height: c_short,
+  underline_position: c_short,
+  underline_thickness: c_short,
+  glyph: Glyph_Slot, /* Literally the only one we care about. */
+  size: Size,
+  charmap: Char_Map,
+  driver: Driver,
+  memory: Memory,
+  stream: Stream,
+  sizes_list: List_Rec,
+  autohint: Generic,
+  extensions: *c_void,
+  internal: Face_Internal
+}
 
 /* Constants. */
 pub static LOAD_DEFAULT: i32                      = 0x0;
