@@ -1,11 +1,9 @@
-Fix time step
-  http://gafferongames.com/game-physics/fix-your-timestep/
-
 TTF rendering
-  See ArrowLib and wikibook
+  check macro
+
+Shader loading validation
 
 Voxelization
-  Done on GPU? Geo shader? Nope.
 
 #[cfg(foo)] and --cfg foo
   Error checking in check macro
