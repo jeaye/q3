@@ -3,6 +3,8 @@ TTF rendering
 
 Shader loading validation
 
+Macrofy Vec2 and Vec4
+
 Voxelization
 
 #[cfg(foo)] and --cfg foo
