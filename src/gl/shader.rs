@@ -33,27 +33,47 @@ impl Shader
   {
     let mut shader = @mut Shader{ prog: 0, vert_obj: 0, frag_obj: 0 };
     
-    /* TODO: Error checking. */
-
     /* Create the shader program. */
     shader.prog = check!(gl::create_program());
+
+    let compile_check = |obj| -> bool
+    {
+      /* Error check. */
+      let result = check!(gl::get_shader_iv(obj, gl::COMPILE_STATUS));
+      if result == 0 as gl::GLint
+      {
+        let err = check!(gl::get_shader_info_log(obj));
+        error!(err);
+      }
+      result != 0
+    };
 
     /* Compile the provided shaders. */
     if vert_src.len() > 0
     {
       shader.vert_obj = check!(gl::create_shader(gl::VERTEX_SHADER));
-      
+      assert!(shader.vert_obj != 0);
+
       let src = [vert_src];
       check!(gl::shader_source(shader.vert_obj, src.map(|x| str::to_bytes(*x))));
       check!(gl::compile_shader(shader.vert_obj));
+
+      /* Error checking. */
+      if !compile_check(shader.vert_obj)
+      { check!(gl::delete_shader(shader.vert_obj)); }
     }
     if frag_src.len() > 0
     {
       shader.frag_obj = check!(gl::create_shader(gl::FRAGMENT_SHADER));
+      assert!(shader.frag_obj != 0);
       
       let src = [frag_src];
       check!(gl::shader_source(shader.frag_obj, src.map(|x| str::to_bytes(*x))));
       check!(gl::compile_shader(shader.frag_obj));
+
+      /* Error checking. */
+      if !compile_check(shader.frag_obj)
+      { check!(gl::delete_shader(shader.frag_obj)); }
     }
 
     /* Check if one of the shaders was properly compiled. */
@@ -63,8 +83,24 @@ impl Shader
     { check!(gl::attach_shader(shader.prog, shader.frag_obj)); }
 
     check!(gl::link_program(shader.prog));
-    check!(gl::validate_program(shader.prog));
-      
+
+    /* Error check. */
+    let result = check!(gl::get_program_iv(shader.prog, gl::LINK_STATUS));
+    if result == 0 as gl::GLint
+    {
+        let err = check!(gl::get_program_info_log(shader.prog));
+        error!(err);
+
+        /* Delete shaders. */
+        check!(gl::detach_shader(shader.prog, shader.vert_obj));
+        check!(gl::delete_shader(shader.vert_obj));
+
+        check!(gl::detach_shader(shader.prog, shader.frag_obj));
+        check!(gl::delete_shader(shader.frag_obj));
+
+        check!(gl::delete_program(shader.prog));
+    }
+
     return shader;
   }
 

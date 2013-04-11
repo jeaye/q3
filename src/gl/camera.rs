@@ -117,7 +117,8 @@ impl Camera
     else if self.angles.y > f32::consts::pi * 0.49
     { self.angles.y = f32::consts::pi * 0.49; }
 
-    self.window.set_cursor_pos((self.window_size.x / 2) as int, (self.window_size.y / 2) as int);
+    self.window.set_cursor_pos( (self.window_size.x / 2) as int, 
+                                (self.window_size.y / 2) as int);
   }
 
   pub fn key_action(&mut self, key: libc::c_int, action: libc::c_int) 
