@@ -11,6 +11,7 @@
 
 use core::libc::{ c_uint };
 use gl = opengles::gl2;
+use math::Vec2;
 use self::glyph::Glyph;
 
 #[macro_escape]
@@ -26,7 +27,8 @@ struct Font
 {
   library: ft::Library,
   face: ft::Face,
-  texuture_atlas: gl::GLuint
+  texuture_atlas: gl::GLuint,
+  atlas_dimensions: Vec2<i32>
 }
 
 impl Font /* TODO: Check macro for Freetype. */
@@ -35,7 +37,8 @@ impl Font /* TODO: Check macro for Freetype. */
   {
     let mut font = Font { library: ptr::null(),
                           face: ptr::null(),
-                          texuture_atlas: 0 
+                          texuture_atlas: 0,
+                          atlas_dimensions: Vec2::zero::<i32>()
                         };
 
     unsafe
@@ -48,6 +51,30 @@ impl Font /* TODO: Check macro for Freetype. */
       ft::FT_Set_Pixel_Sizes(font.face, 0, size as c_uint);
 
       let mut glyph = (*font.face).glyph;
+      let max_width = 1024;
+      let mut row_width = 0, row_height = 0;
+
+      let chars: ~str = ~"!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^abcdefghijklmnopqrstuvwxyz{|}~";
+
+      for chars.each |curr|
+      {
+        if ft::FT_Load_Char(font.face, curr as u32, ft::LOAD_RENDER) != 0
+        { loop; }
+
+        /* If we've exhausted the width for this row, add another. */
+        if row_width + (*glyph).bitmap.width + 1 > max_width
+        {
+          font.atlas_dimensions.x = 
+            if font.atlas_dimensions.x > row_width
+            { font.atlas_dimensions.x }
+            else
+            { row_width };
+          font.atlas_dimensions.y += row_height;
+          row_width = 0; row_height = 0;
+        }
+        /* TODO: Working? */
+        //let foo = hashmap::HashMap::new::<u8, ~str>();
+      }
     }
 
 
@@ -59,7 +86,7 @@ impl Drop for Font
   fn finalize(&self)
   {
     unsafe
-    { ft::FT_Done_FreeType(self.library);; }
+    { ft::FT_Done_FreeType(self.library); }
   }
 }
 
