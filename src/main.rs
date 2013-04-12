@@ -62,11 +62,11 @@ fn main() {
                           ~"#version 330
                             uniform mat4x4 proj;
                             uniform mat4x4 world;
-                            layout (location = 0) in vec3 in_position;
+                            layout (location = 0) in vec4 in_position;
                             layout (location = 1) in vec4 in_color;
                             out vec4 trans_color;
                             void main() {
-                              gl_Position = proj * world * vec4(in_position.x, in_position.y, in_position.z, 1.0); 
+                              gl_Position = proj * world * in_position;
                               trans_color = in_color;
                             }";
     let shader_frag_src =
@@ -75,7 +75,7 @@ fn main() {
                             out vec4 out_color;
                             void main() {
                               /* Colors come in as bytes right now. */
-                              out_color = trans_color / 255.0;
+                              out_color = trans_color;
                             }";
     let shader = gl::Shader::new(shader_vert_src, shader_frag_src);
     shader.bind();

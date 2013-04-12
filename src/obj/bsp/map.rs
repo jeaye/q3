@@ -208,7 +208,7 @@ impl Map
     check!(gl::vertex_attrib_pointer_f32(0, 3, false, 
                 sys::size_of::<lump::Vertex>() as i32, 
                 0));
-    check!(gl::vertex_attrib_pointer_u8(1, 4, false, 
+    check!(gl::vertex_attrib_pointer_u8(1, 4, true, 
                 sys::size_of::<lump::Vertex>() as i32, 
                 sys::size_of::<lump::Vertex>() as u32 -
                 sys::size_of::<Vec4<u8>>() as u32));
