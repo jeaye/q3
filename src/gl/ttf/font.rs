@@ -9,6 +9,7 @@
       TrueType font atlas.
 */
 
+use core::hashmap::HashMap;
 use core::libc::{ c_uint };
 use gl = opengles::gl2;
 use math::Vec2;
@@ -28,7 +29,8 @@ struct Font
   library: ft::Library,
   face: ft::Face,
   texuture_atlas: gl::GLuint,
-  atlas_dimensions: Vec2<i32>
+  atlas_dimensions: Vec2<i32>,
+  glyphs: HashMap<u8, Glyph>
 }
 
 impl Font /* TODO: Check macro for Freetype. */
@@ -38,7 +40,8 @@ impl Font /* TODO: Check macro for Freetype. */
     let mut font = Font { library: ptr::null(),
                           face: ptr::null(),
                           texuture_atlas: 0,
-                          atlas_dimensions: Vec2::zero::<i32>()
+                          atlas_dimensions: Vec2::zero::<i32>(),
+                          glyphs: HashMap::new::<u8, Glyph>()
                         };
 
     unsafe
@@ -72,8 +75,6 @@ impl Font /* TODO: Check macro for Freetype. */
           font.atlas_dimensions.y += row_height;
           row_width = 0; row_height = 0;
         }
-        /* TODO: Working? */
-        //let foo = hashmap::HashMap::new::<u8, ~str>();
       }
     }
 
