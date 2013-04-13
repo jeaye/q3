@@ -4,6 +4,7 @@ TTF rendering
 Macrofy Vec2 and Vec4
 
 Voxelization
+  Sphere
 
 #[cfg(foo)] and --cfg foo
   Error checking in check macro

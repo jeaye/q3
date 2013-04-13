@@ -33,6 +33,11 @@ fn main() {
   glfw::set_error_callback(error_callback);
 
   do glfw::spawn {
+    glfw::window_hint(glfw::CONTEXT_VERSION_MAJOR, 3);
+    glfw::window_hint(glfw::CONTEXT_VERSION_MINOR, 3);
+    glfw::window_hint(glfw::OPENGL_FORWARD_COMPAT, 1);
+    glfw::window_hint(glfw::OPENGL_PROFILE, glfw::OPENGL_CORE_PROFILE);
+
     let window = @glfw::Window::create(1024, 768, "Q^3", glfw::Windowed).unwrap();
     window.make_context_current();
 
@@ -59,7 +64,7 @@ fn main() {
 
     /* Shader Creation. */
     let shader_vert_src =
-                          ~"#version 330
+                          ~"#version 330 core
                             uniform mat4x4 proj;
                             uniform mat4x4 world;
                             layout (location = 0) in vec4 in_position;
@@ -70,7 +75,7 @@ fn main() {
                               trans_color = in_color;
                             }";
     let shader_frag_src =
-                          ~"#version 330
+                          ~"#version 330 core
                             in vec4 trans_color;
                             out vec4 out_color;
                             void main() {
