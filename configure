@@ -15,12 +15,14 @@ rm lib/*.so
 # GLFW3
 cd lib/glfw
 git pull origin master
-make && sudo make install
+make
+cd ../../
 
 # Rust's GLFW3
 cd lib/glfw-rs
 make clean
-git pull
+git pull origin master
+git pull git@github.com:bjz/glfw-rs.git
 make && cp lib/*.so ../
 cd ../../
 

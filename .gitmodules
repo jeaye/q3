@@ -6,4 +6,4 @@
 	url = git://github.com/elmindreda/glfw.git
 [submodule "lib/glfw-rs"]
 	path = lib/glfw-rs
-	url = git@github.com:bjz/glfw-rs.git
+	url = git@github.com:Jeaye/glfw-rs.git
