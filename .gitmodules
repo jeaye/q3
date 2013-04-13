@@ -1,6 +1,9 @@
 [submodule "lib/rust-opengles"]
 	path = lib/rust-opengles
 	url = git@github.com:Jeaye/rust-opengles.git
+[submodule "lib/glfw"]
+	path = lib/glfw
+	url = git://github.com/elmindreda/glfw.git
 [submodule "lib/glfw-rs"]
 	path = lib/glfw-rs
 	url = git@github.com:bjz/glfw-rs.git

@@ -12,7 +12,12 @@
 git submodule update --recursive --init
 rm lib/*.so
 
-# GLFW-3
+# GLFW3
+cd lib/glfw
+git pull origin master
+make && sudo make install
+
+# Rust's GLFW3
 cd lib/glfw-rs
 make clean
 git pull

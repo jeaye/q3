@@ -33,10 +33,9 @@ fn main() {
   glfw::set_error_callback(error_callback);
 
   do glfw::spawn {
-    glfw::window_hint(glfw::CONTEXT_VERSION_MAJOR, 3);
-    glfw::window_hint(glfw::CONTEXT_VERSION_MINOR, 3);
-    glfw::window_hint(glfw::OPENGL_FORWARD_COMPAT, 1);
-    glfw::window_hint(glfw::OPENGL_PROFILE, glfw::OPENGL_CORE_PROFILE);
+    glfw::window_hint::context_version(3, 3);
+    glfw::window_hint::opengl_profile(glfw::OPENGL_CORE_PROFILE);
+    glfw::window_hint::opengl_forward_compat(true);
 
     let window = @glfw::Window::create(1024, 768, "Q^3", glfw::Windowed).unwrap();
     window.make_context_current();
@@ -49,7 +48,7 @@ fn main() {
     do window.set_size_callback |_, width, height|
     { camera.resize(width as i32, height as i32); }
     do window.set_cursor_pos_callback |_, x, y|
-    { camera.mouse_moved(x as i32, y as i32); }
+    { camera.mouse_moved(x, y); }
     do window.set_key_callback |window, key, action|
     {
       camera.key_action(key, action);

@@ -97,10 +97,10 @@ impl Camera
     check!(gl::viewport(0, 0, self.window_size.x, self.window_size.y));
   }
 
-  pub fn mouse_moved(&mut self, x: i32, y: i32) 
+  pub fn mouse_moved(&mut self, x: float, y: float) 
   {
-    let dx = x - (self.window_size.x / 2);
-    let dy = y - (self.window_size.y / 2);
+    let dx = x - (self.window_size.x / 2) as float;
+    let dy = y - (self.window_size.y / 2) as float;
 
     self.angles.x -= dx as f32 * self.look_speed;
     self.angles.y -= dy as f32 * self.look_speed;
@@ -117,8 +117,8 @@ impl Camera
     else if self.angles.y > f32::consts::pi * 0.49
     { self.angles.y = f32::consts::pi * 0.49; }
 
-    self.window.set_cursor_pos( (self.window_size.x / 2) as int, 
-                                (self.window_size.y / 2) as int);
+    self.window.set_cursor_pos( (self.window_size.x / 2) as float, 
+                                (self.window_size.y / 2) as float);
   }
 
   pub fn key_action(&mut self, key: libc::c_int, action: libc::c_int) 
