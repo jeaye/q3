@@ -2,6 +2,8 @@ bin/
 tags
 update.sh
 
+*.so
+
 *~
 *.swp
 *.swo
