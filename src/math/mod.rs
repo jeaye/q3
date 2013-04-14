@@ -14,10 +14,12 @@ pub use math::vec2::Vec2;
 pub use math::vec3::Vec3f;
 pub use math::vec4::Vec4;
 pub use math::bb3::BB3;
+pub use math::util::{ next_power_of_2 };
 
 mod matrix;
 mod vec2;
 mod vec3;
 mod vec4;
 mod bb3;
+mod util;
 

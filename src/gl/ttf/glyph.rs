@@ -16,7 +16,8 @@ pub struct Glyph
   tex: Vec2<f32>,
   advance: Vec2<f32>,
   dimensions: Vec2<f32>,
-  offset: Vec2<f32>
+  offset: Vec2<f32>,
+  buffer: ~[u8]
 }
 
 impl Glyph
@@ -26,7 +27,9 @@ impl Glyph
     Glyph { tex: Vec2::zero::<f32>(),
             advance: Vec2::zero::<f32>(),
             dimensions: Vec2::zero::<f32>(),
-            offset: Vec2::zero::<f32>() }
+            offset: Vec2::zero::<f32>(),
+            buffer: ~[]
+          }
   }
 }
 

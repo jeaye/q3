@@ -12,12 +12,14 @@
 use core::hashmap::HashMap;
 use core::libc::{ c_uint };
 use gl = opengles::gl2;
-use math::Vec2;
+use math::*;
 use self::glyph::Glyph;
 
+#[path = "../util.rs"]
+mod util;
 #[macro_escape]
-#[path = "../check.rs"]
-mod check;
+#[path = "../check_internal.rs"]
+mod check_internal;
 
 mod glyph;
 
@@ -28,7 +30,7 @@ struct Font
 {
   library: ft::Library,
   face: ft::Face,
-  texuture_atlas: gl::GLuint,
+  texture_atlas: gl::GLuint,
   atlas_dimensions: Vec2<i32>,
   glyphs: HashMap<u8, Glyph>
 }
@@ -39,7 +41,7 @@ impl Font /* TODO: Check macro for Freetype. */
   {
     let mut font = Font { library: ptr::null(),
                           face: ptr::null(),
-                          texuture_atlas: 0,
+                          texture_atlas: 0,
                           atlas_dimensions: Vec2::zero::<i32>(),
                           glyphs: HashMap::new::<u8, Glyph>()
                         };
@@ -53,7 +55,7 @@ impl Font /* TODO: Check macro for Freetype. */
    
       ft::FT_Set_Pixel_Sizes(font.face, 0, size as c_uint);
 
-      let mut glyph = (*font.face).glyph;
+      let mut ft_glyph = (*font.face).glyph;
       let max_width = 1024;
       let mut row_width = 0, row_height = 0;
 
@@ -65,16 +67,97 @@ impl Font /* TODO: Check macro for Freetype. */
         { loop; }
 
         /* If we've exhausted the width for this row, add another. */
-        if row_width + (*glyph).bitmap.width + 1 > max_width
+        if row_width + (*ft_glyph).bitmap.width + 1 > max_width
         {
           font.atlas_dimensions.x = 
-            if font.atlas_dimensions.x > row_width
+            if font.atlas_dimensions.x > row_width /* TODO: Max? */
             { font.atlas_dimensions.x }
             else
             { row_width };
           font.atlas_dimensions.y += row_height;
           row_width = 0; row_height = 0;
         }
+
+        let mut glyph = Glyph::new(); /* TODO: Need to be f32 here? Messy. */
+        glyph.advance.x = ((*ft_glyph).advance.x >> 6) as f32;
+        glyph.advance.y = ((*ft_glyph).advance.y >> 6) as f32;
+        glyph.dimensions.x = (*ft_glyph).bitmap.width as f32;
+        glyph.dimensions.y = (*ft_glyph).bitmap.rows as f32;
+        glyph.offset.x = (*ft_glyph).bitmap_left as f32;
+        glyph.offset.y = (*ft_glyph).bitmap_top as f32;
+        glyph.buffer = vec::from_buf( (*ft_glyph).bitmap.buffer,
+                                      (glyph.dimensions.x * glyph.dimensions.y) as uint);
+
+        row_width += (glyph.dimensions.x + 1.0) as i32;
+        row_height = /* TODO: Max? */
+          if row_height > (*ft_glyph).bitmap.rows
+          { row_height }
+          else
+          { (*ft_glyph).bitmap.rows };
+
+        font.glyphs.insert(curr, glyph);
+      }
+
+      font.atlas_dimensions.x = next_power_of_2( /* TODO: Max? */
+                                          if font.atlas_dimensions.x > row_width
+                                          { font.atlas_dimensions.x }
+                                          else
+                                          { row_width });
+      font.atlas_dimensions.y = next_power_of_2(font.atlas_dimensions.y + row_height);
+
+      /* We're using 1 byte alignment buffering. */
+      check!(gl::pixel_store_i(gl::UNPACK_ALIGNMENT, 1));
+      
+      check!(gl::active_texture(gl::TEXTURE0));
+      font.texture_atlas = check!(gl::gen_textures(1))[0];
+      check!(gl::bind_texture(gl::TEXTURE_2D, font.texture_atlas));
+      check!(gl::tex_image_2d(gl::TEXTURE_2D, 0, gl::RGB as i32,
+                              font.atlas_dimensions.x, font.atlas_dimensions.y,
+                              0, gl::RED, gl::UNSIGNED_BYTE, None));
+
+      /* Clamp to the edge to avoid artifacts when scaling. */
+      check!(gl::tex_parameter_i(gl::TEXTURE_2D, gl::TEXTURE_WRAP_S, gl::CLAMP_TO_EDGE as i32));
+      check!(gl::tex_parameter_i(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, gl::CLAMP_TO_EDGE as i32));
+
+      /* Linear filtering usually looks best for text. */
+      check!(gl::tex_parameter_i(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR as i32));
+      check!(gl::tex_parameter_i(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as i32));
+
+      /* Copy all glyphs into the texture atlas. */
+      let mut offset = Vec2::zero::<i32>();
+      row_height = 0;
+      for chars.each |curr|
+      {
+        let mut glyph = match font.glyphs.find_mut(&curr)
+        {
+          Some(g) => g,
+          None => fail!(fmt!("Invalid char (%?) in font %?", curr, file))
+        };
+
+        if offset.x + (glyph.dimensions.x as i32) + 1 > max_width
+        {
+          offset.y = row_height;
+          row_height = 0; offset.x = 0;
+        }
+
+        { /* temp has a short scope. */
+        let temp: &[u8] = glyph.buffer;
+        check!(gl::tex_sub_image_2d(
+                    gl::TEXTURE_2D, 0, offset.x, offset.y,
+                    glyph.dimensions.x as i32, glyph.dimensions.y as i32,
+                    gl::RED, gl::UNSIGNED_BYTE, Some(temp)));
+        }
+
+        /* Calculate the position in the texture. */
+        glyph.tex.x = (offset.x / font.atlas_dimensions.x) as f32;
+        glyph.tex.y = (offset.y / font.atlas_dimensions.y) as f32;
+
+        offset.x += glyph.dimensions.x as i32;
+        row_height = /* TODO: Max? */
+                if row_height > glyph.dimensions.y as i32
+                { row_height }
+                else
+                { glyph.dimensions.y as i32 };
       }
     }
 
