@@ -12,7 +12,7 @@ Q^3 is not a game yet! It's still a hackjob affair that I fondle every day. As o
 BSP renderer and half of a half-baked TTF renderer. 
 
 ### How do I get Q^3 running on my system?
-Garwsh, I don't know! Q^3 currently has glfw3, rust-opengles, and glfw-rs as submodules. To configure, simply run:  
+Garwsh, I don't know! I run on the (nearly) latest Rust incoming; I generally pull every few days. Q^3 currently has glfw3, rust-opengles, and glfw-rs as submodules. To configure, simply run:  
 ```bash
 ./configure
 ```
