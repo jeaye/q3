@@ -28,6 +28,7 @@ mod ft;
 
 struct Font
 {
+  file: ~str,
   library: ft::Library,
   face: ft::Face,
   texture_atlas: gl::GLuint,
@@ -37,21 +38,27 @@ struct Font
 
 impl Font /* TODO: Check macro for Freetype. */
 {
-  pub fn new(file: &str, size: i32) -> Font
+  pub fn new(filename: &str, size: i32) -> Font
   {
-    let mut font = Font { library: ptr::null(),
-                          face: ptr::null(),
-                          texture_atlas: 0,
-                          atlas_dimensions: Vec2::zero::<i32>(),
-                          glyphs: HashMap::new::<u8, Glyph>()
-                        };
+    let mut font = Font
+    {
+      file: filename.to_owned(),
+      library: ptr::null(),
+      face: ptr::null(),
+      texture_atlas: 0,
+      atlas_dimensions: Vec2::zero::<i32>(),
+      glyphs: HashMap::new::<u8, Glyph>()
+    };
 
     unsafe
     {
       ft::FT_Init_FreeType(&font.library);
 
-      do str::as_c_str(file) |c_str|
-      { ft::FT_New_Face(font.library, c_str, 0, &font.face); }
+      do str::as_c_str(filename) |c_str|
+      {
+        if ft::FT_New_Face(font.library, c_str, 0, &font.face) != 0
+        { fail!(~"Failed to create TTF face."); }
+      }
    
       ft::FT_Set_Pixel_Sizes(font.face, 0, size as c_uint);
 
@@ -59,7 +66,7 @@ impl Font /* TODO: Check macro for Freetype. */
       let max_width = 1024;
       let mut row_width = 0, row_height = 0;
 
-      let chars: ~str = ~"!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^abcdefghijklmnopqrstuvwxyz{|}~";
+      let chars: ~str = ~" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^abcdefghijklmnopqrstuvwxyz{|}~";
 
       for chars.each |curr|
       {
@@ -67,7 +74,7 @@ impl Font /* TODO: Check macro for Freetype. */
         { loop; }
 
         /* If we've exhausted the width for this row, add another. */
-        if row_width + (*ft_glyph).bitmap.width + 1 > max_width
+        if row_width + (*ft_glyph).bitmap.width + 1 >= max_width
         {
           font.atlas_dimensions.x = 
             if font.atlas_dimensions.x > row_width /* TODO: Max? */
@@ -128,29 +135,29 @@ impl Font /* TODO: Check macro for Freetype. */
       row_height = 0;
       for chars.each |curr|
       {
-        let mut glyph = match font.glyphs.find_mut(&curr)
+        let mut glyph = match font.glyphs.find_mut(&(curr as u8))
         {
           Some(g) => g,
-          None => fail!(fmt!("Invalid char (%?) in font %?", curr, file))
+          None => fail!(fmt!("Invalid char (%?) in font %?", curr, filename))
         };
 
-        if offset.x + (glyph.dimensions.x as i32) + 1 > max_width
+        if offset.x + (glyph.dimensions.x as i32) + 1 >= max_width
         {
-          offset.y = row_height;
+          offset.y += row_height;
           row_height = 0; offset.x = 0;
         }
 
         { /* temp has a short scope. */
-        let temp: &[u8] = glyph.buffer;
-        check!(gl::tex_sub_image_2d(
-                    gl::TEXTURE_2D, 0, offset.x, offset.y,
-                    glyph.dimensions.x as i32, glyph.dimensions.y as i32,
-                    gl::RED, gl::UNSIGNED_BYTE, Some(temp)));
+          let temp: &[u8] = glyph.buffer;
+          check!(gl::tex_sub_image_2d(
+                      gl::TEXTURE_2D, 0, offset.x, offset.y,
+                      glyph.dimensions.x as i32, glyph.dimensions.y as i32,
+                      gl::RED, gl::UNSIGNED_BYTE, Some(temp)));
         }
 
         /* Calculate the position in the texture. */
-        glyph.tex.x = (offset.x / font.atlas_dimensions.x) as f32;
-        glyph.tex.y = (offset.y / font.atlas_dimensions.y) as f32;
+        glyph.tex.x = (offset.x as f32 / (font.atlas_dimensions.x as f32));
+        glyph.tex.y = (offset.y as f32 / (font.atlas_dimensions.y as f32));
 
         offset.x += glyph.dimensions.x as i32;
         row_height = /* TODO: Max? */

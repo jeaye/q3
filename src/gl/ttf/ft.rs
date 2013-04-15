@@ -164,7 +164,7 @@ pub extern mod ll
   pub fn FT_Init_FreeType(++library: *Library) -> Error;
   pub fn FT_Done_FreeType(++library: Library) -> Error;
 
-  pub fn FT_New_Face(++library: Library, ++file_name: *c_char, ++face_index: c_int, ++face: *Face);
+  pub fn FT_New_Face(++library: Library, ++file_name: *c_char, ++face_index: c_int, ++face: *Face) -> Error;
   pub fn FT_Set_Pixel_Sizes(++face: Face, ++pixel_width: c_uint, ++pixel_height: c_uint) -> Error;
   pub fn FT_Load_Char(++face: Face, ++char_code: c_uint, ++load_flags: c_int) -> Error;
 }

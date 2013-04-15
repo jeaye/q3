@@ -29,9 +29,9 @@ struct Shader
 
 impl Shader
 {
-  pub fn new(vert_src : &str, frag_src : &str) -> @mut Shader
+  pub fn new(vert_src : &str, frag_src : &str) -> Shader
   {
-    let mut shader = @mut Shader{ prog: 0, vert_obj: 0, frag_obj: 0 };
+    let mut shader = Shader{ prog: 0, vert_obj: 0, frag_obj: 0 };
     
     /* Create the shader program. */
     shader.prog = check!(gl::create_program());
@@ -60,7 +60,7 @@ impl Shader
 
       /* Error checking. */
       if !compile_check(shader.vert_obj)
-      { check!(gl::delete_shader(shader.vert_obj)); }
+      { check!(gl::delete_shader(shader.vert_obj)); fail!(~"Fuck; vertex shader is wrong again."); }
     }
     if frag_src.len() > 0
     {
@@ -73,7 +73,7 @@ impl Shader
 
       /* Error checking. */
       if !compile_check(shader.frag_obj)
-      { check!(gl::delete_shader(shader.frag_obj)); }
+      { check!(gl::delete_shader(shader.frag_obj)); fail!(~"Fuck; fragment shader is wrong again."); }
     }
 
     /* Check if one of the shaders was properly compiled. */
@@ -110,7 +110,13 @@ impl Shader
   pub fn get_uniform_location(&self, uniform: &str) -> gl::GLint
   { check!(gl::get_uniform_location(self.prog, uniform.to_owned())) }
 
-  pub fn update_uniform(&self, location: gl::GLint, mat: &Mat4x4)
+  pub fn update_uniform_i32(&self, location: gl::GLint, i: i32)
+  {
+    unsafe
+    { check!(gl::uniform_1i(location, i)); }
+  }
+
+  pub fn update_uniform_mat(&self, location: gl::GLint, mat: &Mat4x4)
   { 
     unsafe
     {

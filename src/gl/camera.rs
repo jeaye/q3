@@ -169,7 +169,7 @@ impl Camera
     { self.frames_this_sec += 1f32; }
 
 
-    self.projection = @Mat4x4::new_perspective_projection( 
+    self.projection = @Mat4x4::new_perspective( 
                                       self.fov,
                                       (self.window_size.x / self.window_size.y) as f32,
                                       self.near_far.x,

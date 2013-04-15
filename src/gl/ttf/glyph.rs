@@ -24,12 +24,14 @@ impl Glyph
 {
   pub fn new() -> Glyph
   {
-    Glyph { tex: Vec2::zero::<f32>(),
-            advance: Vec2::zero::<f32>(),
-            dimensions: Vec2::zero::<f32>(),
-            offset: Vec2::zero::<f32>(),
-            buffer: ~[]
-          }
+    Glyph
+    {
+      tex: Vec2::zero::<f32>(),
+      advance: Vec2::zero::<f32>(),
+      dimensions: Vec2::zero::<f32>(),
+      offset: Vec2::zero::<f32>(),
+      buffer: ~[]
+    }
   }
 }
 

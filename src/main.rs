@@ -29,6 +29,9 @@ mod map;
 #[path = "gl/ttf/font.rs"]
 mod font;
 
+#[path = "gl/ttf/renderer.rs"]
+mod renderer;
+
 fn main() {
   glfw::set_error_callback(error_callback);
 
@@ -55,7 +58,9 @@ fn main() {
       key_callback(window, key, action);
     }
 
-    let _font = font::Font::new("data/test.ttf", 12);
+    /* Temp test for font loading. */
+    let mut _font_renderer = renderer::Renderer::new();
+    let mut _font = font::Font::new("data/test.ttf", 50);
 
     let map = map::Map::new("data/q3ctf1.bsp");
     //let map = map::Map::new("data/dk.bsp");
@@ -80,7 +85,7 @@ fn main() {
                               /* Colors come in as bytes right now. */
                               out_color = trans_color;
                             }";
-    let shader = gl::Shader::new(shader_vert_src, shader_frag_src);
+    let shader = @mut gl::Shader::new(shader_vert_src, shader_frag_src);
     shader.bind();
 
     let proj_loc = shader.get_uniform_location(~"proj");
@@ -98,12 +103,16 @@ fn main() {
       cur_time = (std::time::precise_time_ns() / 10000) as f32;
 
       camera.update(delta);
-      shader.update_uniform(proj_loc, camera.projection);
-      shader.update_uniform(world_loc, camera.view);
+      shader.bind();
+      shader.update_uniform_mat(proj_loc, camera.projection);
+      shader.update_uniform_mat(world_loc, camera.view);
 
       check!(gl::clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT));
       {
-        map.draw();
+        //map.draw();
+        _font_renderer.begin(camera);
+        _font_renderer.render("Q^3 Game", math::Vec2::new::<f32>(100.0, 100.0), &_font);
+        _font_renderer.end();
       } window.swap_buffers();
 
       std::timer::sleep(@std::uv::global_loop::get(), 1000 / (camera.target_frame_rate as uint));
