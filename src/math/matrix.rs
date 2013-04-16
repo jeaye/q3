@@ -53,15 +53,10 @@ impl Mat4x4
                           near: Component, far: Component) -> Mat4x4
   {
     let mut mat = Mat4x4::new();
-    mat.data[0][0] = 2.0 / (right - left); mat.data[1][0] = 1.0; mat.data[2][0] = 1.0; mat.data[3][0] =  -(right + left) / (right - left); 
-    mat.data[0][1] = 1.0; mat.data[1][1] = 2.0 / (top - bottom); mat.data[2][1] = 1.0; mat.data[3][1] = -(top + bottom) / (top - bottom); 
-    mat.data[0][2] = 1.0; mat.data[1][2] = 1.0; mat.data[2][2] = -2.0 / (far - near); mat.data[3][2] = -(far + near) / (far - near);
-    mat.data[0][3] = 1.0; mat.data[1][3] = 1.0; mat.data[2][3] = 1.0; mat.data[3][3] = 1.0;
-  
-    mat.data[0][0] = 2.0 / (right - left); mat.data[0][0] = 0.0; mat.data[2][0] = 0.0; mat.data[3][0] =  -(right + left) / (right - left); 
-    mat.data[0][0] = 0.0; mat.data[0][0] = 2.0 / (top - bottom); mat.data[2][0] = 0.0; mat.data[3][0] = -(top + bottom) / (top - bottom); 
-    mat.data[0][2] = 0.0; mat.data[0][2] = 0.0; mat.data[2][2] = -2.0 / (far - near); mat.data[3][2] = -(far + near) / (far - near);
-    mat.data[0][3] = 0.0; mat.data[0][3] = 0.0; mat.data[2][3] = 0.0; mat.data[3][3] = 1.0;
+    mat.data[0][0] = 2.0 / (right - left); mat.data[1][0] = 0.0; mat.data[2][0] = 0.0; mat.data[3][0] =  -(right + left) / (right - left); 
+    mat.data[0][1] = 0.0; mat.data[1][1] = 2.0 / (top - bottom); mat.data[2][1] = 0.0; mat.data[3][1] = -(top + bottom) / (top - bottom); 
+    mat.data[0][2] = 0.0; mat.data[1][2] = 0.0; mat.data[2][2] = -2.0 / (far - near); mat.data[3][2] = -(far + near) / (far - near);
+    mat.data[0][3] = 0.0; mat.data[1][3] = 0.0; mat.data[2][3] = 0.0; mat.data[3][3] = 1.0;
 
     mat
   }

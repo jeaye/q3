@@ -72,7 +72,7 @@ impl Camera
               look_speed: 0.001,
               move_to: 0,
               move_speed: 0.0001,
-              target_frame_rate: 125.0,
+              target_frame_rate: 60.0,
               frame_rate: 0.0,
               frames_this_sec: 0.0,
               this_sec: 0.0,

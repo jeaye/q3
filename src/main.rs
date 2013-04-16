@@ -107,11 +107,13 @@ fn main() {
       shader.update_uniform_mat(proj_loc, camera.projection);
       shader.update_uniform_mat(world_loc, camera.view);
 
+      let fps = camera.frame_rate;
+
       check!(gl::clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT));
       {
-        //map.draw();
+        map.draw();
         _font_renderer.begin(camera);
-        _font_renderer.render("Q^3 Game", math::Vec2f::new(100.0, 100.0), &_font);
+        _font_renderer.render(fmt!("%?", fps), math::Vec2f::new(0.0, 0.0), &_font);
         _font_renderer.end();
       } window.swap_buffers();
 

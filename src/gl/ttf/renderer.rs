@@ -44,8 +44,7 @@ impl Renderer
 
       void main() 
       { 
-        gl_Position = /*proj **/ vec4(in_coord.xy, -1.0, 1); 
-        gl_Position = proj * vec4(in_coord.xy, -100.0, 1); 
+        gl_Position = proj * vec4(in_coord.xy, -10.0, 1); 
         trans_coord = in_coord.zw; 
       };";
 
@@ -62,8 +61,6 @@ impl Renderer
       {
         //out_color = vec4(1, 1, 1, texture2D(tex0, trans_coord).r) * color0;
         out_color = vec4(1, 1, 1, texture2D(tex0, trans_coord).r);
-        //out_color = texture2D(tex0, trans_coord);
-        //out_color = vec4(1, 1, 1, 1);
       }";
 
     let mut renderer = Renderer
@@ -94,12 +91,7 @@ impl Renderer
     check!(gl::blend_func(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA));
 
     self.shader.bind();
-    //let proj = Mat4x4::new_orthographic(0.0, camera.window_size.x as f32, 0.0, camera.window_size.y as f32,  1.0, 10.0);
-    let proj= Mat4x4::new_perspective( 
-                                      camera.fov,
-                                      (camera.window_size.x / camera.window_size.y) as f32,
-                                      camera.near_far.x,
-                                      camera.near_far.y);
+    let proj =  Mat4x4::new_orthographic(0.0, camera.window_size.x as f32, camera.window_size.y as f32, 0.0,  1.0, 100.0);
     self.shader.update_uniform_mat(self.proj_loc, &proj);
   }
 
@@ -118,19 +110,6 @@ impl Renderer
     check!(gl::vertex_attrib_pointer_f32(0, 4, false, 0, 0));
     check!(gl::enable_vertex_attrib_array(0));
 
-    let scale = 1.0;
-    let scale = 100.0;
-    let mut coords: &[f32] = 
-    &[
-      /*(X , Y)     (U , V)*/
-      -1.0 * scale, 1.0 * scale, 0.0, 0.0,
-      -1.0 * scale, -1.0 * scale, 0.0, 1.0,
-      1.0 * scale, -1.0 * scale, 1.0, 1.0,
-      -1.0 * scale, 1.0 * scale, 0.0, 0.0,
-      1.0 * scale, -1.0 * scale, 1.0, 1.0,
-      1.0 * scale, 1.0 * scale, 1.0, 0.0,
-    ];
-
     struct Point
     {
       x: f32, y: f32,
@@ -139,12 +118,12 @@ impl Renderer
     impl Point
     {
       pub fn new(nx: f32, ny: f32, nu: f32, nv: f32) -> Point
-      { //io::println(fmt!("Point: (%?, %?) [%?, %?]", nx, ny, nu, nv));
-      Point { x: nx, y: ny, u: nu, v: nv } }
+      { Point { x: nx, y: ny, u: nu, v: nv } }
     }
     let mut coords = vec::with_capacity::<Point>(text.len());
 
     let mut temp_pos = pos;
+    temp_pos.y += font.height as f32;
 
     let mut count = 0;
     for text.each |curr|
@@ -167,28 +146,17 @@ impl Renderer
       if end_w <= 0.1 || end_h <= 0.1
       { loop; }
 
-      /* Build the coordinates for the glyph. */
-      //coords.push(Point::new(end_x, -end_y, glyph.tex.x, glyph.tex.y + (glyph.dimensions.y / (font.atlas_dimensions.y as f32))));
-      //coords.push(Point::new(end_x + end_w, -end_y, glyph.tex.x + (glyph.dimensions.x / (font.atlas_dimensions.x as f32)), glyph.tex.y + (glyph.dimensions.y / (font.atlas_dimensions.y as f32))));
-      //coords.push(Point::new(end_x, -end_y - end_h, glyph.tex.x, glyph.tex.y));
-      //coords.push(Point::new(end_x + end_w, -end_y, glyph.tex.x + (glyph.dimensions.x / (font.atlas_dimensions.x as f32)), glyph.tex.y + (glyph.dimensions.y / (font.atlas_dimensions.y as f32))));
-      //coords.push(Point::new(end_x + end_w, -end_y - end_h, glyph.tex.x + (glyph.dimensions.x / (font.atlas_dimensions.x as f32)), glyph.tex.y));
-      //coords.push(Point::new(end_x, -end_y - end_h, glyph.tex.x, glyph.tex.y));
-
-      coords.push(Point::new(end_x, -end_y, glyph.tex.x, glyph.tex.y));
-      coords.push(Point::new(end_x + end_w, -end_y, glyph.tex.x + (glyph.dimensions.x / (font.atlas_dimensions.x as f32)), glyph.tex.y));
-      coords.push(Point::new(end_x, -end_y - end_h, glyph.tex.x, glyph.tex.y + (glyph.dimensions.y / (font.atlas_dimensions.y as f32))));
-      coords.push(Point::new(end_x + end_w, -end_y, glyph.tex.x + (glyph.dimensions.x / (font.atlas_dimensions.x as f32)), glyph.tex.y));
-      coords.push(Point::new(end_x + end_w, -end_y - end_h, glyph.tex.x + (glyph.dimensions.x / (font.atlas_dimensions.x as f32)), glyph.tex.y + (glyph.dimensions.y / (font.atlas_dimensions.y as f32))));
-      coords.push(Point::new(end_x, -end_y - end_h, glyph.tex.x, glyph.tex.y + (glyph.dimensions.y / (font.atlas_dimensions.y as f32))));
+      coords.push(Point::new(end_x, -end_y - end_h, glyph.tex.x, glyph.tex.y));
+      coords.push(Point::new(end_x, -end_y, glyph.tex.x, glyph.tex.y + (glyph.dimensions.y / (font.atlas_dimensions.y as f32))));
+      coords.push(Point::new(end_x + end_w, -end_y, glyph.tex.x + (glyph.dimensions.x / (font.atlas_dimensions.x as f32)), glyph.tex.y + (glyph.dimensions.y / (font.atlas_dimensions.y as f32))));
+      coords.push(Point::new(end_x, -end_y - end_h, glyph.tex.x, glyph.tex.y));
+      coords.push(Point::new(end_x + end_w, -end_y, glyph.tex.x + (glyph.dimensions.x / (font.atlas_dimensions.x as f32)), glyph.tex.y + (glyph.dimensions.y / (font.atlas_dimensions.y as f32))));
+      coords.push(Point::new(end_x + end_w, -end_y - end_h, glyph.tex.x + (glyph.dimensions.x / (font.atlas_dimensions.x as f32)), glyph.tex.y));
       count += 6;
     }
-    for coords.each_mut |c|
-    { c.x *= 0.1; c.y *= 0.1; }
 
     check!(gl::buffer_data(gl::ARRAY_BUFFER, coords, gl::DYNAMIC_DRAW));
     check!(gl::draw_arrays(gl::TRIANGLES, 0, count));
-    //check!(gl::draw_arrays(gl::TRIANGLES, 0, 6));
   }
 }
 

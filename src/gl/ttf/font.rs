@@ -33,7 +33,8 @@ struct Font
   face: ft::Face,
   texture_atlas: gl::GLuint,
   atlas_dimensions: Vec2i,
-  glyphs: HashMap<u8, Glyph>
+  glyphs: HashMap<u8, Glyph>,
+  height: i32,
 }
 
 impl Font /* TODO: Check macro for Freetype. */
@@ -47,7 +48,8 @@ impl Font /* TODO: Check macro for Freetype. */
       face: ptr::null(),
       texture_atlas: 0,
       atlas_dimensions: Vec2i::zero(),
-      glyphs: HashMap::new::<u8, Glyph>()
+      glyphs: HashMap::new::<u8, Glyph>(),
+      height: 0,
     };
 
     unsafe
@@ -101,6 +103,11 @@ impl Font /* TODO: Check macro for Freetype. */
           { row_height }
           else
           { (*ft_glyph).bitmap.rows };
+        font.height = /* TODO: Max? */
+          if font.height > row_height
+          { font.height }
+          else
+          { row_height };
 
         font.glyphs.insert(curr, glyph);
       }
@@ -168,6 +175,7 @@ impl Font /* TODO: Check macro for Freetype. */
       }
     }
 
+    assert!(font.height > 0);
 
     font
   }
