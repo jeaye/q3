@@ -9,7 +9,7 @@
       Lump definitions for Q3 BSP maps.
 */
 
-use math::{ Vec2, Vec3f, Vec4 };
+use math::{ Vec2i, Vec2f, Vec3f, Vec4u8 };
 
 pub enum Lump_Type
 {
@@ -161,17 +161,17 @@ pub struct Brush_Side
 pub struct Vertex
 {
   position: Vec3f,
-  tex_coords: [Vec2<f32>, ..2], /* 0 = Surface; 1 = Lightmap */
+  tex_coords: [Vec2f, ..2], /* 0 = Surface; 1 = Lightmap */
   normal: Vec3f,
-  color: Vec4<u8> 
+  color: Vec4u8 
 }
 impl Vertex
 {
   pub fn new() -> Vertex
   { Vertex {  position: Vec3f::zero(),
-              tex_coords: [Vec2::zero::<f32>(), ..2],
+              tex_coords: [Vec2f::zero(), ..2],
               normal: Vec3f::zero(),
-              color: Vec4::new::<u8>(1, 1, 1, 1) } }
+              color: Vec4u8::new(1, 1, 1, 1) } }
 }
 
 pub struct Mesh_Vert
@@ -209,14 +209,14 @@ pub struct Face
   num_mesh_vertices: i32,
   /* Light map index. */
   lightmap: i32,
-  lightmap_corner: Vec2<i32>,
-  lightmap_size: Vec2<i32>,
+  lightmap_corner: Vec2i,
+  lightmap_size: Vec2i,
   lightmap_origin: Vec3f,
   /* World-space s and t unit vectors. */
   lightmap_vecs: [Vec3f, ..2],
   normal: Vec3f,
   /* Patch dimensions. */
-  patch_size: Vec2<i32>,
+  patch_size: Vec2i,
 }
 impl Face
 {
@@ -230,12 +230,12 @@ impl Face
             start_mesh_vertex: 0, 
             num_mesh_vertices: 0,
             lightmap: 0,
-            lightmap_corner: Vec2::zero::<i32>(),
-            lightmap_size: Vec2::zero::<i32>(),
+            lightmap_corner: Vec2i::zero(),
+            lightmap_size: Vec2i::zero(),
             lightmap_origin: Vec3f::zero(),
             lightmap_vecs: [Vec3f::zero(), ..2],
             normal: Vec3f::zero(),
-            patch_size: Vec2::zero::<i32>() } 
+            patch_size: Vec2i::zero() } 
   }
 }
 

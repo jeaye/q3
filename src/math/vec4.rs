@@ -9,59 +9,102 @@
       A 4D vector with X, Y, Z, and W components.
 */
 
-pub struct Vec4<T>
-{
-  x: T,
-  y: T,
-  z: T,
-  w: T
-}
+pub use self::vecf::Vec4f;
+pub use self::vecu8::Vec4u8;
 
-impl<T: num::Zero + Add<T, T> + Mul<T, T>> Vec4<T>
-{
-  pub fn new(nx: T, ny: T, nz: T, nw: T) -> Vec4<T>
-  { Vec4{ x: nx, y: ny, z: nz, w: nw } }
+macro_rules! declare
+(
+  ($Type:ident, $Mod:ident, $Component:ty) =>
+  (
+    mod $Mod
+    {
+      pub struct $Type
+      {
+        x: $Component,
+        y: $Component,
+        z: $Component,
+        w: $Component,
+      }
 
-  pub fn zero() -> Vec4<T>
-  { Vec4{ x: num::Zero::zero(), y: num::Zero::zero(), z: num::Zero::zero(), w: num::Zero::zero() } }
+      impl $Type
+      {
+        pub fn new(nx: $Component, ny: $Component, nz: $Component, nw: $Component) -> $Type
+        { $Type{ x: nx, y: ny, z: nz, w: nw } }
 
-  pub unsafe fn to_ptr(&self) -> *Vec4<T>
-  {
-    ptr::addr_of(self)
-  }
-}
+        pub fn zero() -> $Type
+        { $Type{ x: 0 as $Component, y: 0 as $Component, z: 0 as $Component, w: 0 as $Component } }
 
-/***** Operator Overloads *****/
-impl<T: Add<T, T>> Add<Vec4<T>, Vec4<T>> for Vec4<T>
-{
-  fn add(&self, rhs: &Vec4<T>) -> Vec4<T>
-  {
-    Vec4{ x: ( self.x + rhs.x ),
-          y: ( self.y + rhs.y ),
-          z: ( self.z + rhs.z ),
-          w: ( self.w + rhs.w )}
-  }
-}
+        pub fn normalize(&mut self)
+        {
+          let mut len = self.length();
 
-impl<T: Sub<T, T>> Sub<Vec4<T>, Vec4<T>> for Vec4<T>
-{
-  fn sub(&self, rhs: &Vec4<T>) -> Vec4<T>
-  {
-    Vec4{ x: ( self.x - rhs.x ),
-          y: ( self.y - rhs.y ),
-          z: ( self.z - rhs.z ),
-          w: ( self.w - rhs.w )}
-  }
-}
+          if (len == 0 as $Component) || (len < 0.0001 as $Component && len > -0.0001 as $Component) /* TODO: Egh, hack. */
+          { len = 1 as $Component; } /* TODO: Return? */
 
-impl<T: Neg<T> + Copy> Neg<Vec4<T>> for Vec4<T>
-{
-  fn neg(&self) -> Vec4<T>
-  {
-    Vec4{ x: ( -self.x ),
-          y: ( -self.y ),
-          z: ( -self.z ),
-          w: ( -self.w )}
-  }
-}
+          self.x /= len;
+          self.y /= len;
+          self.z /= len;
+          self.w /= len;
+        }
+
+        pub fn length(&self) -> $Component
+        { float::sqrt(( (self.x * self.x) + 
+                        (self.y * self.y) + 
+                        (self.z * self.z) +
+                        (self.w * self.w)) as float) as $Component }
+
+        pub unsafe fn to_ptr(&self) -> *$Type
+        { ptr::addr_of(self) }
+      }
+
+      /***** Operator Overloads *****/
+      impl Add<$Type, $Type> for $Type
+      {
+        fn add(&self, rhs: &$Type) -> $Type
+        {
+          $Type{x: ( self.x + rhs.x ),
+                y: ( self.y + rhs.y ),
+                z: ( self.z + rhs.z ),
+                w: ( self.w + rhs.w ) }
+        }
+      }
+
+      impl Sub<$Type, $Type> for $Type
+      {
+        fn sub(&self, rhs: &$Type) -> $Type
+        {
+          $Type{x: ( self.x - rhs.x ),
+                y: ( self.y - rhs.y ),
+                z: ( self.z - rhs.z ),
+                w: ( self.w - rhs.w ) }
+        }
+      }
+
+      impl Mul<$Component, $Type> for $Type
+      {
+        fn mul(&self, rhs: &$Component) -> $Type
+        {
+          $Type{x: ( self.x * *rhs ),
+                y: ( self.y * *rhs ),
+                z: ( self.z * *rhs ),
+                w: ( self.w * *rhs ) }
+        }
+      }
+
+      impl Neg<$Type> for $Type
+      {
+        fn neg(&self) -> $Type
+        {
+          $Type{x: ( -self.x ),
+                y: ( -self.y ),
+                z: ( -self.z ),
+                w: ( -self.w ) }
+        }
+      }
+    }
+  );
+)
+
+declare!(Vec4f, vecf, f32)
+declare!(Vec4u8, vecu8, u8)
 

@@ -9,13 +9,13 @@
       A 3D vector with X, Y, and Z components.
 */
 
-pub use self::macro::Vec3f;
+pub use self::vecf::Vec3f;
 
 macro_rules! declare
 (
-  ($Type:ident, $Component:ty) =>
+  ($Type:ident, $Mod:ident, $Component:ty) =>
   (
-    mod macro
+    mod $Mod
     {
       pub struct $Type
       {
@@ -36,8 +36,8 @@ macro_rules! declare
         {
           let mut len = self.length();
 
-          if len < 0.0001 as $Component && len > -0.0001 as $Component /* TODO: Egh, hack. */
-          { len = 1.0; } /* TODO: Return? */
+          if (len == 0 as $Component) || (len < 0.0001 as $Component && len > -0.0001 as $Component) /* TODO: Egh, hack. */
+          { len = 1 as $Component; } /* TODO: Return? */
 
           self.x /= len;
           self.y /= len;
@@ -107,5 +107,5 @@ macro_rules! declare
   );
 )
 
-declare!(Vec3f, f32)
+declare!(Vec3f, vecf, f32)
 

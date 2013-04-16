@@ -9,7 +9,7 @@
       Loader and handler of BSP maps.
 */
 
-use math::{ Vec3f, Vec4, BB3 };
+use math::{ Vec3f, Vec4u8, BB3 };
 
 #[path = "lump.rs"]
 mod lump;
@@ -211,7 +211,7 @@ impl Map
     check!(gl::vertex_attrib_pointer_u8(1, 4, true, 
                 sys::size_of::<lump::Vertex>() as i32, 
                 sys::size_of::<lump::Vertex>() as u32 -
-                sys::size_of::<Vec4<u8>>() as u32));
+                sys::size_of::<Vec4u8>() as u32));
 
     check!(gl::draw_arrays(gl::TRIANGLES, 0, self.verts.len() as i32));
 

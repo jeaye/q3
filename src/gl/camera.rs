@@ -12,7 +12,7 @@
 
 use glfw;
 use gl = opengles::gl2;
-use math::vec2::Vec2;
+use math::vec2::{ Vec2f, Vec2i };
 use math::vec3::Vec3f;
 use math::matrix::Mat4x4;
 
@@ -34,11 +34,11 @@ static Move_Down: u8 = 32;
 pub struct Camera
 {
   position: Vec3f,
-  angles: Vec2<f32>,
+  angles: Vec2f,
   
   /* Projection. */
   projection: @Mat4x4,
-  near_far: Vec2<f32>,
+  near_far: Vec2f,
   fov: f32,
   view: @Mat4x4,
 
@@ -57,16 +57,16 @@ pub struct Camera
 
   /* Window. */
   window: @glfw::Window,
-  window_size: Vec2<i32>
+  window_size: Vec2i,
 }
 impl Camera
 {
   pub fn new(win: @glfw::Window) -> Camera
   {
     Camera {  position: Vec3f::zero(),
-              angles: Vec2::zero::<f32>(),
+              angles: Vec2f::zero(),
               projection: @Mat4x4::new(),
-              near_far: Vec2::new::<f32>(1.0, 1000.0),
+              near_far: Vec2f::new(1.0, 1000.0),
               fov: 100.0,
               view: @Mat4x4::new(), /* TODO: s/new/identity/g */
               look_speed: 0.001,
@@ -77,7 +77,7 @@ impl Camera
               frames_this_sec: 0.0,
               this_sec: 0.0,
               window: win,
-              window_size: Vec2::zero::<i32>()
+              window_size: Vec2i::zero()
     }
   }
 

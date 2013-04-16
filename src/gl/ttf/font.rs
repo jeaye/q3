@@ -32,7 +32,7 @@ struct Font
   library: ft::Library,
   face: ft::Face,
   texture_atlas: gl::GLuint,
-  atlas_dimensions: Vec2<i32>,
+  atlas_dimensions: Vec2i,
   glyphs: HashMap<u8, Glyph>
 }
 
@@ -46,7 +46,7 @@ impl Font /* TODO: Check macro for Freetype. */
       library: ptr::null(),
       face: ptr::null(),
       texture_atlas: 0,
-      atlas_dimensions: Vec2::zero::<i32>(),
+      atlas_dimensions: Vec2i::zero(),
       glyphs: HashMap::new::<u8, Glyph>()
     };
 
@@ -131,7 +131,7 @@ impl Font /* TODO: Check macro for Freetype. */
       check!(gl::tex_parameter_i(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as i32));
 
       /* Copy all glyphs into the texture atlas. */
-      let mut offset = Vec2::zero::<i32>();
+      let mut offset = Vec2i::zero();
       row_height = 0;
       for chars.each |curr|
       {

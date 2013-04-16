@@ -13,7 +13,7 @@ use gl::shader::Shader;
 use gl::camera::Camera;
 use gl = opengles::gl2;
 use font::Font;
-use math::{ Vec2, Mat4x4 };
+use math::{ Vec2f, Mat4x4 };
 
 #[path = "../util.rs"]
 mod util;
@@ -109,7 +109,7 @@ impl Renderer
     check!(gl::disable(gl::BLEND));
   }
 
-  pub fn render(&mut self, text: &str, pos: Vec2<f32>, font: &Font)
+  pub fn render(&mut self, text: &str, pos: Vec2f, font: &Font)
   {
     check!(gl::active_texture(gl::TEXTURE0));
     check!(gl::bind_texture(gl::TEXTURE_2D, font.texture_atlas));

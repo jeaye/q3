@@ -9,48 +9,88 @@
       A 2D vector with X and Y components.
 */
 
-pub struct Vec2<T>
-{
-  x: T,
-  y: T
-}
-impl<T: num::Zero> Vec2<T> 
-{
-  pub fn new(nx: T, ny: T) -> Vec2<T>
-  { Vec2{ x: nx, y: ny } }
+pub use self::vecf::Vec2f;
+pub use self::veci::Vec2i;
 
-  pub fn zero() -> Vec2<T>
-  { Vec2{ x: num::Zero::zero(), y: num::Zero::zero() } }
+macro_rules! declare
+(
+  ($Type:ident, $Mod:ident, $Component:ty) =>
+  (
+    mod $Mod
+    {
+      pub struct $Type
+      {
+        x: $Component,
+        y: $Component,
+      }
 
-  pub unsafe fn to_ptr(&self) -> *Vec2<T>
-  { ptr::addr_of(self) }
-}
+      impl $Type
+      {
+        pub fn new(nx: $Component, ny: $Component) -> $Type
+        { $Type{ x: nx, y: ny } }
 
-/***** Operator Overloads *****/
-impl<T: Add<T, T>> Add<Vec2<T>, Vec2<T>> for Vec2<T>
-{
-  fn add(&self, rhs: &Vec2<T>) -> Vec2<T>
-  {
-    Vec2{ x: ( self.x + rhs.x ),
-          y: ( self.y + rhs.y ) }
-  }
-}
+        pub fn zero() -> $Type
+        { $Type{ x: 0 as $Component, y: 0 as $Component } }
 
-impl<T: Sub<T, T>> Sub<Vec2<T>, Vec2<T>> for Vec2<T>
-{
-  fn sub(&self, rhs: &Vec2<T>) -> Vec2<T>
-  {
-    Vec2{ x: ( self.x - rhs.x ),
-          y: ( self.y - rhs.y ) }
-  }
-}
+        pub fn normalize(&mut self)
+        {
+          let mut len = self.length();
 
-impl<T: Neg<T>> Neg<Vec2<T>> for Vec2<T>
-{
-  fn neg(&self) -> Vec2<T>
-  {
-    Vec2{ x: ( -self.x ),
-          y: ( -self.y ) }
-  }
-}
+          if (len == 0 as $Component) || (len < 0.0001 as $Component && len > -0.0001 as $Component) /* TODO: Egh, hack. */
+          { len = 1 as $Component; } /* TODO: Return? */
+
+          self.x /= len;
+          self.y /= len;
+        }
+
+        pub fn length(&self) -> $Component
+        { float::sqrt(( (self.x * self.x) + 
+                        (self.y * self.y)) as float) as $Component }
+
+        pub unsafe fn to_ptr(&self) -> *$Type
+        { ptr::addr_of(self) }
+      }
+
+      /***** Operator Overloads *****/
+      impl Add<$Type, $Type> for $Type
+      {
+        fn add(&self, rhs: &$Type) -> $Type
+        {
+          $Type{x: ( self.x + rhs.x ),
+                y: ( self.y + rhs.y ) }
+        }
+      }
+
+      impl Sub<$Type, $Type> for $Type
+      {
+        fn sub(&self, rhs: &$Type) -> $Type
+        {
+          $Type{x: ( self.x - rhs.x ),
+                y: ( self.y - rhs.y ) }
+        }
+      }
+
+      impl Mul<$Component, $Type> for $Type
+      {
+        fn mul(&self, rhs: &$Component) -> $Type
+        {
+          $Type{x: ( self.x * *rhs ),
+                y: ( self.y * *rhs ) }
+        }
+      }
+
+      impl Neg<$Type> for $Type
+      {
+        fn neg(&self) -> $Type
+        {
+          $Type{x: ( -self.x ),
+                y: ( -self.y ) }
+        }
+      }
+    }
+  );
+)
+
+declare!(Vec2f, vecf, f32)
+declare!(Vec2i, veci, i32)
 

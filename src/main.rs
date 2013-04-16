@@ -111,7 +111,7 @@ fn main() {
       {
         //map.draw();
         _font_renderer.begin(camera);
-        _font_renderer.render("Q^3 Game", math::Vec2::new::<f32>(100.0, 100.0), &_font);
+        _font_renderer.render("Q^3 Game", math::Vec2f::new(100.0, 100.0), &_font);
         _font_renderer.end();
       } window.swap_buffers();
 

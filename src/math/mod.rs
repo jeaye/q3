@@ -10,9 +10,9 @@
 */
 
 pub use math::matrix::Mat4x4;
-pub use math::vec2::Vec2;
+pub use math::vec2::{ Vec2i, Vec2f };
 pub use math::vec3::Vec3f;
-pub use math::vec4::Vec4;
+pub use math::vec4::{ Vec4u8, Vec4f };
 pub use math::bb3::BB3;
 pub use math::util::{ next_power_of_2 };
 
