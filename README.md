@@ -9,7 +9,7 @@ Quake-esque first person shooter.
 
 ### What's the current state of Q^3?
 Q^3 is not a game yet! It's still a hackjob affair that I fondle every day. As of writing, it's merely a half-baked
-BSP renderer and half of a half-baked TTF renderer. 
+BSP renderer and a TTF renderer. 
 
 ### How do I get Q^3 running on my system?
 Garwsh, I don't know! I run on the (nearly) latest Rust incoming; I generally pull every few days. Q^3 currently has glfw3, rust-opengles, and glfw-rs as submodules. To configure, simply run:  
