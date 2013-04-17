@@ -32,6 +32,9 @@ mod font;
 #[path = "gl/ttf/renderer.rs"]
 mod renderer;
 
+#[path = "obj/primitive/sphere.rs"]
+mod sphere;
+
 fn main() {
   glfw::set_error_callback(error_callback);
 
@@ -57,6 +60,8 @@ fn main() {
       camera.key_action(key, action);
       key_callback(window, key, action);
     }
+
+    let mut sphere = sphere::Sphere::new(100.0, 10);
 
     /* Temp test for font loading. */
     let mut _font_renderer = renderer::Renderer::new();
@@ -84,6 +89,7 @@ fn main() {
                             void main() {
                               /* Colors come in as bytes right now. */
                               out_color = trans_color;
+                              //out_color = vec4(1, 1, 1, 1);
                             }";
     let shader = @mut gl::Shader::new(shader_vert_src, shader_frag_src);
     shader.bind();
@@ -111,7 +117,8 @@ fn main() {
 
       check!(gl::clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT));
       {
-        map.draw();
+        //map.draw();
+        sphere.draw();
         _font_renderer.begin(camera);
         _font_renderer.render(fmt!("%?", fps), math::Vec2f::new(0.0, 0.0), &_font);
         _font_renderer.end();

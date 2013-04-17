@@ -155,7 +155,7 @@ impl Renderer
       count += 6;
     }
 
-    check!(gl::buffer_data(gl::ARRAY_BUFFER, coords, gl::DYNAMIC_DRAW));
+    check!(gl::buffer_data(gl::ARRAY_BUFFER, coords, gl::DYNAMIC_DRAW)); /* TODO: STREAM */
     check!(gl::draw_arrays(gl::TRIANGLES, 0, count));
   }
 }
