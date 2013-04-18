@@ -50,7 +50,7 @@ fn main() {
     camera.init();
 
     /* Setup callbacks. */
-    window.set_input_mode(glfw::CURSOR_MODE, glfw::CURSOR_CAPTURED as int);
+    window.set_cursor_mode(glfw::CURSOR_CAPTURED);
     do window.set_size_callback |_, width, height|
     { camera.resize(width as i32, height as i32); }
     do window.set_cursor_pos_callback |_, x, y|
