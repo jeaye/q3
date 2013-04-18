@@ -61,7 +61,7 @@ fn main() {
       key_callback(window, key, action);
     }
 
-    let mut sphere = sphere::Sphere::new(100.0, 10);
+    let mut sphere = sphere::Sphere::new(100.0, 5);
 
     /* Temp test for font loading. */
     let mut _font_renderer = renderer::Renderer::new();

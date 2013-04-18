@@ -56,44 +56,70 @@ impl Sphere
       Vec3f::new(magic_z, magic_x, 0.0),
       Vec3f::new(-magic_z, magic_x, 0.0),
       Vec3f::new(magic_z, -magic_x, 0.0),
-      Vec3f::new(-magic_z, -magic_x, 0.0),
+      Vec3f::new(-magic_z, -magic_x, 0.0), 
     ];
 
-    //sphere.verts =
-    //~[
-    //  /* http://www.glprogramming.com/red/chapter02.html#name8 */
-    //  root_verts[0], root_verts[4], root_verts[1], root_verts[0], root_verts[9], root_verts[4], 
-    //  root_verts[9], root_verts[5], root_verts[4], root_verts[4], root_verts[5], root_verts[8], 
-    //  root_verts[4], root_verts[8], root_verts[1], root_verts[8], root_verts[10], root_verts[1], 
-    //  root_verts[8], root_verts[3], root_verts[10], root_verts[5], root_verts[3], root_verts[8], 
-    //  root_verts[5], root_verts[2], root_verts[3], root_verts[2], root_verts[7], root_verts[3],
-    //  root_verts[7], root_verts[10], root_verts[3], root_verts[7], root_verts[6], root_verts[10], 
-    //  root_verts[7], root_verts[11], root_verts[6], root_verts[11], root_verts[0], root_verts[6], 
-    //  root_verts[0], root_verts[1], root_verts[6], root_verts[6], root_verts[1], root_verts[10], 
-    //  root_verts[9], root_verts[0], root_verts[11], root_verts[9], root_verts[11], root_verts[2], 
-    //  root_verts[9], root_verts[2], root_verts[5], root_verts[7], root_verts[2], root_verts[11],
-    //];
-
-    sphere.verts =
-    ~[
+    let verts: &[Vec3f] = 
+    &[
       /* http://www.glprogramming.com/red/chapter02.html#name8 */
-      root_verts[0], root_verts[0], root_verts[4], root_verts[4], root_verts[1], root_verts[1], root_verts[0], root_verts[0], root_verts[9], root_verts[9],   root_verts[4],  root_verts[4],  
-      root_verts[9], root_verts[9], root_verts[5], root_verts[5], root_verts[4], root_verts[4], root_verts[4], root_verts[4], root_verts[5], root_verts[5],   root_verts[8],  root_verts[8],  
-      root_verts[4], root_verts[4], root_verts[8], root_verts[8], root_verts[1], root_verts[1], root_verts[8], root_verts[8], root_verts[10],root_verts[10],  root_verts[1],  root_verts[1], 
-      root_verts[8], root_verts[8], root_verts[3], root_verts[3], root_verts[10],root_verts[10], root_verts[5], root_verts[5], root_verts[3], root_verts[3],  root_verts[8],  root_verts[8], 
-      root_verts[5], root_verts[5], root_verts[2], root_verts[2], root_verts[3], root_verts[3], root_verts[2], root_verts[2], root_verts[7], root_verts[7],   root_verts[3],  root_verts[3],  
-      root_verts[7], root_verts[7], root_verts[10],root_verts[10], root_verts[3], root_verts[3], root_verts[7], root_verts[7], root_verts[6], root_verts[6],  root_verts[10], root_verts[10],
-      root_verts[7], root_verts[7], root_verts[11],root_verts[11], root_verts[6], root_verts[6], root_verts[11], root_verts[11], root_verts[0], root_verts[0], root_verts[6],   root_verts[6],
-      root_verts[0], root_verts[0], root_verts[1], root_verts[1], root_verts[6], root_verts[6], root_verts[6], root_verts[6], root_verts[1], root_verts[1],    root_verts[10], root_verts[10],  
-      root_verts[9], root_verts[9], root_verts[0], root_verts[0], root_verts[11],root_verts[11], root_verts[9], root_verts[9], root_verts[11], root_verts[11], root_verts[2],  root_verts[2],
-      root_verts[9], root_verts[9], root_verts[2], root_verts[2], root_verts[5], root_verts[5], root_verts[7], root_verts[7], root_verts[2], root_verts[2],    root_verts[11], root_verts[11],  
+      root_verts[0], root_verts[0], root_verts[4], root_verts[0], root_verts[1], root_verts[0], root_verts[0], root_verts[1], root_verts[9], root_verts[1],   root_verts[4],  root_verts[1],  
+      root_verts[9], root_verts[2], root_verts[5], root_verts[2], root_verts[4], root_verts[2], root_verts[4], root_verts[3], root_verts[5], root_verts[3],   root_verts[8],  root_verts[3],  
+      root_verts[4], root_verts[4], root_verts[8], root_verts[4], root_verts[1], root_verts[4], root_verts[8], root_verts[5], root_verts[10],root_verts[5],  root_verts[1],  root_verts[5], 
+      root_verts[8], root_verts[6], root_verts[3], root_verts[6], root_verts[10],root_verts[6], root_verts[5], root_verts[7], root_verts[3], root_verts[7],  root_verts[8],  root_verts[7], 
+      root_verts[5], root_verts[8], root_verts[2], root_verts[8], root_verts[3], root_verts[8], root_verts[2], root_verts[9], root_verts[7], root_verts[9],   root_verts[3],  root_verts[9],  
+      root_verts[7], root_verts[1], root_verts[10],root_verts[1], root_verts[3], root_verts[1], root_verts[7], root_verts[2], root_verts[6], root_verts[2],  root_verts[10], root_verts[2],
+      root_verts[7], root_verts[3], root_verts[11],root_verts[3], root_verts[6], root_verts[3], root_verts[11],root_verts[4], root_verts[0], root_verts[4], root_verts[6],   root_verts[4],
+      root_verts[0], root_verts[5], root_verts[1], root_verts[5], root_verts[6], root_verts[5], root_verts[6], root_verts[6], root_verts[1], root_verts[6],    root_verts[10], root_verts[6],  
+      root_verts[9], root_verts[7], root_verts[0], root_verts[7], root_verts[11],root_verts[7], root_verts[9], root_verts[8], root_verts[11],root_verts[8], root_verts[2],  root_verts[8],
+      root_verts[9], root_verts[9], root_verts[2], root_verts[9], root_verts[5], root_verts[9], root_verts[7], root_verts[0], root_verts[2], root_verts[0],    root_verts[11], root_verts[0],  
     ];
+    for uint::range_step(0, verts.len(), 6) |x|
+    { sphere.subdivide(verts[x], verts[x + 2], verts[x + 4], new_subdivides); }
 
     sphere.vbo = check!(gl::gen_buffers(1))[0];
     check!(gl::bind_buffer(gl::ARRAY_BUFFER, sphere.vbo));
     check!(gl::buffer_data(gl::ARRAY_BUFFER, sphere.verts, gl::STATIC_DRAW));
 
     sphere
+  }
+
+  /* Recursive subdivide for a given triangle. */
+  fn subdivide(&mut self, v1: Vec3f, v2: Vec3f, v3: Vec3f, depth: i32)
+  {
+    let mut v12 = Vec3f::zero(), v23 = Vec3f::zero(), v31 = Vec3f::zero();
+
+    if depth == 0
+    {
+      self.verts.push(v1);
+      self.verts.push(v1);
+
+      self.verts.push(v2);
+      self.verts.push(v1);
+
+      self.verts.push(v3);
+      self.verts.push(v1);
+      return;
+    }
+
+    v12.x = v1.x + v2.x;
+    v23.x = v2.x + v3.x;
+    v31.x = v3.x + v1.x;
+
+    v12.y = v1.y + v2.y;
+    v23.y = v2.y + v3.y;
+    v31.y = v3.y + v1.y;
+
+    v12.z = v1.z + v2.z;
+    v23.z = v2.z + v3.z;
+    v31.z = v3.z + v1.z;
+
+    v12.normalize();
+    v23.normalize();
+    v31.normalize();
+    self.subdivide(v1, v12, v31, depth - 1);
+    self.subdivide(v2, v23, v12, depth - 1);
+    self.subdivide(v3, v31, v23, depth - 1);
+    self.subdivide(v12, v23, v31, depth - 1);
   }
 
   pub fn draw(&self)
