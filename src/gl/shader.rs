@@ -111,10 +111,7 @@ impl Shader
   { check!(gl::get_uniform_location(self.prog, uniform.to_owned())) }
 
   pub fn update_uniform_i32(&self, location: gl::GLint, i: i32)
-  {
-    unsafe
-    { check!(gl::uniform_1i(location, i)); }
-  }
+  { check!(gl::uniform_1i(location, i)); }
 
   pub fn update_uniform_mat(&self, location: gl::GLint, mat: &Mat4x4)
   { 

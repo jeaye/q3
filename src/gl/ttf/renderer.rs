@@ -12,7 +12,7 @@
 use gl::shader::Shader;
 use gl::camera::Camera;
 use gl = opengles::gl2;
-use font::Font;
+use super::Font;
 use math::{ Vec2f, Mat4x4 };
 
 #[path = "../util.rs"]

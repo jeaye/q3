@@ -191,13 +191,10 @@ impl Map
 
   priv fn upload(&mut self)
   {
-    unsafe
-    {
-      self.vbo = check!(gl::gen_buffers(1));
-      assert!(self.vbo.len() == 1);
-      check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.vbo[0]));
-      check!(gl::buffer_data(gl::ARRAY_BUFFER, self.verts, gl::STATIC_DRAW));
-    }
+    self.vbo = check!(gl::gen_buffers(1));
+    assert!(self.vbo.len() == 1);
+    check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.vbo[0]));
+    check!(gl::buffer_data(gl::ARRAY_BUFFER, self.verts, gl::STATIC_DRAW));
   }
 
   pub fn draw(&self)

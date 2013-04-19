@@ -14,11 +14,11 @@ extern mod opengles;
 
 pub use glfw::*;
 pub use opengles::gl2::*;
-pub use gl::camera::Camera;
-pub use gl::shader::Shader;
-pub use gl::util::*;
+pub use self::camera::Camera;
+pub use self::shader::Shader;
+pub use self::util::*;
 
-pub mod camera;
-pub mod shader;
-pub mod util;
+mod camera;
+mod shader;
+mod util;
 
