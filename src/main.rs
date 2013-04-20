@@ -68,27 +68,7 @@ fn main() {
     //let map = map::Map::new("data/dk.bsp");
 
     /* Shader Creation. */
-    let shader_vert_src =
-                          ~"#version 330 core
-                            uniform mat4x4 proj;
-                            uniform mat4x4 world;
-                            layout (location = 0) in vec4 in_position;
-                            layout (location = 1) in vec4 in_color;
-                            out vec4 trans_color;
-                            void main() {
-                              gl_Position = proj * world * in_position;
-                              trans_color = in_color;
-                            }";
-    let shader_frag_src =
-                          ~"#version 330 core
-                            in vec4 trans_color;
-                            out vec4 out_color;
-                            void main() {
-                              /* Colors come in as bytes right now. */
-                              out_color = trans_color;
-                              //out_color = vec4(1, 1, 1, 1);
-                            }";
-    let shader = @mut gl::Shader::new(shader_vert_src, shader_frag_src);
+    let shader = @mut gl::Shader_Builder::new_with_files("data/shaders/color.vert", "data/shaders/color.frag");
     shader.bind();
 
     let proj_loc = shader.get_uniform_location(~"proj");

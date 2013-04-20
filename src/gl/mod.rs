@@ -15,7 +15,7 @@ extern mod opengles;
 pub use glfw::*;
 pub use opengles::gl2::*;
 pub use self::camera::Camera;
-pub use self::shader::Shader;
+pub use self::shader::{ Shader, Shader_Builder };
 pub use self::util::*;
 
 mod camera;

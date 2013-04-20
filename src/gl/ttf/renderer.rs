@@ -9,7 +9,7 @@
       A TTF font renderer.
 */
 
-use gl::shader::Shader;
+use gl::shader::{ Shader, Shader_Builder };
 use gl::camera::Camera;
 use gl = opengles::gl2;
 use super::Font;
@@ -24,7 +24,7 @@ mod check_internal;
 struct Renderer
 {
   vbo: gl::GLuint,
-  shader: Shader,
+  shader: @Shader,
   proj_loc: gl::GLint,
 }
 
@@ -32,41 +32,10 @@ impl Renderer
 {
   pub fn new() -> Renderer
   {
-    let vert_shader =
-      "#version 330 core
-
-      uniform mat4 proj; 
-      uniform mat4 world; 
-
-      layout (location = 0) in vec4 in_coord; 
-
-      out vec2 trans_coord; 
-
-      void main() 
-      { 
-        gl_Position = proj * vec4(in_coord.xy, -10.0, 1); 
-        trans_coord = in_coord.zw; 
-      };";
-
-    let frag_shader =
-      "#version 330 core
-
-      uniform sampler2D tex0;
-      uniform vec4 color0;
-
-      in vec2 trans_coord;
-      out vec4 out_color;
-
-      void main()
-      {
-        //out_color = vec4(1, 1, 1, texture2D(tex0, trans_coord).r) * color0;
-        out_color = vec4(1, 1, 1, texture2D(tex0, trans_coord).r);
-      }";
-
     let mut renderer = Renderer
     {
         vbo: 0,
-        shader: Shader::new(vert_shader, frag_shader),
+        shader: Shader_Builder::new_with_files("data/shaders/text.vert", "data/shaders/text.frag"),
         proj_loc: 0,
     };
     renderer.proj_loc = renderer.shader.get_uniform_location(~"proj");
