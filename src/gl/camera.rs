@@ -77,7 +77,7 @@ impl Camera
               frames_this_sec: 0.0,
               this_sec: 0.0,
               window: win,
-              window_size: Vec2i::zero()
+              window_size: Vec2i::zero(),
     }
   }
 
@@ -87,6 +87,9 @@ impl Camera
     check!(gl::enable(gl::DEPTH_TEST));
     check!(gl::depth_func(gl::LEQUAL));
     check!(gl::clear_color(0.0, 0.0, 0.0, 1.0));
+
+    match self.window.get_size()
+    { (width, height) => self.resize(width as i32, height as i32) }
   }
 
   pub fn resize(&mut self, new_width: i32, new_height: i32)
