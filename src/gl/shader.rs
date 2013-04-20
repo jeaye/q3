@@ -43,6 +43,7 @@ pub struct Debug_Shader
   frag_file: ~str,
   vert_file_time: libc::time_t,
   frag_file_time: libc::time_t,
+  valid: bool, /* Whether or not the last compilation succeeded. */
 }
 
 #[cfg(debug_shader)]
@@ -59,9 +60,11 @@ impl Debug_Shader
       frag_file: ~"",
       vert_file_time: 0,
       frag_file_time: 0,
+      valid: false,
     };
 
     assert!(shared::load(shader, vert_src, frag_src));
+    shader.valid = true;
 
     shader as @Shaderable
   }
@@ -77,6 +80,7 @@ impl Debug_Shader
       frag_file: new_frag_file.to_owned(),
       vert_file_time: 0,
       frag_file_time: 0,
+      valid: false,
     };
     shader.vert_file_time = match Path(new_vert_file).stat()
     {
@@ -96,6 +100,7 @@ impl Debug_Shader
     let frag_src = str::from_bytes(fio.read_whole_stream());
 
     assert!(shared::load(shader, vert_src, frag_src));
+    shader.valid = true;
 
     shader as @Shaderable
   }
@@ -127,24 +132,24 @@ impl Shader for Debug_Shader
       let fio = io::file_reader(&Path(self.frag_file)).unwrap();
       let frag_src = str::from_bytes(fio.read_whole_stream());
 
-      shared::load(self, vert_src, frag_src);
+      self.valid = shared::load(self, vert_src, frag_src);
 
       self.vert_file_time = vert_time;
       self.frag_file_time = frag_time;
     }
 
-
-    shared::bind(self);
+    if self.valid
+    { shared::bind(self); }
   }
 
   pub fn get_uniform_location(&self, uniform: &str) -> gl::GLint
-  { shared::get_uniform_location(self, uniform) }
+  { if self.valid { return shared::get_uniform_location(self, uniform); } -1 }
 
   pub fn update_uniform_i32(&self, location: gl::GLint, i: i32)
-  { shared::update_uniform_i32(location, i) }
+  { if self.valid { shared::update_uniform_i32(location, i); } }
 
   pub fn update_uniform_mat(&self, location: gl::GLint, mat: &Mat4x4)
-  { shared::update_uniform_mat(location, mat) }
+  { if self.valid { shared::update_uniform_mat(location, mat); } }
 }
  
 #[cfg(release_shader)]
