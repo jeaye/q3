@@ -94,8 +94,8 @@ fn main() {
 
       check!(gl::clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT));
       {
-        //map.draw();
-        sphere.draw();
+        map.draw();
+        //sphere.draw();
         font_renderer.begin(camera);
         font_renderer.render(fmt!("%?", fps), math::Vec2f::new(0.0, 0.0), &font);
         font_renderer.end();
