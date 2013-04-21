@@ -229,7 +229,7 @@ mod shared
       if result == 0 as gl::GLint
       {
         let err = check!(gl::get_shader_info_log(obj));
-        error!(err);
+        io::println(err);
       }
       result != 0
     };

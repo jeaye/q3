@@ -10,7 +10,7 @@
       simplistic geometry.
 */
 
-#version 330 core
+#version 330
 
 in vec4 trans_color;
 out vec4 out_color;

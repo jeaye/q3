@@ -25,8 +25,9 @@ pub struct Map
   entity: lump::Entity,
   verts: ~[lump::Vertex],
   faces: ~[lump::Face],
-  mesh_verts: ~[lump::Mesh_Vert],
-  vbo: ~[gl::GLuint],
+  mesh_verts: ~[lump::Mesh_Vert], 
+  vao: gl::GLuint,
+  vbo: ~[gl::GLuint], /* TODO: No need for the array */
   position: Vec3f, /* TODO: Trait for positional objects. */
   bb: BB3
 }
@@ -40,6 +41,7 @@ impl Map
                         verts: ~[],
                         faces: ~[],
                         mesh_verts: ~[],
+                        vao: 0,
                         vbo: ~[],
                         position: Vec3f::zero(),
                         bb: BB3::zero()
@@ -191,17 +193,20 @@ impl Map
 
   priv fn upload(&mut self)
   {
+    self.vao = check!(gl::gen_vertex_arrays(1))[0];
     self.vbo = check!(gl::gen_buffers(1));
     assert!(self.vbo.len() == 1);
+
+    check!(gl::bind_vertex_array(self.vao));
+    check!(gl::enable_vertex_attrib_array(0));
+    check!(gl::enable_vertex_attrib_array(1));
     check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.vbo[0]));
     check!(gl::buffer_data(gl::ARRAY_BUFFER, self.verts, gl::STATIC_DRAW));
   }
 
   pub fn draw(&self)
   {
-    check!(gl::enable_vertex_attrib_array(0));
-    check!(gl::enable_vertex_attrib_array(1));
-    check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.vbo[0]));
+    check!(gl::bind_vertex_array(self.vao));
     check!(gl::vertex_attrib_pointer_f32(0, 3, false, 
                 sys::size_of::<lump::Vertex>() as i32, 
                 0));
@@ -211,9 +216,6 @@ impl Map
                 sys::size_of::<Vec4u8>() as u32));
 
     check!(gl::draw_arrays(gl::TRIANGLES, 0, self.verts.len() as i32));
-
-    check!(gl::disable_vertex_attrib_array(0));
-    check!(gl::disable_vertex_attrib_array(1));
   }
 
   pub fn center(&self) -> Vec3f

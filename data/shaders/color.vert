@@ -10,7 +10,7 @@
       simplistic geometry.
 */
 
-#version 330 core
+#version 330
 
 uniform mat4x4 proj;
 uniform mat4x4 world;

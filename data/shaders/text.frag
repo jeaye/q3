@@ -10,7 +10,7 @@
       TTF text.
 */
 
-#version 330 core
+#version 330
 
 uniform sampler2D tex0;
 uniform vec4 color0;
@@ -21,6 +21,6 @@ out vec4 out_color;
 void main()
 {
   //out_color = vec4(1, 1, 1, texture2D(tex0, trans_coord).r) * color0;
-  out_color = vec4(1, 1, 1, texture2D(tex0, trans_coord).r); 
+  out_color = vec4(1, 1, 1, texture(tex0, trans_coord).r); 
 }
 
