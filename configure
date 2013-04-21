@@ -14,7 +14,7 @@ rm lib/*.so
 
 # GLFW3
 cd lib/glfw
-git pull origin master
+#git pull origin master
 cmake CMakeLists.txt -DBUILD_SHARED_LIBS=ON
 make
 cd ../../
@@ -22,16 +22,16 @@ cd ../../
 # Rust's GLFW3
 cd lib/glfw-rs
 make clean
-git pull origin master # Pull from my fork
-git pull git://github.com/bjz/glfw-rs.git # Pull from parent
+#git pull origin master # Pull from my fork
+#git pull git://github.com/bjz/glfw-rs.git # Pull from parent
 make && cp lib/*.so ../
 cd ../../
 
 # OpenGL ES
 cd lib/rust-opengles
 make clean
-git pull origin master # Pull from my fork
-git pull git://github.com/mozilla-servo/rust-opengles.git # Pull from parent
+#git pull origin master # Pull from my fork
+#git pull git://github.com/mozilla-servo/rust-opengles.git # Pull from parent
 sh ./configure
 make && cp *.so ../
 cd ../../
