@@ -14,7 +14,6 @@ pub use self::ll::*;
 
 #[nolink]
 #[link_args="-lfreetype"]
-#[cfg(target_os = "linux")] /* TODO: Fix for other platforms. */
 extern mod linkhack { }
 
 /* Types. */
