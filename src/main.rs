@@ -40,7 +40,10 @@ fn main() {
     glfw::window_hint::opengl_profile(glfw::OPENGL_CORE_PROFILE);
     glfw::window_hint::opengl_forward_compat(true);
 
-    let window = @glfw::Window::create(1024, 768, "Q^3", glfw::Windowed).unwrap();
+    let window_res = glfw::Window::create(1024, 768, "Q^3", glfw::Windowed);
+    if window_res.is_err()
+    { fail!(window_res.get_err()); }
+    let window = @window_res.get();
     window.make_context_current();
 
     let camera = @mut gl::Camera::new(window);
