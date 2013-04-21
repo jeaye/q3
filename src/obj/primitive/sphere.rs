@@ -22,6 +22,7 @@ mod check;
 pub struct Sphere
 {
   radius: f32,
+  vao: gl::GLuint,
   vbo: gl::GLuint,
   verts: ~[Vec3f],
 }
@@ -37,6 +38,7 @@ impl Sphere
     let mut sphere = Sphere
     {
       radius: new_radius,
+      vao: 0,
       vbo: 0,
       verts: ~[],
     };
@@ -76,7 +78,9 @@ impl Sphere
     for uint::range_step(0, verts.len(), 6) |x|
     { sphere.subdivide(verts[x], verts[x + 2], verts[x + 4], new_subdivides); }
 
+    sphere.vao = check!(gl::gen_vertex_arrays(1))[0]; /* TODO: Check these. */
     sphere.vbo = check!(gl::gen_buffers(1))[0];
+    check!(gl::bind_vertex_array(sphere.vao));
     check!(gl::bind_buffer(gl::ARRAY_BUFFER, sphere.vbo));
     check!(gl::buffer_data(gl::ARRAY_BUFFER, sphere.verts, gl::STATIC_DRAW));
 
@@ -124,14 +128,20 @@ impl Sphere
 
   pub fn draw(&self)
   {
+    check!(gl::bind_vertex_array(self.vao));
     check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.vbo));
+
     check!(gl::vertex_attrib_pointer_f32(0, 3, false, (sys::size_of::<Vec3f>() * 2) as i32, 0));
     check!(gl::vertex_attrib_pointer_f32(1, 3, false, (sys::size_of::<Vec3f>() * 2) as i32, sys::size_of::<Vec3f>() as u32));
     check!(gl::enable_vertex_attrib_array(0));
     check!(gl::enable_vertex_attrib_array(1));
+
     check!(gl::draw_arrays(gl::TRIANGLES, 0, (self.verts.len() as i32) / 2));
+
     check!(gl::disable_vertex_attrib_array(0));
     check!(gl::disable_vertex_attrib_array(1));
+    check!(gl::bind_vertex_array(0));
+    check!(gl::bind_buffer(gl::ARRAY_BUFFER, 0));
   }
 }
 

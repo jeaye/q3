@@ -23,6 +23,7 @@ mod check_internal;
 
 struct Renderer
 {
+  vao: gl::GLuint,
   vbo: gl::GLuint,
   shader: @Shader,
   proj_loc: gl::GLint,
@@ -34,6 +35,7 @@ impl Renderer
   {
     let mut renderer = Renderer
     {
+        vao: 0,
         vbo: 0,
         shader: Shader_Builder::new_with_files("data/shaders/text.vert", "data/shaders/text.frag"),
         proj_loc: 0,
@@ -43,7 +45,13 @@ impl Renderer
     renderer.shader.bind();
     renderer.shader.update_uniform_i32(tex_loc, 0);
 
+    renderer.vao = check!(gl::gen_vertex_arrays(1))[0];
+    check!(gl::bind_vertex_array(renderer.vao));
     renderer.vbo = check!(gl::gen_buffers(1))[0];
+    check!(gl::bind_buffer(gl::ARRAY_BUFFER, renderer.vbo));
+    let data: ~[u8] = ~[];
+    check!(gl::buffer_data(gl::ARRAY_BUFFER, data, gl::DYNAMIC_DRAW)); /* TODO: STREAM */
+    check!(gl::enable_vertex_attrib_array(0));
 
     renderer
   }
@@ -75,9 +83,10 @@ impl Renderer
     check!(gl::active_texture(gl::TEXTURE0));
     check!(gl::bind_texture(gl::TEXTURE_2D, font.texture_atlas));
 
+    check!(gl::bind_vertex_array(self.vao));
     check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.vbo));
-    check!(gl::vertex_attrib_pointer_f32(0, 4, false, 0, 0));
     check!(gl::enable_vertex_attrib_array(0));
+    check!(gl::vertex_attrib_pointer_f32(0, 4, false, 0, 0));
 
     struct Point
     {
@@ -126,6 +135,10 @@ impl Renderer
 
     check!(gl::buffer_data(gl::ARRAY_BUFFER, coords, gl::DYNAMIC_DRAW)); /* TODO: STREAM */
     check!(gl::draw_arrays(gl::TRIANGLES, 0, count));
+
+    check!(gl::disable_vertex_attrib_array(0));
+    check!(gl::bind_buffer(gl::ARRAY_BUFFER, 0));
+    check!(gl::bind_vertex_array(0));
   }
 }
 

@@ -64,7 +64,7 @@ fn main() {
     let mut sphere = sphere::Sphere::new(100.0, 5);
 
     /* Temp test for font loading. */
-    //let mut font_renderer = ttf::Renderer::new();
+    let mut font_renderer = ttf::Renderer::new();
     let mut font = ttf::Font::new("data/test.ttf", 50);
 
     let map = map::Map::new("data/q3ctf1.bsp");
@@ -99,9 +99,9 @@ fn main() {
       {
         map.draw();
         //sphere.draw();
-        //font_renderer.begin(camera);
-        //font_renderer.render(fmt!("%?", fps), math::Vec2f::new(0.0, 0.0), &font);
-        //font_renderer.end();
+        font_renderer.begin(camera);
+        font_renderer.render(fmt!("%?", fps), math::Vec2f::new(0.0, 0.0), &font);
+        font_renderer.end();
       } window.swap_buffers();
 
       std::timer::sleep(@std::uv::global_loop::get(), 1000 / (camera.target_frame_rate as uint));

@@ -198,8 +198,6 @@ impl Map
     assert!(self.vbo.len() == 1);
 
     check!(gl::bind_vertex_array(self.vao));
-    check!(gl::enable_vertex_attrib_array(0));
-    check!(gl::enable_vertex_attrib_array(1));
     check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.vbo[0]));
     check!(gl::buffer_data(gl::ARRAY_BUFFER, self.verts, gl::STATIC_DRAW));
   }
@@ -207,6 +205,10 @@ impl Map
   pub fn draw(&self)
   {
     check!(gl::bind_vertex_array(self.vao));
+    check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.vbo[0]));
+    check!(gl::enable_vertex_attrib_array(0));
+    check!(gl::enable_vertex_attrib_array(1));
+
     check!(gl::vertex_attrib_pointer_f32(0, 3, false, 
                 sys::size_of::<lump::Vertex>() as i32, 
                 0));
@@ -214,8 +216,12 @@ impl Map
                 sys::size_of::<lump::Vertex>() as i32, 
                 sys::size_of::<lump::Vertex>() as u32 -
                 sys::size_of::<Vec4u8>() as u32));
-
     check!(gl::draw_arrays(gl::TRIANGLES, 0, self.verts.len() as i32));
+
+    check!(gl::disable_vertex_attrib_array(0));
+    check!(gl::disable_vertex_attrib_array(1));
+    check!(gl::bind_vertex_array(0));
+    check!(gl::bind_buffer(gl::ARRAY_BUFFER, 0));
   }
 
   pub fn center(&self) -> Vec3f
