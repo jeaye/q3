@@ -217,7 +217,7 @@ mod shared
 
   pub fn load(shader: &mut super::Shader_Builder, vert_src: &str, frag_src: &str) -> bool
   {
-    if check!(gl::is_program(shader.prog)) > 0
+    if check!(gl::is_program(shader.prog))
     { check!(gl::delete_program(shader.prog)); }
 
     shader.prog = check!(gl::create_program());
