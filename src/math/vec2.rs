@@ -49,6 +49,9 @@ macro_rules! declare
 
         pub unsafe fn to_ptr(&self) -> *$Type
         { ptr::addr_of(self) }
+
+        pub fn to_str(&self) -> ~str
+        { fmt!("(%?, %?)", self.x, self.y) }
       }
 
       /***** Operator Overloads *****/

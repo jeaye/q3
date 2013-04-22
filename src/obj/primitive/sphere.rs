@@ -78,6 +78,7 @@ impl Sphere
     ];
     for uint::range_step(0, verts.len(), 3) |x|
     { sphere.subdivide(verts[x], verts[x + 1], verts[x + 2], new_subdivides); }
+    voxelize(sphere.verts);
     //sphere.verts = voxelize(sphere.verts);
 
     sphere.vao = check!(gl::gen_vertex_arrays(1))[0]; /* TODO: Check these. */
@@ -150,20 +151,34 @@ priv fn voxelize(verts: &[Vertex_PC]) -> ~[Vertex_PC]
   /* Require at least one triangle. */
   assert!(verts.len() >= 3);
 
-  let mut new_verts: ~[Vertex_PC] = ~[];
+  let resolution = 10.0f32;
 
   /* Bounding box of vert dimensions. */
-  let mut min = BB3::zero(), max = BB3::zero();
-  for verts.each |x|
+  let mut min = Vec3f::new(verts[0].position.x, verts[0].position.y, verts[0].position.z);
+  let mut max = Vec3f::new(verts[0].position.x, verts[0].position.y, verts[0].position.z);
+  for verts.each |curr|
   {
+    min.x = cmp::min(min.x, curr.position.x);
+    min.y = cmp::min(min.y, curr.position.y);
+    min.z = cmp::min(min.z, curr.position.z);
+
+    max.x = cmp::max(max.x, curr.position.x);
+    max.y = cmp::max(max.y, curr.position.y);
+    max.z = cmp::max(max.z, curr.position.z);
   }
+  io::println(fmt!("Min: %s", min.to_str()));
+  io::println(fmt!("Max: %s", max.to_str()));
 
   /* Calculate, given resolution (how many voxels across), the dimensions of a voxel. */
-  /* Create 3D array of voxels. Render wireframe? */
-  /* Triangle -> box collision checking to enable voxels. */
-  /* Pass back on to sphere for rendering. */
+  let size = cmp::max(max.x - min.x, cmp::max(max.y - min.y, max.z - min.z)) / resolution;
+  io::println(fmt!("Size: %?", size));
 
-  new_verts
+  /* Create 3D array of voxels. Render wireframe? */
+  //let mut new_verts: ~[[[Vertex_PC]]] = ~[[[]]];
+  /* Triangle -> box collision checking to enable voxels. */
+
+  /* Pass back on to sphere for rendering. */
+  ~[]
 }
 
 
