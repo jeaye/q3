@@ -9,7 +9,7 @@
       An arbitrarily subdivided Icosahedron.
 */
 
-use math::Vec3f;
+use math::{ Vec3f, BB3 };
 
 #[path = "../../gl/mod.rs"]
 mod gl;

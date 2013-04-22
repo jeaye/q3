@@ -19,9 +19,9 @@ pub struct BB3 /* TODO: Check math on this shit. */
 
 impl BB3
 {
-  pub fn new( t_left: Vec3f, b_right: Vec3f) -> BB3
+  pub fn new(t_left: Vec3f, b_right: Vec3f) -> BB3
   {
-    BB3{  top_left: t_left, bottom_right: b_right }
+    BB3{ top_left: t_left, bottom_right: b_right }
   }
 
   pub fn zero() -> BB3

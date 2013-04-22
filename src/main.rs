@@ -29,8 +29,8 @@ mod map;
 #[path = "gl/ttf/mod.rs"]
 mod ttf;
 
-#[path = "obj/primitive/sphere.rs"]
-mod sphere;
+#[path = "obj/primitive/mod.rs"]
+mod primitive;
 
 fn main() {
   glfw::set_error_callback(error_callback);
@@ -61,7 +61,7 @@ fn main() {
       key_callback(window, key, action);
     }
 
-    let mut sphere = sphere::Sphere::new(100.0, 5);
+    let mut sphere = primitive::Sphere::new(100.0, 5);
 
     /* Temp test for font loading. */
     let mut font_renderer = ttf::Renderer::new();
@@ -97,8 +97,8 @@ fn main() {
 
       check!(gl::clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT));
       {
-        map.draw();
-        //sphere.draw();
+        //map.draw();
+        sphere.draw();
         font_renderer.begin(camera);
         font_renderer.render(fmt!("%?", fps), math::Vec2f::new(0.0, 0.0), &font);
         font_renderer.end();
