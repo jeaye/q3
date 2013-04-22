@@ -10,6 +10,7 @@
 */
 
 use math::{ Vec3f, BB3 };
+use primitive::Vertex_PC;
 
 #[path = "../../gl/mod.rs"]
 mod gl;
@@ -24,7 +25,7 @@ pub struct Sphere
   radius: f32,
   vao: gl::GLuint,
   vbo: gl::GLuint,
-  verts: ~[Vec3f],
+  verts: ~[Vertex_PC],
 }
 
 impl Sphere
@@ -61,22 +62,23 @@ impl Sphere
       Vec3f::new(-magic_z, -magic_x, 0.0), 
     ];
 
-    let verts: &[Vec3f] = 
+    let verts: &[Vertex_PC] = 
     &[
       /* http://www.glprogramming.com/red/chapter02.html#name8 */
-      root_verts[0], root_verts[0], root_verts[4], root_verts[0], root_verts[1], root_verts[0], root_verts[0], root_verts[1], root_verts[9], root_verts[1],   root_verts[4],  root_verts[1],  
-      root_verts[9], root_verts[2], root_verts[5], root_verts[2], root_verts[4], root_verts[2], root_verts[4], root_verts[3], root_verts[5], root_verts[3],   root_verts[8],  root_verts[3],  
-      root_verts[4], root_verts[4], root_verts[8], root_verts[4], root_verts[1], root_verts[4], root_verts[8], root_verts[5], root_verts[10],root_verts[5],  root_verts[1],  root_verts[5], 
-      root_verts[8], root_verts[6], root_verts[3], root_verts[6], root_verts[10],root_verts[6], root_verts[5], root_verts[7], root_verts[3], root_verts[7],  root_verts[8],  root_verts[7], 
-      root_verts[5], root_verts[8], root_verts[2], root_verts[8], root_verts[3], root_verts[8], root_verts[2], root_verts[9], root_verts[7], root_verts[9],   root_verts[3],  root_verts[9],  
-      root_verts[7], root_verts[1], root_verts[10],root_verts[1], root_verts[3], root_verts[1], root_verts[7], root_verts[2], root_verts[6], root_verts[2],  root_verts[10], root_verts[2],
-      root_verts[7], root_verts[3], root_verts[11],root_verts[3], root_verts[6], root_verts[3], root_verts[11],root_verts[4], root_verts[0], root_verts[4], root_verts[6],   root_verts[4],
-      root_verts[0], root_verts[5], root_verts[1], root_verts[5], root_verts[6], root_verts[5], root_verts[6], root_verts[6], root_verts[1], root_verts[6],    root_verts[10], root_verts[6],  
-      root_verts[9], root_verts[7], root_verts[0], root_verts[7], root_verts[11],root_verts[7], root_verts[9], root_verts[8], root_verts[11],root_verts[8], root_verts[2],  root_verts[8],
-      root_verts[9], root_verts[9], root_verts[2], root_verts[9], root_verts[5], root_verts[9], root_verts[7], root_verts[0], root_verts[2], root_verts[0],    root_verts[11], root_verts[0],  
+      Vertex_PC::new(root_verts[0], root_verts[0]), Vertex_PC::new(root_verts[4], root_verts[0]), Vertex_PC::new(root_verts[1], root_verts[0]), Vertex_PC::new(root_verts[0], root_verts[1]), Vertex_PC::new(root_verts[9], root_verts[1]),   Vertex_PC::new(root_verts[4],  root_verts[1]),  
+      Vertex_PC::new(root_verts[9], root_verts[2]), Vertex_PC::new(root_verts[5], root_verts[2]), Vertex_PC::new(root_verts[4], root_verts[2]), Vertex_PC::new(root_verts[4], root_verts[3]), Vertex_PC::new(root_verts[5], root_verts[3]),   Vertex_PC::new(root_verts[8],  root_verts[3]),  
+      Vertex_PC::new(root_verts[4], root_verts[4]), Vertex_PC::new(root_verts[8], root_verts[4]), Vertex_PC::new(root_verts[1], root_verts[4]), Vertex_PC::new(root_verts[8], root_verts[5]), Vertex_PC::new(root_verts[10],root_verts[5]),  Vertex_PC::new(root_verts[1],  root_verts[5]), 
+      Vertex_PC::new(root_verts[8], root_verts[6]), Vertex_PC::new(root_verts[3], root_verts[6]), Vertex_PC::new(root_verts[10],root_verts[6]), Vertex_PC::new(root_verts[5], root_verts[7]), Vertex_PC::new(root_verts[3], root_verts[7]),  Vertex_PC::new(root_verts[8],  root_verts[7]), 
+      Vertex_PC::new(root_verts[5], root_verts[8]), Vertex_PC::new(root_verts[2], root_verts[8]), Vertex_PC::new(root_verts[3], root_verts[8]), Vertex_PC::new(root_verts[2], root_verts[9]), Vertex_PC::new(root_verts[7], root_verts[9]),   Vertex_PC::new(root_verts[3],  root_verts[9]),  
+      Vertex_PC::new(root_verts[7], root_verts[1]), Vertex_PC::new(root_verts[10],root_verts[1]), Vertex_PC::new(root_verts[3], root_verts[1]), Vertex_PC::new(root_verts[7], root_verts[2]), Vertex_PC::new(root_verts[6], root_verts[2]),  Vertex_PC::new(root_verts[10], root_verts[2]),
+      Vertex_PC::new(root_verts[7], root_verts[3]), Vertex_PC::new(root_verts[11],root_verts[3]), Vertex_PC::new(root_verts[6], root_verts[3]), Vertex_PC::new(root_verts[11],root_verts[4]), Vertex_PC::new(root_verts[0], root_verts[4]), Vertex_PC::new(root_verts[6],   root_verts[4]),
+      Vertex_PC::new(root_verts[0], root_verts[5]), Vertex_PC::new(root_verts[1], root_verts[5]), Vertex_PC::new(root_verts[6], root_verts[5]), Vertex_PC::new(root_verts[6], root_verts[6]), Vertex_PC::new(root_verts[1], root_verts[6]),    Vertex_PC::new(root_verts[10], root_verts[6]),  
+      Vertex_PC::new(root_verts[9], root_verts[7]), Vertex_PC::new(root_verts[0], root_verts[7]), Vertex_PC::new(root_verts[11],root_verts[7]), Vertex_PC::new(root_verts[9], root_verts[8]), Vertex_PC::new(root_verts[11],root_verts[8]), Vertex_PC::new(root_verts[2],  root_verts[8]),
+      Vertex_PC::new(root_verts[9], root_verts[9]), Vertex_PC::new(root_verts[2], root_verts[9]), Vertex_PC::new(root_verts[5], root_verts[9]), Vertex_PC::new(root_verts[7], root_verts[0]), Vertex_PC::new(root_verts[2], root_verts[0]),    Vertex_PC::new(root_verts[11], root_verts[0]),  
     ];
-    for uint::range_step(0, verts.len(), 6) |x|
-    { sphere.subdivide(verts[x], verts[x + 2], verts[x + 4], new_subdivides); }
+    for uint::range_step(0, verts.len(), 3) |x|
+    { sphere.subdivide(verts[x], verts[x + 1], verts[x + 2], new_subdivides); }
+    //sphere.verts = voxelize(sphere.verts);
 
     sphere.vao = check!(gl::gen_vertex_arrays(1))[0]; /* TODO: Check these. */
     sphere.vbo = check!(gl::gen_buffers(1))[0];
@@ -88,38 +90,36 @@ impl Sphere
   }
 
   /* Recursive subdivide for a given triangle. */
-  priv fn subdivide(&mut self, v1: Vec3f, v2: Vec3f, v3: Vec3f, depth: i32)
+  priv fn subdivide(&mut self, v1: Vertex_PC, v2: Vertex_PC, v3: Vertex_PC, depth: i32)
   {
-    let mut v12 = Vec3f::zero(), v23 = Vec3f::zero(), v31 = Vec3f::zero();
-
     if depth == 0
     {
       self.verts.push(v1);
-      self.verts.push(v1);
-
       self.verts.push(v2);
-      self.verts.push(v1);
-
       self.verts.push(v3);
-      self.verts.push(v1);
       return;
     }
 
-    v12.x = v1.x + v2.x; /* TODO: Lack of clean mutable indexing. */
-    v23.x = v2.x + v3.x;
-    v31.x = v3.x + v1.x;
+    let mut v12 = Vertex_PC::zero(), v23 = Vertex_PC::zero(), v31 = Vertex_PC::zero();
+    v12.color = v1.color;
+    v23.color = v1.color;
+    v31.color = v1.color;
 
-    v12.y = v1.y + v2.y;
-    v23.y = v2.y + v3.y;
-    v31.y = v3.y + v1.y;
+    v12.position.x = v1.position.x + v2.position.x; /* TODO: Lack of clean mutable indexing. */
+    v23.position.x = v2.position.x + v3.position.x;
+    v31.position.x = v3.position.x + v1.position.x;
 
-    v12.z = v1.z + v2.z;
-    v23.z = v2.z + v3.z;
-    v31.z = v3.z + v1.z;
+    v12.position.y = v1.position.y + v2.position.y;
+    v23.position.y = v2.position.y + v3.position.y;
+    v31.position.y = v3.position.y + v1.position.y;
 
-    v12.normalize();
-    v23.normalize();
-    v31.normalize();
+    v12.position.z = v1.position.z + v2.position.z;
+    v23.position.z = v2.position.z + v3.position.z;
+    v31.position.z = v3.position.z + v1.position.z;
+
+    v12.position.normalize();
+    v23.position.normalize();
+    v31.position.normalize();
     self.subdivide(v1, v12, v31, depth - 1);
     self.subdivide(v2, v23, v12, depth - 1);
     self.subdivide(v3, v31, v23, depth - 1);
@@ -131,12 +131,12 @@ impl Sphere
     check!(gl::bind_vertex_array(self.vao));
     check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.vbo));
 
-    check!(gl::vertex_attrib_pointer_f32(0, 3, false, (sys::size_of::<Vec3f>() * 2) as i32, 0));
-    check!(gl::vertex_attrib_pointer_f32(1, 3, false, (sys::size_of::<Vec3f>() * 2) as i32, sys::size_of::<Vec3f>() as u32));
+    check!(gl::vertex_attrib_pointer_f32(0, 3, false, (sys::size_of::<Vertex_PC>()) as i32, 0));
+    check!(gl::vertex_attrib_pointer_f32(1, 3, false, (sys::size_of::<Vertex_PC>()) as i32, sys::size_of::<Vec3f>() as u32));
     check!(gl::enable_vertex_attrib_array(0));
     check!(gl::enable_vertex_attrib_array(1));
 
-    check!(gl::draw_arrays(gl::TRIANGLES, 0, (self.verts.len() as i32) / 2));
+    check!(gl::draw_arrays(gl::TRIANGLES, 0, (self.verts.len() as i32)));
 
     check!(gl::disable_vertex_attrib_array(0));
     check!(gl::disable_vertex_attrib_array(1));
@@ -145,12 +145,19 @@ impl Sphere
   }
 }
 
-priv fn voxelize(verts: &[Vec3f]) -> ~[Vec3f]
+priv fn voxelize(verts: &[Vertex_PC]) -> ~[Vertex_PC]
 {
-  /* Pos -> Col, Pos -> Col, etc */
-  let mut new_verts: ~[Vec3f] = ~[];
+  /* Require at least one triangle. */
+  assert!(verts.len() >= 3);
+
+  let mut new_verts: ~[Vertex_PC] = ~[];
 
   /* Bounding box of vert dimensions. */
+  let mut min = BB3::zero(), max = BB3::zero();
+  for verts.each |x|
+  {
+  }
+
   /* Calculate, given resolution (how many voxels across), the dimensions of a voxel. */
   /* Create 3D array of voxels. Render wireframe? */
   /* Triangle -> box collision checking to enable voxels. */
