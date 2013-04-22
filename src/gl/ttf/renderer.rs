@@ -133,7 +133,7 @@ impl Renderer
       count += 6;
     }
 
-    check!(gl::buffer_data(gl::ARRAY_BUFFER, coords, gl::DYNAMIC_DRAW)); /* TODO: STREAM */
+    check!(gl::buffer_data(gl::ARRAY_BUFFER, coords, gl::STREAM_DRAW)); 
     check!(gl::draw_arrays(gl::TRIANGLES, 0, count));
 
     check!(gl::disable_vertex_attrib_array(0));

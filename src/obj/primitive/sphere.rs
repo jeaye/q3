@@ -88,7 +88,7 @@ impl Sphere
   }
 
   /* Recursive subdivide for a given triangle. */
-  fn subdivide(&mut self, v1: Vec3f, v2: Vec3f, v3: Vec3f, depth: i32)
+  priv fn subdivide(&mut self, v1: Vec3f, v2: Vec3f, v3: Vec3f, depth: i32)
   {
     let mut v12 = Vec3f::zero(), v23 = Vec3f::zero(), v31 = Vec3f::zero();
 
@@ -105,7 +105,7 @@ impl Sphere
       return;
     }
 
-    v12.x = v1.x + v2.x;
+    v12.x = v1.x + v2.x; /* TODO: Lack of clean mutable indexing. */
     v23.x = v2.x + v3.x;
     v31.x = v3.x + v1.x;
 
@@ -144,4 +144,19 @@ impl Sphere
     check!(gl::bind_buffer(gl::ARRAY_BUFFER, 0));
   }
 }
+
+priv fn voxelize(verts: &[Vec3f]) -> ~[Vec3f]
+{
+  /* Pos -> Col, Pos -> Col, etc */
+  let mut new_verts: ~[Vec3f] = ~[];
+
+  /* Bounding box of vert dimensions. */
+  /* Calculate, given resolution (how many voxels across), the dimensions of a voxel. */
+  /* Create 3D array of voxels. Render wireframe? */
+  /* Triangle -> box collision checking to enable voxels. */
+  /* Pass back on to sphere for rendering. */
+
+  new_verts
+}
+
 
