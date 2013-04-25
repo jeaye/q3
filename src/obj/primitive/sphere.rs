@@ -9,9 +9,8 @@
       An arbitrarily subdivided Icosahedron.
 */
 
-use math::{ Vec3f, BB3 };
+use math::{ Vec3f };
 use primitive::Vertex_PC;
-use primitive::Triangle;
 use primitive::Cube;
 
 #[path = "../../gl/mod.rs"]
@@ -28,6 +27,9 @@ pub struct Sphere
   vao: gl::GLuint,
   vbo: gl::GLuint,
   verts: ~[Vertex_PC],
+
+  vox_vao: gl::GLuint,
+  vox_vbo: gl::GLuint,
   voxels: ~[Cube],
 }
 
@@ -45,6 +47,9 @@ impl Sphere
       vao: 0,
       vbo: 0,
       verts: ~[],
+
+      vox_vao: 0,
+      vox_vbo: 0,
       voxels: ~[],
     };
 
@@ -84,17 +89,17 @@ impl Sphere
     { sphere.subdivide(verts[x], verts[x + 1], verts[x + 2], new_subdivides); }
     sphere.voxels = voxelize(sphere.verts);
 
-    io::println(fmt!("Vertex size: %?" sys::size_of::<Vertex_PC>()));
-    io::println(fmt!("Triangle size: %?" sys::size_of::<Triangle>()));
-    io::println(fmt!("Cube size: %?" sys::size_of::<Cube>()));
-    io::println(fmt!("Voxels: %?", sphere.voxels.len()));
-
     sphere.vao = check!(gl::gen_vertex_arrays(1))[0]; /* TODO: Check these. */
     sphere.vbo = check!(gl::gen_buffers(1))[0];
     check!(gl::bind_vertex_array(sphere.vao));
     check!(gl::bind_buffer(gl::ARRAY_BUFFER, sphere.vbo));
+    check!(gl::buffer_data(gl::ARRAY_BUFFER, sphere.verts, gl::STATIC_DRAW));
+
+    sphere.vox_vao = check!(gl::gen_vertex_arrays(1))[0]; /* TODO: Check these. */
+    sphere.vox_vbo = check!(gl::gen_buffers(1))[0];
+    check!(gl::bind_vertex_array(sphere.vox_vao));
+    check!(gl::bind_buffer(gl::ARRAY_BUFFER, sphere.vox_vbo));
     check!(gl::buffer_data(gl::ARRAY_BUFFER, sphere.voxels, gl::STATIC_DRAW));
-    //check!(gl::buffer_data(gl::ARRAY_BUFFER, sphere.verts, gl::STATIC_DRAW));
 
     sphere
   }
@@ -138,26 +143,51 @@ impl Sphere
 
   pub fn draw(&self)
   {
-    check!(gl::bind_vertex_array(self.vao));
-    check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.vbo));
+    {
+      check!(gl::bind_vertex_array(self.vao));
+      check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.vbo));
 
-    check!(gl::vertex_attrib_pointer_f32(0, 3, false, (sys::size_of::<Vertex_PC>()) as i32, 0));
-    check!(gl::vertex_attrib_pointer_f32(1, 3, false, (sys::size_of::<Vertex_PC>()) as i32, sys::size_of::<Vec3f>() as u32));
-    check!(gl::enable_vertex_attrib_array(0));
-    check!(gl::enable_vertex_attrib_array(1));
+      check!(gl::vertex_attrib_pointer_f32(0, 3, false, (sys::size_of::<Vertex_PC>()) as i32, 0));
+      check!(gl::vertex_attrib_pointer_f32(1, 3, false, (sys::size_of::<Vertex_PC>()) as i32, sys::size_of::<Vec3f>() as u32));
+      check!(gl::enable_vertex_attrib_array(0));
+      check!(gl::enable_vertex_attrib_array(1));
 
-    check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::LINE));
-    //check!(gl::draw_arrays(gl::TRIANGLES, 0, (self.verts.len() as i32)));
-    check!(gl::draw_arrays(gl::TRIANGLES, 0, (self.voxels.len() as i32 * 36)));
-    check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::FILL));
+      check!(gl::draw_arrays(gl::TRIANGLES, 0, (self.verts.len() as i32)));
 
-    check!(gl::disable_vertex_attrib_array(0));
-    check!(gl::disable_vertex_attrib_array(1));
-    check!(gl::bind_vertex_array(0));
-    check!(gl::bind_buffer(gl::ARRAY_BUFFER, 0));
+      check!(gl::disable_vertex_attrib_array(0));
+      check!(gl::disable_vertex_attrib_array(1));
+      check!(gl::bind_vertex_array(0));
+      check!(gl::bind_buffer(gl::ARRAY_BUFFER, 0));
+    }
+
+    {
+      check!(gl::bind_vertex_array(self.vox_vao));
+      check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.vox_vbo));
+
+      check!(gl::vertex_attrib_pointer_f32(0, 3, false, (sys::size_of::<Vertex_PC>()) as i32, 0));
+      check!(gl::vertex_attrib_pointer_f32(1, 3, false, (sys::size_of::<Vertex_PC>()) as i32, sys::size_of::<Vec3f>() as u32));
+      check!(gl::enable_vertex_attrib_array(0));
+      check!(gl::enable_vertex_attrib_array(1));
+
+      check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::LINE));
+      check!(gl::draw_arrays(gl::TRIANGLES, 0, (self.voxels.len() as i32 * 36)));
+      check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::FILL));
+
+      check!(gl::disable_vertex_attrib_array(0));
+      check!(gl::disable_vertex_attrib_array(1));
+      check!(gl::bind_vertex_array(0));
+      check!(gl::bind_buffer(gl::ARRAY_BUFFER, 0));
+    }
   }
 }
 
+macro_rules! index
+(
+  ($arr:ident[$x:expr][$y:expr][$z:expr]) => 
+  (
+    $arr[($z * resolution * resolution) + (y * resolution) + x]
+  )
+)
 priv fn voxelize(verts: &[Vertex_PC]) -> ~[Cube]
 {
   /* Require at least one triangle. */
@@ -178,27 +208,27 @@ priv fn voxelize(verts: &[Vertex_PC]) -> ~[Cube]
     max.y = cmp::max(max.y, curr.position.y);
     max.z = cmp::max(max.z, curr.position.z);
   }
+  let center = Vec3f::new(max.x - ((max.x - min.x) / 2.0), max.y - ((max.y - min.y) / 2.0), max.z - ((max.z - min.z) / 2.0));
   io::println(fmt!("Min: %s", min.to_str()));
   io::println(fmt!("Max: %s", max.to_str()));
+  io::println(fmt!("Center: %s", center.to_str()));
 
   /* Calculate, given resolution (how many voxels across), the dimensions of a voxel. */
   let size = cmp::max(max.x - min.x, cmp::max(max.y - min.y, max.z - min.z)) / resolution;
   io::println(fmt!("Size: %?", size));
 
-  /* Create 3D array of voxels. Render wireframe? */
-  macro_rules! index
-  (
-    ($arr:ident[$x:expr][$y:expr][$z:expr]) => 
-    (
-      $arr[($z * resolution * resolution) + (y * resolution) + x]
-    )
-  )
+  /* Create 3D array of voxels. */
+  let mid_offset = ((resolution / 2.0) * size);
+  io::println(fmt!("Mid Offset: %s", mid_offset.to_str()));
   let mut new_verts: ~[Cube] = vec::with_capacity((resolution * resolution * resolution) as uint);
-  for uint::range(0, resolution as uint) |z|
+  for uint::range(0, resolution as uint) |z| /* TODO: Calculate max/min here to find out where this actually lies. */
   { for uint::range(0, resolution as uint) |y|
     { for uint::range(0, resolution as uint) |x|
-      { new_verts.push(Cube::new(size, Vec3f::new(x as f32 * size, y as f32 * size, z as f32 * size))); } } }
+      { new_verts.push(Cube::new(size, Vec3f::new((x as f32 * size) - mid_offset, (y as f32 * size) - mid_offset, (z as f32 * size) - mid_offset) - center)); }
+    }
+  }
   assert!(new_verts.len() == (resolution * resolution * resolution) as uint);
+
   /* Triangle -> box collision checking to enable voxels. */
 
   /* Pass back on to sphere for rendering. */

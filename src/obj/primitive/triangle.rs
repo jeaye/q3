@@ -10,7 +10,6 @@
 */
 
 use math::Vec3f;
-use primitive::Vertex_PC;
 use Vert = primitive::Vertex_PC;
 
 #[packed]
