@@ -64,7 +64,7 @@ impl Font /* TODO: Check macro for Freetype. */
    
       ft::FT_Set_Pixel_Sizes(font.face, 0, size as c_uint);
 
-      let mut ft_glyph = (*font.face).glyph;
+      let ft_glyph = (*font.face).glyph;
       let max_width = 1024;
       let mut row_width = 0, row_height = 0;
 

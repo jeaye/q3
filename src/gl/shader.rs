@@ -51,7 +51,7 @@ impl Debug_Shader
 {
   pub fn new(vert_src : &str, frag_src : &str) -> @Shaderable
   {
-    let mut shader = @mut Debug_Shader
+    let shader = @mut Debug_Shader
     {
       prog: 0,
       vert_obj: 0,
@@ -71,7 +71,7 @@ impl Debug_Shader
 
   pub fn new_with_files(new_vert_file : &str, new_frag_file : &str) -> @Shaderable
   {
-    let mut shader = @mut Debug_Shader
+    let shader = @mut Debug_Shader
     {
       prog: 0,
       vert_obj: 0,

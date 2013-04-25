@@ -11,6 +11,7 @@
 
 use math::{ Vec3f, BB3 };
 use primitive::Vertex_PC;
+use primitive::Cube;
 
 #[path = "../../gl/mod.rs"]
 mod gl;
@@ -78,14 +79,14 @@ impl Sphere
     ];
     for uint::range_step(0, verts.len(), 3) |x|
     { sphere.subdivide(verts[x], verts[x + 1], verts[x + 2], new_subdivides); }
-    voxelize(sphere.verts);
+    let voxels = voxelize(sphere.verts);
     //sphere.verts = voxelize(sphere.verts);
 
     sphere.vao = check!(gl::gen_vertex_arrays(1))[0]; /* TODO: Check these. */
     sphere.vbo = check!(gl::gen_buffers(1))[0];
     check!(gl::bind_vertex_array(sphere.vao));
     check!(gl::bind_buffer(gl::ARRAY_BUFFER, sphere.vbo));
-    check!(gl::buffer_data(gl::ARRAY_BUFFER, sphere.verts, gl::STATIC_DRAW));
+    check!(gl::buffer_data(gl::ARRAY_BUFFER, voxels, gl::STATIC_DRAW));
 
     sphere
   }
@@ -146,7 +147,7 @@ impl Sphere
   }
 }
 
-priv fn voxelize(verts: &[Vertex_PC]) -> ~[Vertex_PC]
+priv fn voxelize(verts: &[Vertex_PC]) -> ~[Cube]
 {
   /* Require at least one triangle. */
   assert!(verts.len() >= 3);
@@ -174,11 +175,28 @@ priv fn voxelize(verts: &[Vertex_PC]) -> ~[Vertex_PC]
   io::println(fmt!("Size: %?", size));
 
   /* Create 3D array of voxels. Render wireframe? */
-  //let mut new_verts: ~[[[Vertex_PC]]] = ~[[[]]];
+  macro_rules! index
+  (
+    ($arr:ident[$x:expr][$y:expr][$z:expr]) => 
+    (
+      $arr[($z * resolution * resolution) + (y * resolution) + x]
+    )
+  )
+  let mut new_verts: ~[Cube] = vec::with_capacity((resolution * resolution * resolution) as uint);
+  for uint::range(0, resolution as uint) |z|
+  {
+    for uint::range(0, resolution as uint) |y|
+    {
+      for uint::range(0, resolution as uint) |x|
+      {
+        new_verts.push(Cube::new(size, Vec3f::new(x as f32, y as f32, z as f32)));
+      }
+    }
+  }
   /* Triangle -> box collision checking to enable voxels. */
 
   /* Pass back on to sphere for rendering. */
-  ~[]
+  new_verts
 }
 
 

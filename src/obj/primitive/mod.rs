@@ -9,9 +9,13 @@
       An aggregator of primitive geometric items.
 */
 
-pub use self::sphere::Sphere;
 pub use self::vertex::{ Vertex_P, Vertex_PC, Vertex_PN, Vertex_PCN };
+pub use self::triangle::Triangle;
+pub use self::cube::Cube;
+pub use self::sphere::Sphere;
 
-mod sphere;
 mod vertex;
+mod triangle;
+mod cube;
+mod sphere;
 
