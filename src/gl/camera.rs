@@ -66,7 +66,7 @@ impl Camera
     Camera {  position: Vec3f::zero(),
               angles: Vec2f::zero(),
               projection: @Mat4x4::new(),
-              near_far: Vec2f::new(1.0, 1000.0),
+              near_far: Vec2f::new(0.1, 1000.0),
               fov: 100.0,
               view: @Mat4x4::new(), /* TODO: s/new/identity/g */
               look_speed: 0.001,

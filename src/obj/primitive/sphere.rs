@@ -146,10 +146,10 @@ impl Sphere
     check!(gl::enable_vertex_attrib_array(0));
     check!(gl::enable_vertex_attrib_array(1));
 
-    //check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::LINE));
+    check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::LINE));
     //check!(gl::draw_arrays(gl::TRIANGLES, 0, (self.verts.len() as i32)));
-    check!(gl::draw_arrays(gl::POINTS, 0, (self.voxels.len() as i32 * 36)));
-    //check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::FILL));
+    check!(gl::draw_arrays(gl::TRIANGLES, 0, (self.voxels.len() as i32 * 36)));
+    check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::FILL));
 
     check!(gl::disable_vertex_attrib_array(0));
     check!(gl::disable_vertex_attrib_array(1));
