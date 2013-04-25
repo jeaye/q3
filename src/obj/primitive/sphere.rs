@@ -11,6 +11,7 @@
 
 use math::{ Vec3f, BB3 };
 use primitive::Vertex_PC;
+use primitive::Triangle;
 use primitive::Cube;
 
 #[path = "../../gl/mod.rs"]
@@ -27,6 +28,7 @@ pub struct Sphere
   vao: gl::GLuint,
   vbo: gl::GLuint,
   verts: ~[Vertex_PC],
+  voxels: ~[Cube],
 }
 
 impl Sphere
@@ -43,6 +45,7 @@ impl Sphere
       vao: 0,
       vbo: 0,
       verts: ~[],
+      voxels: ~[],
     };
 
     let root_verts: [Vec3f, ..12] =
@@ -79,14 +82,19 @@ impl Sphere
     ];
     for uint::range_step(0, verts.len(), 3) |x|
     { sphere.subdivide(verts[x], verts[x + 1], verts[x + 2], new_subdivides); }
-    let voxels = voxelize(sphere.verts);
-    //sphere.verts = voxelize(sphere.verts);
+    sphere.voxels = voxelize(sphere.verts);
+
+    io::println(fmt!("Vertex size: %?" sys::size_of::<Vertex_PC>()));
+    io::println(fmt!("Triangle size: %?" sys::size_of::<Triangle>()));
+    io::println(fmt!("Cube size: %?" sys::size_of::<Cube>()));
+    io::println(fmt!("Voxels: %?", sphere.voxels.len()));
 
     sphere.vao = check!(gl::gen_vertex_arrays(1))[0]; /* TODO: Check these. */
     sphere.vbo = check!(gl::gen_buffers(1))[0];
     check!(gl::bind_vertex_array(sphere.vao));
     check!(gl::bind_buffer(gl::ARRAY_BUFFER, sphere.vbo));
-    check!(gl::buffer_data(gl::ARRAY_BUFFER, voxels, gl::STATIC_DRAW));
+    check!(gl::buffer_data(gl::ARRAY_BUFFER, sphere.voxels, gl::STATIC_DRAW));
+    //check!(gl::buffer_data(gl::ARRAY_BUFFER, sphere.verts, gl::STATIC_DRAW));
 
     sphere
   }
@@ -138,7 +146,10 @@ impl Sphere
     check!(gl::enable_vertex_attrib_array(0));
     check!(gl::enable_vertex_attrib_array(1));
 
-    check!(gl::draw_arrays(gl::TRIANGLES, 0, (self.verts.len() as i32)));
+    //check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::LINE));
+    //check!(gl::draw_arrays(gl::TRIANGLES, 0, (self.verts.len() as i32)));
+    check!(gl::draw_arrays(gl::POINTS, 0, (self.voxels.len() as i32 * 36)));
+    //check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::FILL));
 
     check!(gl::disable_vertex_attrib_array(0));
     check!(gl::disable_vertex_attrib_array(1));
@@ -184,15 +195,10 @@ priv fn voxelize(verts: &[Vertex_PC]) -> ~[Cube]
   )
   let mut new_verts: ~[Cube] = vec::with_capacity((resolution * resolution * resolution) as uint);
   for uint::range(0, resolution as uint) |z|
-  {
-    for uint::range(0, resolution as uint) |y|
-    {
-      for uint::range(0, resolution as uint) |x|
-      {
-        new_verts.push(Cube::new(size, Vec3f::new(x as f32, y as f32, z as f32)));
-      }
-    }
-  }
+  { for uint::range(0, resolution as uint) |y|
+    { for uint::range(0, resolution as uint) |x|
+      { new_verts.push(Cube::new(size, Vec3f::new(x as f32 * size, y as f32 * size, z as f32 * size))); } } }
+  assert!(new_verts.len() == (resolution * resolution * resolution) as uint);
   /* Triangle -> box collision checking to enable voxels. */
 
   /* Pass back on to sphere for rendering. */

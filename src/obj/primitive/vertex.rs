@@ -11,6 +11,7 @@
 
 use math::Vec3f;
 
+#[packed]
 pub struct Vertex_P
 {
   position: Vec3f,
@@ -23,6 +24,7 @@ impl Vertex_P
   { Vertex_P { position: Vec3f::zero() } }
 }
 
+#[packed]
 pub struct Vertex_PC
 {
   position: Vec3f,
@@ -38,6 +40,7 @@ impl Vertex_PC
   { Vertex_PC { position: Vec3f::zero(), color: Vec3f::new(1.0, 1.0, 1.0) } }
 }
 
+#[packed]
 pub struct Vertex_PN
 {
   position: Vec3f,
@@ -53,6 +56,7 @@ impl Vertex_PN
   { Vertex_PN { position: Vec3f::zero(), normal: Vec3f::zero() } }
 }
 
+#[packed]
 pub struct Vertex_PCN
 {
   position: Vec3f,

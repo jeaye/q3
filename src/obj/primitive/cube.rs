@@ -12,9 +12,10 @@
 use math::Vec3f;
 use primitive::Triangle;
 
+#[packed]
 struct Cube
 {
-  triangles: ~([Triangle, ..12]),
+  triangles: ([Triangle, ..12]),
 }
 impl Cube
 {
@@ -24,43 +25,43 @@ impl Cube
     Cube
     {
       triangles:
-      ~([
-          Triangle::new_with_position(Vec3f::new(-half,-half,-half), 
-                                      Vec3f::new(-half,-half, half),
-                                      Vec3f::new(-half, half, half)),
-          Triangle::new_with_position(Vec3f::new(half, half,-half),
-                                      Vec3f::new(-half,-half,-half),
-                                      Vec3f::new(-half, half,-half)),
-          Triangle::new_with_position(Vec3f::new(half,-half, half),
-                                      Vec3f::new(-half,-half,-half),
-                                      Vec3f::new(half,-half,-half)),
-          Triangle::new_with_position(Vec3f::new(half, half,-half),
-                                      Vec3f::new(half,-half,-half),
-                                      Vec3f::new(-half,-half,-half)),
-          Triangle::new_with_position(Vec3f::new(-half,-half,-half),
-                                      Vec3f::new(-half, half, half),
-                                      Vec3f::new(-half, half,-half)),
-          Triangle::new_with_position(Vec3f::new(half,-half, half),
-                                      Vec3f::new(-half,-half, half),
-                                      Vec3f::new(-half,-half,-half)),
-          Triangle::new_with_position(Vec3f::new(-half, half, half),
-                                      Vec3f::new(-half,-half, half),
-                                      Vec3f::new(half,-half, half)),
-          Triangle::new_with_position(Vec3f::new(half, half, half),
-                                      Vec3f::new(half,-half,-half),
-                                      Vec3f::new(half, half,-half)),
-          Triangle::new_with_position(Vec3f::new(half,-half,-half),
-                                      Vec3f::new(half, half, half),
-                                      Vec3f::new(half,-half, half)),
-          Triangle::new_with_position(Vec3f::new(half, half, half),
-                                      Vec3f::new(half, half,-half),
-                                      Vec3f::new(-half, half,-half)),
-          Triangle::new_with_position(Vec3f::new(half, half, half),
-                                      Vec3f::new(-half, half,-half),
-                                      Vec3f::new(-half, half, half)),
-          Triangle::new_with_position(Vec3f::new(half, half, half),
-                                      Vec3f::new(-half, half, half),
-                                      Vec3f::new(half,-half, half)),
+      ([
+          Triangle::new_with_position(Vec3f::new(-half,-half,-half) + center, 
+                                      Vec3f::new(-half,-half, half) + center,
+                                      Vec3f::new(-half, half, half) + center),
+          Triangle::new_with_position(Vec3f::new(half, half,-half) + center,
+                                      Vec3f::new(-half,-half,-half) + center,
+                                      Vec3f::new(-half, half,-half) + center),
+          Triangle::new_with_position(Vec3f::new(half,-half, half) + center,
+                                      Vec3f::new(-half,-half,-half) + center,
+                                      Vec3f::new(half,-half,-half) + center),
+          Triangle::new_with_position(Vec3f::new(half, half,-half) + center,
+                                      Vec3f::new(half,-half,-half) + center,
+                                      Vec3f::new(-half,-half,-half) + center),
+          Triangle::new_with_position(Vec3f::new(-half,-half,-half) + center,
+                                      Vec3f::new(-half, half, half) + center,
+                                      Vec3f::new(-half, half,-half) + center),
+          Triangle::new_with_position(Vec3f::new(half,-half, half) + center,
+                                      Vec3f::new(-half,-half, half) + center,
+                                      Vec3f::new(-half,-half,-half) + center),
+          Triangle::new_with_position(Vec3f::new(-half, half, half) + center,
+                                      Vec3f::new(-half,-half, half) + center,
+                                      Vec3f::new(half,-half, half) + center),
+          Triangle::new_with_position(Vec3f::new(half, half, half) + center,
+                                      Vec3f::new(half,-half,-half) + center,
+                                      Vec3f::new(half, half,-half) + center),
+          Triangle::new_with_position(Vec3f::new(half,-half,-half) + center,
+                                      Vec3f::new(half, half, half) + center,
+                                      Vec3f::new(half,-half, half) + center),
+          Triangle::new_with_position(Vec3f::new(half, half, half) + center,
+                                      Vec3f::new(half, half,-half) + center,
+                                      Vec3f::new(-half, half,-half) + center),
+          Triangle::new_with_position(Vec3f::new(half, half, half) + center,
+                                      Vec3f::new(-half, half,-half) + center,
+                                      Vec3f::new(-half, half, half) + center),
+          Triangle::new_with_position(Vec3f::new(half, half, half) + center,
+                                      Vec3f::new(-half, half, half) + center,
+                                      Vec3f::new(half,-half, half) + center),
     ])
     }
   }
