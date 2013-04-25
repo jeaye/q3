@@ -220,14 +220,18 @@ priv fn voxelize(verts: &[Vertex_PC]) -> ~[Cube]
   /* Create 3D array of voxels. */
   let mid_offset = ((resolution / 2.0) * size);
   io::println(fmt!("Mid Offset: %s", mid_offset.to_str()));
-  let mut new_verts: ~[Cube] = vec::with_capacity((resolution * resolution * resolution) as uint);
-  for uint::range(0, resolution as uint) |z| /* TODO: Calculate max/min here to find out where this actually lies. */
-  { for uint::range(0, resolution as uint) |y|
-    { for uint::range(0, resolution as uint) |x|
-      { new_verts.push(Cube::new(size, Vec3f::new((x as f32 * size) - mid_offset, (y as f32 * size) - mid_offset, (z as f32 * size) - mid_offset) - center)); }
+  let mut new_verts: ~[Cube] = vec::with_capacity((f32::pow(resolution + 1.0, 3.0)) as uint);
+  for uint::range(0, resolution as uint + 1) |z| /* TODO: Calculate max/min here to find out where this actually lies. */
+  { for uint::range(0, resolution as uint + 1) |y|
+    { for uint::range(0, resolution as uint + 1) |x|
+      {
+        let c = Vec3f::new((x as f32 * size) - mid_offset, (y as f32 * size) - mid_offset, (z as f32 * size) - mid_offset) - center;
+        let cube = Cube::new(size, c);
+        new_verts.push(cube);
+      }
     }
   }
-  assert!(new_verts.len() == (resolution * resolution * resolution) as uint);
+  assert!(new_verts.len() == (f32::pow(resolution + 1.0, 3.0)) as uint);
 
   /* Triangle -> box collision checking to enable voxels. */
 
