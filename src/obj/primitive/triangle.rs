@@ -27,3 +27,22 @@ impl Triangle
   { Triangle { verts: ([ Vert::zero(), ..3 ]) } }
 }
 
+#[packed]
+struct Triangle_Index
+{
+  indices: ([u32, ..3]),
+}
+impl Triangle_Index
+{
+  pub fn new(start: u32) -> Triangle_Index
+  {
+    Triangle_Index
+    {
+      indices:
+      [
+        start, start + 1, start + 2,
+      ]
+    }
+  }
+}
+

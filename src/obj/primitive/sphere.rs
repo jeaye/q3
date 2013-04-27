@@ -12,7 +12,7 @@
 use math::{ Vec3f };
 use primitive::Vertex_PC;
 use primitive::Triangle;
-use primitive::Cube;
+use primitive::{ Cube, Cube_Index };
 
 #[path = "../../gl/mod.rs"]
 mod gl;
@@ -31,7 +31,9 @@ pub struct Sphere
 
   vox_vao: gl::GLuint,
   vox_vbo: gl::GLuint,
+  vox_ibo: gl::GLuint,
   voxels: ~[Cube],
+  indices: ~[Cube_Index],
 }
 
 impl Sphere
@@ -51,7 +53,9 @@ impl Sphere
 
       vox_vao: 0,
       vox_vbo: 0,
+      vox_ibo: 0,
       voxels: ~[],
+      indices: ~[],
     };
 
     let root_verts: [Vec3f, ..12] =
@@ -108,9 +112,16 @@ impl Sphere
 
     sphere.vox_vao = check!(gl::gen_vertex_arrays(1))[0]; /* TODO: Check these. */
     sphere.vox_vbo = check!(gl::gen_buffers(1))[0];
+    sphere.vox_ibo = check!(gl::gen_buffers(1))[0];
     check!(gl::bind_vertex_array(sphere.vox_vao));
     check!(gl::bind_buffer(gl::ARRAY_BUFFER, sphere.vox_vbo));
     check!(gl::buffer_data(gl::ARRAY_BUFFER, sphere.voxels, gl::STATIC_DRAW));
+
+
+    for u32::range(0, 8)|x|
+    { sphere.indices.push(Cube_Index::new(x)); }
+    check!(gl::bind_buffer(gl::ELEMENT_ARRAY_BUFFER, sphere.vox_ibo));
+    check!(gl::buffer_data(gl::ELEMENT_ARRAY_BUFFER, sphere.indices, gl::STATIC_DRAW));
 
     sphere
   }
@@ -172,6 +183,7 @@ impl Sphere
     {
       check!(gl::bind_vertex_array(self.vox_vao));
       check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.vox_vbo));
+      check!(gl::bind_buffer(gl::ELEMENT_ARRAY_BUFFER, self.vox_ibo));
 
       check!(gl::vertex_attrib_pointer_f32(0, 3, false, (sys::size_of::<Vertex_PC>()) as i32, 0));
       check!(gl::vertex_attrib_pointer_f32(1, 3, false, (sys::size_of::<Vertex_PC>()) as i32, sys::size_of::<Vec3f>() as u32));
@@ -179,13 +191,15 @@ impl Sphere
       check!(gl::enable_vertex_attrib_array(1));
 
       check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::LINE));
-      check!(gl::draw_arrays(gl::TRIANGLES, 0, (self.voxels.len() as i32 * 36)));
+      //check!(gl::draw_arrays(gl::TRIANGLES, 0, (self.voxels.len() as i32 * 36)));
+      check!(gl::draw_elements(gl::TRIANGLES, self.indices.len() as i32 * 36, gl::UNSIGNED_INT, None));
       check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::FILL));
 
       check!(gl::disable_vertex_attrib_array(0));
       check!(gl::disable_vertex_attrib_array(1));
       check!(gl::bind_vertex_array(0));
       check!(gl::bind_buffer(gl::ARRAY_BUFFER, 0));
+      check!(gl::bind_buffer(gl::ELEMENT_ARRAY_BUFFER, 0));
     }
   }
 }

@@ -10,8 +10,8 @@
 */
 
 pub use self::vertex::{ Vertex_P, Vertex_PC, Vertex_PN, Vertex_PCN };
-pub use self::triangle::Triangle;
-pub use self::cube::Cube;
+pub use self::triangle::{ Triangle, Triangle_Index };
+pub use self::cube::{ Cube, Cube_Index };
 pub use self::sphere::Sphere;
 
 mod vertex;

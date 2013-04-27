@@ -10,7 +10,7 @@
 */
 
 use math::Vec3f;
-use primitive::Triangle;
+use primitive::{ Triangle, Triangle_Index };
 
 #[packed]
 struct Cube
@@ -63,6 +63,37 @@ impl Cube
                                       Vec3f::new(-half, half, half) + center,
                                       Vec3f::new(half,-half, half) + center),
     ])
+    }
+  }
+}
+
+#[packed]
+struct Cube_Index
+{
+  indices: ([Triangle_Index, ..12]),
+}
+impl Cube_Index
+{
+  pub fn new(start: u32) -> Cube_Index
+  {
+    let adjusted_start = start * 36;
+    Cube_Index
+    {
+      indices:
+      [
+        Triangle_Index::new(adjusted_start),
+        Triangle_Index::new(adjusted_start + 3),
+        Triangle_Index::new(adjusted_start + 6),
+        Triangle_Index::new(adjusted_start + 9),
+        Triangle_Index::new(adjusted_start + 12),
+        Triangle_Index::new(adjusted_start + 15),
+        Triangle_Index::new(adjusted_start + 18),
+        Triangle_Index::new(adjusted_start + 21),
+        Triangle_Index::new(adjusted_start + 24),
+        Triangle_Index::new(adjusted_start + 27),
+        Triangle_Index::new(adjusted_start + 30),
+        Triangle_Index::new(adjusted_start + 33),
+      ]
     }
   }
 }
