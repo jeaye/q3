@@ -125,21 +125,35 @@ impl Map
     /* Create 3D array of voxels. */
     let mid_offset = (((self.resolution  as f32) / 2.0) * size);
     self.voxels = vec::with_capacity((f32::pow((self.resolution + 1) as f32, 3.0)) as uint);
-    for uint::range(0, self.resolution as uint + 1) |z| 
-    { for uint::range(0, self.resolution as uint + 1) |y|
-      { for uint::range(0, self.resolution as uint + 1) |x|
+    let adjusted_resolution: uint = self.resolution as uint + 1;
+    for uint::range(0, adjusted_resolution) |z| 
+    { for uint::range(0, adjusted_resolution) |y|
+      { for uint::range(0, adjusted_resolution) |x|
         {
           let c = Vec3f::new((x as f32 * size) - mid_offset, (y as f32 * size) - mid_offset, (z as f32 * size) - mid_offset) - center;
           let cube = Cube::new(size, c);
           self.voxels.push(cube);
+
+          /* Check if this cube intersects with any triangles. */
+          for tris.each |tri|
+          {
+            if tri_cube_intersect(c, size, tri, x)
+            {
+              self.indices.push(Cube_Index::new(((z * adjusted_resolution * adjusted_resolution) + (y * adjusted_resolution) + x) as u32));
+              break;
+            }
+          }
         }
       }
     }
-    assert!(self.voxels.len() == (f32::pow((self.resolution + 1) as f32, 3.0)) as uint);
-
-    /* Triangle -> box collision checking to enable voxels. */
-    for u32::range(0, self.voxels.len() as u32) |x|
-    { self.indices.push(Cube_Index::new(x)); }
+    assert!(self.voxels.len() == (f32::pow((adjusted_resolution) as f32, 3.0)) as uint);
   }
+}
+
+priv fn tri_cube_intersect(box_center: Vec3f, box_size: f32, tri: &Triangle, x: uint) -> bool
+{
+
+  /* There is an overlap. */
+  true
 }
 
