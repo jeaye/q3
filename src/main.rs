@@ -24,13 +24,16 @@ mod math;
 mod check;
 
 #[path = "obj/bsp/map.rs"]
-mod map;
+mod map; /* mod.rs */
 
 #[path = "gl/ttf/mod.rs"]
 mod ttf;
 
 #[path = "obj/primitive/mod.rs"]
 mod primitive;
+
+#[path = "obj/voxel/mod.rs"]
+mod voxel;
 
 fn main() {
   glfw::set_error_callback(error_callback);
@@ -62,6 +65,7 @@ fn main() {
     }
 
     let mut sphere = primitive::Sphere::new(100.0, 5);
+    let vox_sphere = voxel::Map::new(sphere.tris, 10);
 
     /* Temp test for font loading. */
     let mut font_renderer = ttf::Renderer::new();
@@ -99,6 +103,7 @@ fn main() {
       {
         //map.draw();
         sphere.draw();
+        vox_sphere.draw();
         font_renderer.begin(camera);
         font_renderer.render(fmt!("%?", fps), math::Vec2f::new(0.0, 0.0), &font);
         font_renderer.end();

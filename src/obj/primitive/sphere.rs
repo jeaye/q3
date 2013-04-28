@@ -12,7 +12,6 @@
 use math::{ Vec3f };
 use primitive::Vertex_PC;
 use primitive::Triangle;
-use primitive::{ Cube, Cube_Index };
 
 #[path = "../../gl/mod.rs"]
 mod gl;
@@ -28,12 +27,6 @@ pub struct Sphere
   vao: gl::GLuint,
   vbo: gl::GLuint,
   tris: ~[Triangle],
-
-  vox_vao: gl::GLuint,
-  vox_vbo: gl::GLuint,
-  vox_ibo: gl::GLuint,
-  voxels: ~[Cube],
-  indices: ~[Cube_Index],
 }
 
 impl Sphere
@@ -50,12 +43,6 @@ impl Sphere
       vao: 0,
       vbo: 0,
       tris: ~[],
-
-      vox_vao: 0,
-      vox_vbo: 0,
-      vox_ibo: 0,
-      voxels: ~[],
-      indices: ~[],
     };
 
     let root_verts: [Vec3f, ..12] =
@@ -102,26 +89,12 @@ impl Sphere
     ];
     for uint::range(0, tris.len()) |x|
     { sphere.subdivide(tris[x], new_subdivides); }
-    sphere.voxels = voxelize(sphere.tris, 1);
 
     sphere.vao = check!(gl::gen_vertex_arrays(1))[0]; /* TODO: Check these. */
     sphere.vbo = check!(gl::gen_buffers(1))[0];
     check!(gl::bind_vertex_array(sphere.vao));
     check!(gl::bind_buffer(gl::ARRAY_BUFFER, sphere.vbo));
     check!(gl::buffer_data(gl::ARRAY_BUFFER, sphere.tris, gl::STATIC_DRAW));
-
-    sphere.vox_vao = check!(gl::gen_vertex_arrays(1))[0]; /* TODO: Check these. */
-    sphere.vox_vbo = check!(gl::gen_buffers(1))[0];
-    sphere.vox_ibo = check!(gl::gen_buffers(1))[0];
-    check!(gl::bind_vertex_array(sphere.vox_vao));
-    check!(gl::bind_buffer(gl::ARRAY_BUFFER, sphere.vox_vbo));
-    check!(gl::buffer_data(gl::ARRAY_BUFFER, sphere.voxels, gl::STATIC_DRAW));
-
-
-    for u32::range(0, 8)|x|
-    { sphere.indices.push(Cube_Index::new(x)); }
-    check!(gl::bind_buffer(gl::ELEMENT_ARRAY_BUFFER, sphere.vox_ibo));
-    check!(gl::buffer_data(gl::ELEMENT_ARRAY_BUFFER, sphere.indices, gl::STATIC_DRAW));
 
     sphere
   }
@@ -163,99 +136,20 @@ impl Sphere
 
   pub fn draw(&self)
   {
-    {
-      check!(gl::bind_vertex_array(self.vao));
-      check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.vbo));
+    check!(gl::bind_vertex_array(self.vao));
+    check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.vbo));
 
-      check!(gl::vertex_attrib_pointer_f32(0, 3, false, (sys::size_of::<Vertex_PC>()) as i32, 0));
-      check!(gl::vertex_attrib_pointer_f32(1, 3, false, (sys::size_of::<Vertex_PC>()) as i32, sys::size_of::<Vec3f>() as u32));
-      check!(gl::enable_vertex_attrib_array(0));
-      check!(gl::enable_vertex_attrib_array(1));
+    check!(gl::vertex_attrib_pointer_f32(0, 3, false, (sys::size_of::<Vertex_PC>()) as i32, 0));
+    check!(gl::vertex_attrib_pointer_f32(1, 3, false, (sys::size_of::<Vertex_PC>()) as i32, sys::size_of::<Vec3f>() as u32));
+    check!(gl::enable_vertex_attrib_array(0));
+    check!(gl::enable_vertex_attrib_array(1));
 
-      check!(gl::draw_arrays(gl::TRIANGLES, 0, (self.tris.len() as i32 * 3)));
+    check!(gl::draw_arrays(gl::TRIANGLES, 0, (self.tris.len() as i32 * 3)));
 
-      check!(gl::disable_vertex_attrib_array(0));
-      check!(gl::disable_vertex_attrib_array(1));
-      check!(gl::bind_vertex_array(0));
-      check!(gl::bind_buffer(gl::ARRAY_BUFFER, 0));
-    }
-
-    {
-      check!(gl::bind_vertex_array(self.vox_vao));
-      check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.vox_vbo));
-      check!(gl::bind_buffer(gl::ELEMENT_ARRAY_BUFFER, self.vox_ibo));
-
-      check!(gl::vertex_attrib_pointer_f32(0, 3, false, (sys::size_of::<Vertex_PC>()) as i32, 0));
-      check!(gl::vertex_attrib_pointer_f32(1, 3, false, (sys::size_of::<Vertex_PC>()) as i32, sys::size_of::<Vec3f>() as u32));
-      check!(gl::enable_vertex_attrib_array(0));
-      check!(gl::enable_vertex_attrib_array(1));
-
-      check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::LINE));
-      //check!(gl::draw_arrays(gl::TRIANGLES, 0, (self.voxels.len() as i32 * 36)));
-      check!(gl::draw_elements(gl::TRIANGLES, self.indices.len() as i32 * 36, gl::UNSIGNED_INT, None));
-      check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::FILL));
-
-      check!(gl::disable_vertex_attrib_array(0));
-      check!(gl::disable_vertex_attrib_array(1));
-      check!(gl::bind_vertex_array(0));
-      check!(gl::bind_buffer(gl::ARRAY_BUFFER, 0));
-      check!(gl::bind_buffer(gl::ELEMENT_ARRAY_BUFFER, 0));
-    }
+    check!(gl::disable_vertex_attrib_array(0));
+    check!(gl::disable_vertex_attrib_array(1));
+    check!(gl::bind_vertex_array(0));
+    check!(gl::bind_buffer(gl::ARRAY_BUFFER, 0));
   }
 }
-
-macro_rules! index
-(
-  ($arr:ident[$x:expr][$y:expr][$z:expr]) => 
-  (
-    $arr[($z * resolution * resolution) + (y * resolution) + x]
-  )
-)
-priv fn voxelize(tris: &[Triangle], resolution: i32) -> ~[Cube]
-{
-  /* Require at least one triangle. */
-  assert!(tris.len() >= 3);
-
-  /* Bounding box of vert dimensions. */
-  let mut min = Vec3f::new(tris[0].verts[0].position.x, tris[0].verts[0].position.y, tris[0].verts[0].position.z);
-  let mut max = Vec3f::new(tris[0].verts[0].position.x, tris[0].verts[0].position.y, tris[0].verts[0].position.z);
-  for tris.each |curr|
-  {
-    for curr.verts.each |vert|
-    {
-      min.x = cmp::min(min.x, vert.position.x);
-      min.y = cmp::min(min.y, vert.position.y);
-      min.z = cmp::min(min.z, vert.position.z);
-
-      max.x = cmp::max(max.x, vert.position.x);
-      max.y = cmp::max(max.y, vert.position.y);
-      max.z = cmp::max(max.z, vert.position.z);
-    }
-  }
-  let center = Vec3f::new(max.x - ((max.x - min.x) / 2.0), max.y - ((max.y - min.y) / 2.0), max.z - ((max.z - min.z) / 2.0));
-
-  /* Calculate, given resolution (how many voxels across), the dimensions of a voxel. */
-  let size = cmp::max(max.x - min.x, cmp::max(max.y - min.y, max.z - min.z)) / (resolution as f32);
-
-  /* Create 3D array of voxels. */
-  let mid_offset = (((resolution  as f32) / 2.0) * size);
-  let mut voxels: ~[Cube] = vec::with_capacity((f32::pow((resolution + 1) as f32, 3.0)) as uint);
-  for uint::range(0, resolution as uint + 1) |z| 
-  { for uint::range(0, resolution as uint + 1) |y|
-    { for uint::range(0, resolution as uint + 1) |x|
-      {
-        let c = Vec3f::new((x as f32 * size) - mid_offset, (y as f32 * size) - mid_offset, (z as f32 * size) - mid_offset) - center;
-        let cube = Cube::new(size, c);
-        voxels.push(cube);
-      }
-    }
-  }
-  assert!(voxels.len() == (f32::pow((resolution + 1) as f32, 3.0)) as uint);
-
-  /* Triangle -> box collision checking to enable voxels. */
-
-  /* Pass back on to sphere for rendering. */
-  voxels
-}
-
 
