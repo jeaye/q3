@@ -65,7 +65,11 @@ fn main() {
     }
 
     let mut sphere = primitive::Sphere::new(100.0, 5);
-    let vox_sphere = voxel::Map::new(sphere.tris, 10);
+
+    let t = std::time::precise_time_s();
+    let vox_sphere = voxel::Map::new(sphere.tris, 30);
+    let et = std::time::precise_time_s();
+    io::println(fmt!("Voxelization took %? seconds.", (et - t)));
 
     /* Temp test for font loading. */
     let mut font_renderer = ttf::Renderer::new();
@@ -102,7 +106,7 @@ fn main() {
       check!(gl::clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT));
       {
         //map.draw();
-        sphere.draw();
+        //sphere.draw();
         vox_sphere.draw();
         font_renderer.begin(camera);
         font_renderer.render(fmt!("%?", fps), math::Vec2f::new(0.0, 0.0), &font);

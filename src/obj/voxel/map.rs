@@ -25,7 +25,7 @@ mod check;
 
 macro_rules! index
 (
-  ($arr:ident[$x:expr][$y:expr][$z:expr]) => 
+  ($arr:expr[$x:expr][$y:expr][$z:expr]) => 
   (
     $arr[($z * self.resolution * self.resolution) + (y * self.resolution) + x]
   )
@@ -85,7 +85,7 @@ impl Map
     check!(gl::enable_vertex_attrib_array(0));
     check!(gl::enable_vertex_attrib_array(1));
 
-    check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::LINE));
+    //check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::LINE));
     check!(gl::draw_elements(gl::TRIANGLES, self.indices.len() as i32 * 36, gl::UNSIGNED_INT, None));
     check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::FILL));
 
@@ -125,7 +125,8 @@ impl Map
     /* Create 3D array of voxels. */
     let mid_offset = (((self.resolution  as f32) / 2.0) * size);
     self.voxels = vec::with_capacity((f32::pow((self.resolution + 1) as f32, 3.0)) as uint);
-    let adjusted_resolution: uint = self.resolution as uint + 1;
+    self.indices = vec::with_capacity((f32::pow((self.resolution + 1) as f32, 3.0)) as uint);
+    let adjusted_resolution = self.resolution as uint + 1;
     for uint::range(0, adjusted_resolution) |z| 
     { for uint::range(0, adjusted_resolution) |y|
       { for uint::range(0, adjusted_resolution) |x|
@@ -150,10 +151,193 @@ impl Map
   }
 }
 
+macro_rules! find_min_max
+(
+  ($x0:expr, $x1:expr, $x2:expr, $min:expr, $max:expr) =>
+  (
+    {
+      $min = $x0;
+      $max = $x0;
+
+      if($x1 < $min){ $min = $x1; }
+      if($x1 > $max){ $max = $x1; }
+      if($x2 < $min){ $min = $x2; }
+      if($x2 > $max){ $max = $x2; }
+    }
+  )
+)
+
+/*======================== X-tests ========================*/
+macro_rules! axis_test_x01
+(
+  ($a:expr, $b:expr, $fa:expr, $fb:expr) =>
+  (
+    {
+      p0 = $a * v0.y - $b * v0.z;
+      p2 = $a * v2.y - $b * v2.z;
+      if p0 < p2  { min = p0; max = p2;} else { min = p2; max = p0; }
+      rad = $fa * box_size + $fb * box_size;
+      if min > rad || max < -rad  { return false; }
+    }
+  )
+)
+
+macro_rules! axis_test_x2
+(
+  ($a:expr, $b:expr, $fa:expr, $fb:expr) =>
+  (
+    {
+      p0 = $a * v0.y - $b * v0.z;
+      p1 = $a * v1.y - $b * v1.z;
+      if p0 < p1 { min = p0; max = p1; } else { min = p1; max = p0; }
+      rad = $fa * box_size + $fb * box_size;
+      if min > rad || max < -rad { return false; }
+    }
+  )
+)
+
+/*======================== Y-tests ========================*/
+
+macro_rules! axis_test_y02
+(
+  ($a:expr, $b:expr, $fa:expr, $fb:expr) =>
+  (
+    {
+      p0 = -$a * v0.x + $b * v0.z;
+      p2 = -$a * v2.x + $b * v2.z;
+      if p0 < p2 { min = p0; max = p2; } else { min = p2; max = p0; }
+      rad = $fa * box_size + $fb * box_size;
+      if min > rad || max < -rad { return false; }
+    }
+  )
+)
+
+macro_rules! axis_test_y1
+(
+  ($a:expr, $b:expr, $fa:expr, $fb:expr) =>
+  (
+    {
+      p0 = -$a * v0.x + $b * v0.z;
+      p1 = -$a * v1.x + $b * v1.z;
+      if p0 < p1 { min = p0; max = p1; } else { min = p1; max = p0; }
+      rad = $fa * box_size + $fb * box_size;
+      if min > rad || max < -rad { return false; }
+    }
+  )
+)
+
+/*======================== Z-tests ========================*/
+
+macro_rules! axis_test_z12
+(
+  ($a:expr, $b:expr, $fa:expr, $fb:expr) =>
+  (
+    {
+      p1 = $a * v1.x - $b * v1.y;
+      p2 = $a * v2.x - $b * v2.y;
+      if p2 < p1 { min = p2; max = p1;} else { min = p1; max = p2; }
+      rad = $fa * box_size + $fb * box_size;
+      if min > rad || max < -rad { return false; }
+    }
+  )
+)
+
+
+macro_rules! axis_test_z0
+(
+  ($a:expr, $b:expr, $fa:expr, $fb:expr) =>
+  (
+    {
+      p0 = $a * v0.x - $b * v0.y;
+      p1 = $a * v1.x - $b * v1.y;
+      if p0 < p1 { min = p0; max = p1; } else { min = p1; max = p0; }
+      rad = $fa * box_size + $fb * box_size;
+      if min > rad || max < -rad { return false; }
+    }
+  )
+)
+
+#[inline(always)]
 priv fn tri_cube_intersect(box_center: Vec3f, box_size: f32, tri: &Triangle, x: uint) -> bool
 {
+  let mut v0 = Vec3f::zero(), v1 = Vec3f::zero(), v2 = Vec3f::zero();
+  let mut min = 0.0, max = 0.0, p0 = 0.0, p1 = 0.0, p2 = 0.0, rad = 0.0, fex = 0.0, fey = 0.0, fez = 0.0;
+  let mut normal = Vec3f::zero(), e0 = Vec3f::zero(), e1 = Vec3f::zero(), e2 = Vec3f::zero();
 
-  /* There is an overlap. */
-  true
+  /* Move everything so that the box's center is in (0, 0, 0). */
+  v0 = tri.verts[0].position - box_center;
+  v1 = tri.verts[1].position - box_center;
+  v2 = tri.verts[2].position - box_center;
+
+  /* Computer triangle edges. */
+  e0 = v1 - v0; /* Edge 0. */
+  e1 = v2 - v1; /* Edge 1. */
+  e2 = v0 - v2; /* Edge 2. */
+
+  /* Bullet 3. */
+  fex = f32::abs(e0.x);
+  fey = f32::abs(e0.y);
+  fez = f32::abs(e0.z);
+  axis_test_x01!(e0.z, e0.y, fez, fey);
+  axis_test_y02!(e0.z, e0.x, fez, fex);
+  axis_test_z12!(e0.y, e0.x, fey, fex);
+
+  fex = f32::abs(e1.x);
+  fey = f32::abs(e1.y);
+  fez = f32::abs(e1.z);
+  axis_test_x01!(e1.z, e1.y, fez, fey);
+  axis_test_y02!(e1.z, e1.x, fez, fex);
+  axis_test_z0!(e1.y, e1.x, fey, fex);
+
+  fex = f32::abs(e2.x);
+  fey = f32::abs(e2.y);
+  fez = f32::abs(e2.z);
+  axis_test_x2!(e2.z, e2.y, fez, fey);
+  axis_test_y1!(e2.z, e2.x, fez, fex);
+  axis_test_z12!(e2.y, e2.x, fey, fex);
+
+  /* Bullet 1. */
+  /* Test in X-direction */
+  find_min_max!(v0.x, v1.x, v2.x, min, max);
+  if min > box_size || max < -box_size { return false; }
+
+  /* Test in Y-direction */
+  find_min_max!(v0.y, v1.y, v2.y, min, max);
+  if min > box_size || max < -box_size { return false; }
+
+  /* Test in Z-direction */
+  find_min_max!(v0.z, v1.z, v2.z, min, max);
+  if min > box_size || max < -box_size { return false; }
+
+  /* Bullet 2. */
+  normal = e0.cross(&e1);
+  plane_cube_intersect(&normal, &v0, box_size)
+}
+
+#[inline(always)]
+priv fn plane_cube_intersect(normal: &Vec3f, vert: &Vec3f, box_size: f32) -> bool
+{
+  let mut vmin: [f32, ..3] = [0.0, 0.0, 0.0];
+  let mut vmax: [f32, ..3] = [0.0, 0.0, 0.0];
+  let mut v = 0.0;
+
+  for uint::range(0, 3) |q|
+  {
+    v = vert[q];
+    if normal[q] > 0.0
+    {
+      vmin[q] = -box_size - v;
+      vmax[q] = box_size - v;
+    }
+    else
+    {
+      vmin[q] = box_size - v;
+      vmax[q] = -box_size - v;
+    }
+  }
+  if (normal[0]*vmin[0]+normal[1]*vmin[1]+normal[2]*vmin[2]) > 0.0 { return false; }
+  if (normal[0]*vmax[0]+normal[1]*vmax[1]+normal[2]*vmax[2]) >= 0.0 { return true; }
+
+  false
 }
 

@@ -25,6 +25,25 @@ impl Triangle
   { Triangle { verts: ([ Vert::new_with_position(v1), Vert::new_with_position(v2), Vert::new_with_position(v3) ]) } }
   pub fn zero() -> Triangle
   { Triangle { verts: ([ Vert::zero(), ..3 ]) } }
+
+  pub fn get_normal(&self) -> Vec3f
+  {
+    let mut a = Vec3f::zero(), b = Vec3f::zero(), res = Vec3f::zero();
+
+    /* First edge. */
+    a.x = self.verts[0].position.x - self.verts[1].position.x;
+    a.y = self.verts[0].position.y - self.verts[1].position.y;
+    a.z = self.verts[0].position.z - self.verts[1].position.z;
+
+    /* Second edge. */
+    b.x = self.verts[1].position.x - self.verts[2].position.x;
+    b.y = self.verts[1].position.y - self.verts[2].position.y;
+    b.z = self.verts[1].position.z - self.verts[2].position.z;
+
+    res = a.cross(&b); /* TODO: Other way? */
+    res.normalize();
+    res
+  }
 }
 
 #[packed]

@@ -35,7 +35,7 @@ impl Vertex_PC
   pub fn new(pos: Vec3f, col: Vec3f) -> Vertex_PC
   { Vertex_PC { position: pos, color: col } }
   pub fn new_with_position(pos: Vec3f) -> Vertex_PC
-  { Vertex_PC { position: pos, color: Vec3f::new(1.0, 1.0, 1.0) } }
+  { Vertex_PC { position: pos, color: pos } }
   pub fn zero() -> Vertex_PC
   { Vertex_PC { position: Vec3f::zero(), color: Vec3f::new(1.0, 1.0, 1.0) } }
 }

@@ -106,6 +106,20 @@ macro_rules! declare
                 z: ( -self.z ) }
         }
       }
+
+      impl Index<uint, $Component> for $Type
+      {
+        fn index(&self, rhs: &uint) -> $Component
+        {
+          match rhs
+          {
+            &0 => { self.x }
+            &1 => { self.y }
+            &2 => { self.z }
+            _ => { fail!(~"Invalid index to Vec3"); }
+          }
+        }
+      }
     }
   );
 )
