@@ -1,5 +1,11 @@
 Voxelization
-  Sphere
+  No need to check all triangles
+    Octree?
+    Threading
+      On different index arrays? Merge at the end?
+    Check every other triangle? ^_^
+  Paging
+  RLE for networking
 
 #[cfg(foo)] and --cfg foo
   Error checking in check macro
