@@ -5,7 +5,7 @@ Q^3 is a very new project using Mozilla's Rust language and OpenGL to create a Q
 The goal of this project is not to be Quake 3, but to be its own game. Currently testing the tech available to me, I'm still assessing what's going to become of Q^3. However, my goal is to take Quake 3 and QuakeLive maps, voxelize them, allow groups of players to join, and blow the shit out of everything in a fast-paced Quake-esque first person shooter. 
 
 ### What's the current state of Q^3?
-Q^3 is not a game yet! It's still a hackjob affair that I fondle every day. As of writing, it's merely a half-baked BSP renderer and a TTF renderer. The main focus now is an optimal voxelization routine that will turn Quake maps into Q^3-ready maps. This is being done using a combination of the Separating Axis Theorem, an octree, and a fuckton of threads.
+Q^3 is not a game yet! It's still a hackjob affair that I fondle every day. As of writing, it's merely a half-baked BSP renderer and a TTF renderer. The main focus now is an optimal voxelization routine that will turn Quake maps into Q^3-ready maps. This is being done using a combination of the Separating Axis Theorem, some paging, and a fuckton of threads.
 
 ### How do I get Q^3 running on my system?
 I run on the (nearly) latest Rust incoming; I generally pull every few days. Q^3 currently has glfw3, rust-opengles, and glfw-rs as submodules. To configure, simply run:  
