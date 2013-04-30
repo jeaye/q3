@@ -3,7 +3,7 @@
     See licensing in LICENSE file, or at:
         http://www.opensource.org/licenses/BSD-3-Clause
 
-    File: src/obj/voxel/map.rs
+    File: obj/voxel/map.rs
     Author: Jesse 'Jeaye' Wilkerson
     Description:
       A voxelization of arbitrary triangles
@@ -153,16 +153,16 @@ impl Map
 
 macro_rules! find_min_max
 (
-  ($x0:expr, $x1:expr, $x2:expr, $min:expr, $max:expr) =>
+  ($x0:expr, $x1:expr, $x2:expr) =>
   (
     {
-      $min = $x0;
-      $max = $x0;
+      min = $x0;
+      max = $x0;
 
-      if($x1 < $min){ $min = $x1; }
-      if($x1 > $max){ $max = $x1; }
-      if($x2 < $min){ $min = $x2; }
-      if($x2 > $max){ $max = $x2; }
+      if($x1 < min){ min = $x1; }
+      if($x1 > max){ max = $x1; }
+      if($x2 < min){ min = $x2; }
+      if($x2 > max){ max = $x2; }
     }
   )
 )
@@ -260,9 +260,9 @@ macro_rules! axis_test_z0
 #[inline(always)]
 priv fn tri_cube_intersect(box_center: Vec3f, box_size: f32, tri: &Triangle, x: uint) -> bool
 {
-  let mut v0 = Vec3f::zero(), v1 = Vec3f::zero(), v2 = Vec3f::zero();
-  let mut min = 0.0, max = 0.0, p0 = 0.0, p1 = 0.0, p2 = 0.0, rad = 0.0, fex = 0.0, fey = 0.0, fez = 0.0;
-  let mut normal = Vec3f::zero(), e0 = Vec3f::zero(), e1 = Vec3f::zero(), e2 = Vec3f::zero();
+  let mut v0, v1, v2;
+  let mut min, max, p0, p1, p2, rad, fex, fey, fez;
+  let mut normal, e0, e1, e2;
 
   /* Move everything so that the box's center is in (0, 0, 0). */
   v0 = tri.verts[0].position - box_center;
@@ -298,15 +298,15 @@ priv fn tri_cube_intersect(box_center: Vec3f, box_size: f32, tri: &Triangle, x: 
 
   /* Bullet 1. */
   /* Test in X-direction */
-  find_min_max!(v0.x, v1.x, v2.x, min, max);
+  find_min_max!(v0.x, v1.x, v2.x);
   if min > box_size || max < -box_size { return false; }
 
   /* Test in Y-direction */
-  find_min_max!(v0.y, v1.y, v2.y, min, max);
+  find_min_max!(v0.y, v1.y, v2.y);
   if min > box_size || max < -box_size { return false; }
 
   /* Test in Z-direction */
-  find_min_max!(v0.z, v1.z, v2.z, min, max);
+  find_min_max!(v0.z, v1.z, v2.z);
   if min > box_size || max < -box_size { return false; }
 
   /* Bullet 2. */
