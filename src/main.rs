@@ -23,8 +23,8 @@ mod math;
 #[path = "gl/check.rs"]
 mod check;
 
-#[path = "obj/bsp/map.rs"]
-mod map; /* mod.rs */
+#[path = "obj/bsp/mod.rs"]
+mod bsp; 
 
 #[path = "gl/ttf/mod.rs"]
 mod ttf;
@@ -75,7 +75,7 @@ fn main() {
     let mut font_renderer = ttf::Renderer::new();
     let mut font = ttf::Font::new("data/test.ttf", 50);
 
-    let map = map::Map::new("data/q3ctf1.bsp");
+    let map = bsp::Map::new("data/q3ctf1.bsp");
     //let map = map::Map::new("data/dk.bsp");
 
     /* Shader Creation. */
