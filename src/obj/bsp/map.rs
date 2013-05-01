@@ -183,12 +183,12 @@ impl Map
           }
         }
         /* Something else. */
-        n => { io::println(fmt!("BSP: Invalid face: %?", n)); }
+        n => { warn!(fmt!("BSP: Invalid face: %?", n)); }
       }
     };
 
     self.verts = verts;
-    debug!("Trianglulated to %? faces.", self.verts.len());
+    debug!("BSP: Trianglulated to %? faces.", self.verts.len());
   }
 
   priv fn upload(&mut self)
