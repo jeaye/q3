@@ -10,6 +10,7 @@
 */
 
 pub use self::vecf::Vec3f;
+pub use self::veci::Vec3i;
 
 macro_rules! declare
 (
@@ -125,4 +126,5 @@ macro_rules! declare
 )
 
 declare!(Vec3f, vecf, f32)
+declare!(Vec3i, veci, i32)
 

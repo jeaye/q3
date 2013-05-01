@@ -66,10 +66,10 @@ fn main() {
 
     let mut sphere = primitive::Sphere::new(100.0, 5);
 
-    let t = std::time::precise_time_s();
-    let vox_sphere = voxel::Map::new(sphere.tris, 10);
+    let st = std::time::precise_time_s();
+    let vox_sphere = voxel::Map::new(sphere.tris, 30);
     let et = std::time::precise_time_s();
-    io::println(fmt!("Voxelization took %? seconds.", (et - t)));
+    io::println(fmt!("Voxelization took %? seconds.", (et - st)));
 
     /* Temp test for font loading. */
     let mut font_renderer = ttf::Renderer::new();

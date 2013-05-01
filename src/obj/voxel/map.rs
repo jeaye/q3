@@ -10,7 +10,7 @@
       into OpenGL-ready cubes.
 */
 
-use math::{ Vec3f };
+use math::{ Vec3f, Vec3i };
 use primitive::Vertex_PC;
 use primitive::Triangle;
 use primitive::{ Cube, Cube_Index };
@@ -126,28 +126,93 @@ impl Map
     let mid_offset = (((self.resolution  as f32) / 2.0) * size);
     self.voxels = vec::with_capacity((f32::pow((self.resolution + 1) as f32, 3.0)) as uint);
     self.indices = vec::with_capacity((f32::pow((self.resolution + 1) as f32, 3.0)) as uint);
-    let adjusted_resolution = self.resolution as uint + 1;
-    for uint::range(0, adjusted_resolution) |z| 
-    { for uint::range(0, adjusted_resolution) |y|
-      { for uint::range(0, adjusted_resolution) |x|
+    for uint::range(0, self.resolution as uint) |z| 
+    { for uint::range(0, self.resolution as uint) |y|
+      { for uint::range(0, self.resolution as uint) |x|
         {
-          let c = Vec3f::new((x as f32 * size) - mid_offset, (y as f32 * size) - mid_offset, (z as f32 * size) - mid_offset) - center;
+          let c = Vec3f::new((x as f32 * size) - mid_offset + (size / 2.0), (y as f32 * size) - mid_offset + (size / 2.0), (z as f32 * size) - mid_offset + (size / 2.0)) - center;
           let cube = Cube::new(size, c);
           self.voxels.push(cube);
-
-          /* Check if this cube intersects with any triangles. */
-          for tris.each |tri|
-          {
-            if tri_cube_intersect(c, size, tri, x)
-            {
-              self.indices.push(Cube_Index::new(((z * adjusted_resolution * adjusted_resolution) + (y * adjusted_resolution) + x) as u32));
-              break;
-            }
-          }
         }
       }
     }
-    assert!(self.voxels.len() == (f32::pow((adjusted_resolution) as f32, 3.0)) as uint);
+    assert!(self.voxels.len() == (f32::pow((self.resolution) as f32, 3.0)) as uint);
+
+    for tris.each |tri|
+    {
+      /* Calculate bounding box of the triangle. */
+      min = Vec3f::new(tri.verts[0].position.x, tri.verts[0].position.y, tri.verts[0].position.z);
+      max = Vec3f::new(tri.verts[0].position.x, tri.verts[0].position.y, tri.verts[0].position.z);
+      for tri.verts.each |vert|
+      {
+        min.x = cmp::min(min.x, vert.position.x);
+        min.y = cmp::min(min.y, vert.position.y);
+        min.z = cmp::min(min.z, vert.position.z);
+
+        max.x = cmp::max(max.x, vert.position.x);
+        max.y = cmp::max(max.y, vert.position.y);
+        max.z = cmp::max(max.z, vert.position.z);
+      }
+      /* TODO: 
+        There're some cases that aren't caught that allow some triangles to slip through voxelization.
+        I have alleviated this a bit by widening the area of searching by another half of a voxel,
+        but artifacts still show on very dense (high res) voxel meshes. Shouldn't be a problem for me. */
+      min.x -= size / 2.0;
+      min.y -= size / 2.0;
+      min.z -= size / 2.0;
+      max.x += size / 2.0;
+      max.y += size / 2.0;
+      max.z += size / 2.0;
+
+      /* Determine what voxels lie in the bounding box. */
+      let mut vox_amount = Vec3i::new(f32::ceil(((max.x - min.x) / size)) as i32,
+                                      f32::ceil(((max.y - min.y) / size)) as i32,
+                                      f32::ceil(((max.z - min.z) / size)) as i32);
+      if vox_amount.x < 1
+      { vox_amount.x = 1; }
+      if vox_amount.y < 1
+      { vox_amount.y = 1; }
+      if vox_amount.z < 1
+      { vox_amount.z = 1; }
+      let start_indices = Vec3i::new( ((min.x - -mid_offset) / size) as i32,
+                                      ((min.y - -mid_offset) / size) as i32,
+                                      ((min.z - -mid_offset) / size) as i32);
+
+      /* Test intersection with each accepted voxel. */
+      /* TODO: Better loop syntax. */
+      let mut z = start_indices.z;
+      loop collision:
+      {
+        if z == start_indices.z + vox_amount.z
+        { break; }
+
+        let mut y = start_indices.y;
+        loop
+        {
+          if y == start_indices.y + vox_amount.y
+          { break; }
+
+          let mut x = start_indices.x;
+          loop
+          {
+            if x == start_indices.x + vox_amount.x
+            { break; }
+
+            let index = (z * ((self.resolution * self.resolution) as i32)) + (y * (self.resolution as i32)) + x;
+            let c = Vec3f::new((x as f32 * size) - mid_offset, (y as f32 * size) - mid_offset, (z as f32 * size) - mid_offset) - center;
+            if tri_cube_intersect(c, size, tri)
+            {
+              self.indices.push(Cube_Index::new(index as u32));
+              break collision; 
+            }
+            
+            x += 1;
+          }
+          y += 1;
+        }
+        z += 1;
+      }
+    }
   }
 }
 
@@ -258,7 +323,7 @@ macro_rules! axis_test_z0
 )
 
 #[inline(always)]
-priv fn tri_cube_intersect(box_center: Vec3f, box_size: f32, tri: &Triangle, x: uint) -> bool
+priv fn tri_cube_intersect(box_center: Vec3f, box_size: f32, tri: &Triangle) -> bool
 {
   let mut v0, v1, v2;
   let mut min, max, p0, p1, p2, rad, fex, fey, fez;
