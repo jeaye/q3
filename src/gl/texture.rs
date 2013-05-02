@@ -30,6 +30,7 @@ struct Texture
 
 impl Texture
 {
+  #[inline(always)]
   pub fn new(targ: gl::GLenum, file: &str) -> Texture
   {
     let tex = Texture{ target: targ, obj: check!(gl::gen_textures(1)), filename: file };
@@ -57,6 +58,7 @@ impl Texture
     tex
   }
 
+  #[inline(always)]
   pub fn bind(&self, unit: gl::GLenum)
   {
     check!(gl::active_texture(unit));
@@ -64,3 +66,4 @@ impl Texture
   }
 }
  
+

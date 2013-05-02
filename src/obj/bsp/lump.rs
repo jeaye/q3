@@ -34,6 +34,7 @@ pub enum Lump_Type
 
 static version: i32 = 0x2E;
 
+#[packed]
 pub struct Lump
 {
   /* Offset from the BOF to the lump. */
@@ -43,10 +44,12 @@ pub struct Lump
 } 
 impl Lump
 {
+  #[inline(always)]
   pub fn new() -> Lump
   { Lump{ offset: 0, length: 0 } }
 }
 
+#[packed]
 pub struct Header
 {
   /* Always "IBSP" */
@@ -58,10 +61,12 @@ pub struct Header
 }
 impl Header
 {
+  #[inline(always)]
   pub fn new() -> Header
   { Header{ magic: [0, ..4], version: 0, lumps: [Lump::new(), ..17] } }
 }
 
+#[packed]
 pub struct Entity
 {
   /* Size of the buffer. */
@@ -70,10 +75,11 @@ pub struct Entity
 }
 impl Entity
 {
+  #[inline(always)]
   pub fn new() -> Entity
   { Entity{ size: 0, buffer: ~[] } }
 }
-
+#[packed]
 pub struct Texture
 {
   name: [i8, ..64],
@@ -81,6 +87,7 @@ pub struct Texture
   content_flags: i32
 }
 
+#[packed]
 pub struct Plane
 {
   normal: Vec3f,
@@ -88,6 +95,7 @@ pub struct Plane
   distance: f32
 }
 
+#[packed]
 pub struct Node
 {
   /* Index of the corresponding plane. */
@@ -99,6 +107,7 @@ pub struct Node
   maxs: [i32, ..3]
 }
 
+#[packed]
 pub struct Leaf
 {
   /* Visdata cluster index. */
@@ -116,18 +125,21 @@ pub struct Leaf
   num_brushes: i32
 }
 
+#[packed]
 pub struct Leaf_Face
 {
   /* Face index. */
   face: i32
 }
 
+#[packed]
 pub struct Leaf_Brush
 {
   /* Brush index. */
   brush: i32
 }
 
+#[packed]
 pub struct Model
 {
   /* Bounding box. */
@@ -141,6 +153,7 @@ pub struct Model
   num_brushes: i32
 }
 
+#[packed]
 pub struct Brush
 {
   /* First brush side. */
@@ -150,6 +163,7 @@ pub struct Brush
   texture: i32
 }
 
+#[packed]
 pub struct Brush_Side
 {
   /* Plane index. */
@@ -158,6 +172,7 @@ pub struct Brush_Side
   texture: i32
 }
 
+#[packed]
 pub struct Vertex
 {
   position: Vec3f,
@@ -167,6 +182,7 @@ pub struct Vertex
 }
 impl Vertex
 {
+  #[inline(always)]
   pub fn new() -> Vertex
   { Vertex {  position: Vec3f::zero(),
               tex_coords: [Vec2f::zero(), ..2],
@@ -174,6 +190,7 @@ impl Vertex
               color: Vec4u8::new(1, 1, 1, 1) } }
 }
 
+#[packed]
 pub struct Mesh_Vert
 {
   /* Vertex index offset, relative to the first vertex of face. */
@@ -181,10 +198,12 @@ pub struct Mesh_Vert
 }
 impl Mesh_Vert
 {
+  #[inline(always)]
   pub fn new() -> Mesh_Vert
   { Mesh_Vert { offset: 0 } }
 }
 
+#[packed]
 pub struct Effect
 {
   name: [i8, ..64],
@@ -194,6 +213,7 @@ pub struct Effect
   unknown: i32
 }
 
+#[packed]
 pub struct Face
 {
   /* Texture index. */
@@ -220,6 +240,7 @@ pub struct Face
 }
 impl Face
 {
+  #[inline(always)]
   pub fn new() -> Face
   { 
     Face {  texture: 0,
@@ -239,11 +260,13 @@ impl Face
   }
 }
 
+#[packed]
 pub struct Light_Map
 {
   data: [[[u8, ..128], ..128], ..3]
 }
 
+#[packed]
 pub struct Light_Vol
 {
   /* Ambient color compontn RGB. */
@@ -254,6 +277,7 @@ pub struct Light_Vol
   direction: [u8, ..2] /* 0 = phi; 1 = theta */
 }
 
+#[packed]
 pub struct Vis_Data
 {
   num_clusters: i32,

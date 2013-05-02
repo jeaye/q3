@@ -224,6 +224,7 @@ impl Map
     check!(gl::bind_buffer(gl::ARRAY_BUFFER, 0));
   }
 
+  #[inline(always)]
   pub fn center(&self) -> Vec3f
   { self.bb.center_with_offset(self.position) }
 }

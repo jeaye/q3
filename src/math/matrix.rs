@@ -22,6 +22,7 @@ struct Mat4x4
 impl Mat4x4
 {
 
+  #[inline(always)]
   pub fn new() -> Mat4x4
   {
     Mat4x4{data:[ [1.0, 0.0, 0.0, 0.0],
@@ -30,6 +31,7 @@ impl Mat4x4
                   [0.0, 0.0, 0.0, 1.0]]}
   }
 
+  #[inline(always)]
   pub fn new_perspective(fov: Component, aspect_ratio: Component, near: Component, far: Component) -> Mat4x4
   {
     let mut mat = Mat4x4::new();
@@ -49,6 +51,7 @@ impl Mat4x4
     mat
   }
 
+  #[inline(always)]
   pub fn new_orthographic(left: Component, right: Component, bottom: Component, top: Component,
                           near: Component, far: Component) -> Mat4x4
   {
@@ -83,6 +86,7 @@ impl Mat4x4
     mat
   }
   
+  #[inline(always)]
   pub fn new_rotation_x(deg: Component) -> Mat4x4
   {
     let mut mat = Mat4x4::new();
@@ -96,6 +100,7 @@ impl Mat4x4
     mat
   }
 
+  #[inline(always)]
   pub fn new_rotation_y(deg: Component) -> Mat4x4
   {
     let mut mat = Mat4x4::new();
@@ -109,6 +114,7 @@ impl Mat4x4
     mat
   }
 
+  #[inline(always)]
   pub fn new_rotation_z(deg: Component) -> Mat4x4
   {
     let mut mat = Mat4x4::new();
@@ -122,6 +128,7 @@ impl Mat4x4
     mat
   }
 
+  #[inline(always)]
   pub fn new_lookat(position: Vec3f, target: Vec3f, up: Vec3f) -> Mat4x4
   {
     let mut forward = target - position;
@@ -142,24 +149,33 @@ impl Mat4x4
     mat
   }
 
+  #[inline(always)]
   pub fn get_width(&self) -> uint
   { return 4; }
+  #[inline(always)]
   pub fn get_height(&self) -> uint
   { return 4; }
 
+  #[inline(always)]
   pub fn up(&self) -> Vec3f
   { Vec3f::new(self.data[0][1], self.data[1][1], self.data[2][1]) }
+  #[inline(always)]
   pub fn down(&self) -> Vec3f
   { Vec3f::new(-self.data[0][1], -self.data[1][1], -self.data[2][1]) }
+  #[inline(always)]
   pub fn left(&self) -> Vec3f
   { Vec3f::new(-self.data[0][0], -self.data[1][0], -self.data[2][0]) }
+  #[inline(always)]
   pub fn right(&self) -> Vec3f
   { Vec3f::new(self.data[0][0], self.data[1][0], self.data[2][0]) }
+  #[inline(always)]
   pub fn forward(&self) -> Vec3f
   { Vec3f::new(-self.data[0][2], -self.data[1][2], -self.data[2][2]) }
+  #[inline(always)]
   pub fn backward(&self) -> Vec3f
   { Vec3f::new(self.data[0][2], self.data[1][2], self.data[2][2]) }
 
+  #[inline(always)]
   pub fn identity(&mut self)
   {
     self.data = [ [1.0, 0.0, 0.0, 0.0],
@@ -168,8 +184,9 @@ impl Mat4x4
                   [0.0, 0.0, 0.0, 1.0]];
   }
 
+  #[inline(always)]
   pub unsafe fn to_ptr(&self) -> *Mat4x4
-  { return ptr::addr_of(self); }
+  { return ptr::addr_of(self); } /* TODO: Remove this. */
 
   pub fn show(&self)
   {

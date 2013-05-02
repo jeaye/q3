@@ -28,12 +28,15 @@ macro_rules! declare
 
       impl $Type
       {
+        #[inline(always)]
         pub fn new(nx: $Component, ny: $Component, nz: $Component, nw: $Component) -> $Type
         { $Type{ x: nx, y: ny, z: nz, w: nw } }
 
+        #[inline(always)]
         pub fn zero() -> $Type
         { $Type{ x: 0 as $Component, y: 0 as $Component, z: 0 as $Component, w: 0 as $Component } }
 
+        #[inline(always)]
         pub fn normalize(&mut self)
         {
           let mut len = self.length();
@@ -47,15 +50,18 @@ macro_rules! declare
           self.w /= len;
         }
 
+        #[inline(always)]
         pub fn length(&self) -> $Component
         { float::sqrt(( (self.x * self.x) + 
                         (self.y * self.y) + 
                         (self.z * self.z) +
                         (self.w * self.w)) as float) as $Component }
 
+        #[inline(always)]
         pub unsafe fn to_ptr(&self) -> *$Type
-        { ptr::addr_of(self) }
+        { ptr::addr_of(self) } /* TODO: Remove. */
 
+        #[inline(always)]
         pub fn to_str(&self) -> ~str
         { fmt!("(%?, %?, %?, %?)", self.x, self.y, self.z, self.w) }
       }

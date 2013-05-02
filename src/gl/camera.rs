@@ -61,6 +61,7 @@ pub struct Camera
 }
 impl Camera
 {
+  #[inline(always)]
   pub fn new(win: @glfw::Window) -> Camera
   {
     Camera {  position: Vec3f::zero(),
@@ -81,6 +82,7 @@ impl Camera
     }
   }
 
+  #[inline(always)]
   pub fn init(&mut self)
   {
     //check!(gl::enable(gl::CULL_FACE)); /* TODO: Look into winding. */
@@ -92,6 +94,7 @@ impl Camera
     { (width, height) => self.resize(width as i32, height as i32) }
   }
 
+  #[inline(always)]
   pub fn resize(&mut self, new_width: i32, new_height: i32)
   {
     self.window_size.x = new_width;

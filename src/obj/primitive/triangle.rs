@@ -19,10 +19,13 @@ struct Triangle /* TODO: Template this? */
 }
 impl Triangle
 {
+  #[inline(always)]
   pub fn new(v1: Vert, v2: Vert, v3: Vert) -> Triangle
   { Triangle { verts: ([ v1, v2, v3 ]) } }
+  #[inline(always)]
   pub fn new_with_position(v1: Vec3f, v2: Vec3f, v3: Vec3f) -> Triangle
   { Triangle { verts: ([ Vert::new_with_position(v1), Vert::new_with_position(v2), Vert::new_with_position(v3) ]) } }
+  #[inline(always)]
   pub fn zero() -> Triangle
   { Triangle { verts: ([ Vert::zero(), ..3 ]) } }
 
@@ -53,6 +56,7 @@ struct Triangle_Index
 }
 impl Triangle_Index
 {
+  #[inline(always)]
   pub fn new(start: u32) -> Triangle_Index
   {
     Triangle_Index

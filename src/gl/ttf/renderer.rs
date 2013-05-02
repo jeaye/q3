@@ -56,6 +56,7 @@ impl Renderer
     renderer
   }
 
+  #[inline(always)]
   pub fn begin(&mut self, camera: &Camera)
   {
     check!(gl::disable(gl::DEPTH_TEST));
@@ -72,6 +73,7 @@ impl Renderer
     self.shader.update_uniform_mat(self.proj_loc, &proj);
   }
 
+  #[inline(always)]
   pub fn end(&mut self)
   {
     check!(gl::enable(gl::DEPTH_TEST));
@@ -95,6 +97,7 @@ impl Renderer
     }
     impl Point
     {
+      #[inline(always)]
       pub fn new(nx: f32, ny: f32, nu: f32, nv: f32) -> Point
       { Point { x: nx, y: ny, u: nu, v: nv } }
     }

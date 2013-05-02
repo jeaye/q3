@@ -11,6 +11,7 @@
 
 use math::Vec2f;
 
+#[packed]
 pub struct Glyph
 {
   tex: Vec2f,
@@ -22,6 +23,7 @@ pub struct Glyph
 
 impl Glyph
 {
+  #[inline(always)]
   pub fn new() -> Glyph
   {
     Glyph
