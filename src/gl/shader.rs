@@ -180,7 +180,7 @@ impl Release_Shader
   #[inline(always)]
   pub fn new_with_files(vert_file : &str, frag_file : &str) -> @Shaderable
   {
-    let mut shader = @mut Release_Shader{ prog: 0, vert_obj: 0, frag_obj: 0 };
+    let shader = @mut Release_Shader{ prog: 0, vert_obj: 0, frag_obj: 0 };
 
     let fio = io::file_reader(&Path(vert_file)).unwrap();
     let vert_src = str::from_bytes(fio.read_whole_stream());

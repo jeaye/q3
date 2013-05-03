@@ -21,9 +21,6 @@ mod util;
 #[macro_escape]
 mod check_internal;
 
-#[path = "../obj/mod.rs"]
-mod obj;
-
 static Move_Left: u8 = 1;
 static Move_Right: u8 = 2;
 static Move_Forward: u8 = 4;
@@ -85,7 +82,7 @@ impl Camera
   #[inline(always)]
   pub fn init(&mut self)
   {
-    //check!(gl::enable(gl::CULL_FACE)); /* TODO: Look into winding. */
+    check!(gl::enable(gl::CULL_FACE)); 
     check!(gl::enable(gl::DEPTH_TEST));
     check!(gl::depth_func(gl::LEQUAL));
     check!(gl::clear_color(0.0, 0.0, 0.0, 1.0));
@@ -206,13 +203,5 @@ impl Camera
     if self.move_to & Move_Down > 0
     { self.position.y -= self.move_speed * dt; }
   }
-}
-
-impl obj::traits::Movable for Camera
-{
-  pub fn translate(&mut self, _new_position: Vec3f) /* TODO: wtf */
-  { }
-  pub fn translate_to(&mut self, _new_position: Vec3f)
-  { }
 }
 

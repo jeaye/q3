@@ -12,9 +12,9 @@ I run on the (nearly) latest Rust incoming; I generally pull every few days. Q^3
 ```bash
 ./configure
 ```
-From there, you should be able to compile and run with:  
+From there, you should be able to compile and run a release build with:  
 ```bash
-make && ./bin/q3
+make release && ./bin/q3
 ```
 **NOTE:** Ensure that you have Freetype2 installed.  
 **NOTE:** I don't have access to a Windows machine at the moment, so I'm not sure yet what will go into building 

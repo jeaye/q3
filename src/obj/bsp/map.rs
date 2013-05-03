@@ -36,20 +36,22 @@ impl Map
 {
   pub fn new(file: &str) -> Map
   {
-    let mut map = Map{  header: lump::Header::new(),
-                        entity: lump::Entity::new(),
-                        verts: ~[],
-                        faces: ~[],
-                        mesh_verts: ~[],
-                        vao: 0,
-                        vbo: ~[],
-                        position: Vec3f::zero(),
-                        bb: BB3::zero()
-                        };
+    let mut map = Map
+    {
+      header: lump::Header::new(),
+      entity: lump::Entity::new(),
+      verts: ~[],
+      faces: ~[],
+      mesh_verts: ~[],
+      vao: 0,
+      vbo: ~[],
+      position: Vec3f::zero(),
+      bb: BB3::zero(),
+    };
 
     let mut fio = io::file_reader(@path::PosixPath(file)).unwrap();
     unsafe {  fio.read( cast::transmute((&map.header, sys::size_of::<lump::Header>())),
-              sys::size_of::<lump::Header>()); }
+                        sys::size_of::<lump::Header>()); }
 
     assert!( map.header.magic[0] == 'I' as i8 &&
              map.header.magic[1] == 'B' as i8 &&
@@ -81,7 +83,7 @@ impl Map
       unsafe { fio.read( cast::transmute((&vert, sys::size_of::<lump::Vertex>())),
                 sys::size_of::<lump::Vertex>()); }
       
-      /* BSP likes Z to be up; I like Y to be up. */
+      /* BSP likes Z to be up; we like Y to be up. */
       let temp = vert.position.y;
       vert.position.y = vert.position.z;
       vert.position.z = -temp;

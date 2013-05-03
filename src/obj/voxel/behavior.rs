@@ -3,17 +3,15 @@
     See licensing in LICENSE file, or at:
         http://www.opensource.org/licenses/BSD-3-Clause
 
-    File: obj/voxel/mod.rs
+    File: obj/voxel/behavior.rs
     Author: Jesse 'Jeaye' Wilkerson
     Description:
-      An aggregator of voxel-oriented items.
+      A collection of voxel types and behaviors.
 */
 
-pub use self::map::Map;
-pub use self::chunk::Chunk;
-pub use self::behavior::Behavior;
-
-mod map;
-mod chunk;
-mod behavior;
+pub enum Behavior
+{
+  Invisible,
+  Default,
+}
 

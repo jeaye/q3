@@ -23,14 +23,6 @@ mod util;
 #[path = "../../gl/check.rs"]
 mod check;
 
-macro_rules! index
-(
-  ($arr:expr[$x:expr][$y:expr][$z:expr]) => 
-  (
-    $arr[($z * self.resolution * self.resolution) + (y * self.resolution) + x]
-  )
-)
-
 struct Map
 {
   resolution: u32,
@@ -41,7 +33,6 @@ struct Map
 
   voxels: ~[Cube],
   indices: ~[Cube_Index],
-  //types: ~[Voxel_Type], /* TODO: Different types of voxels. */
 }
 
 impl Map
@@ -56,7 +47,6 @@ impl Map
       ibo: 0,
       voxels: ~[],
       indices: ~[],
-      //types: ~[],
     };
 
     map.voxelize(tris);
