@@ -9,7 +9,7 @@
       A pageable 3D chunk of voxel data.
 */
 
-use math::{ Vec3f, Vec3i8 };
+use math::{ Vec3i8 };
 use primitive::{ Cube, Cube_Index };
 use super::Behavior;
 
