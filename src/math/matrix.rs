@@ -186,7 +186,7 @@ impl Mat4x4
 
   #[inline(always)]
   pub unsafe fn to_ptr(&self) -> *Mat4x4
-  { return ptr::addr_of(self); } /* TODO: Remove this. */
+  { ptr::to_unsafe_ptr(self) }
 
   pub fn show(&self)
   {

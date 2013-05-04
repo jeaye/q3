@@ -53,7 +53,7 @@ macro_rules! declare
 
         #[inline(always)]
         pub unsafe fn to_ptr(&self) -> *$Type
-        { ptr::addr_of(self) } /* TODO: Remove. */
+        { ptr::to_unsafe_ptr(self) } 
 
         #[inline(always)]
         pub fn to_str(&self) -> ~str

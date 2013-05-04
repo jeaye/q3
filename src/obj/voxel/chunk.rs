@@ -10,8 +10,6 @@
 */
 
 use math::{ Vec3f, Vec3i8 };
-use primitive::Vertex_PC;
-use primitive::Triangle;
 use primitive::{ Cube, Cube_Index };
 use super::Behavior;
 

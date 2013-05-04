@@ -171,7 +171,7 @@ impl Map
       /* Test intersection with each accepted voxel. */
       /* TODO: Better loop syntax. */
       let mut z = start_indices.z;
-      loop collision:
+      'collision: loop
       {
         if z == start_indices.z + vox_amount.z
         { break; }
@@ -193,7 +193,7 @@ impl Map
             if tri_cube_intersect(c, size, tri)
             {
               self.indices.push(Cube_Index::new(index as u32));
-              break collision; 
+              break 'collision; 
             }
             
             x += 1;
