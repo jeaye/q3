@@ -79,11 +79,13 @@ fn main() {
     //let map = map::Map::new("data/dk.bsp");
 
     /* Shader Creation. */
-    let shader = @mut gl::Shader_Builder::new_with_files("data/shaders/color.vert", "data/shaders/color.frag");
+    let shader = @mut gl::Shader_Builder::new_with_files("data/shaders/voxel.vert", "data/shaders/voxel.frag");
     shader.bind();
 
     let proj_loc = shader.get_uniform_location(~"proj");
     let world_loc = shader.get_uniform_location(~"world");
+    let voxel_size_loc = shader.get_uniform_location(~"voxel_size");
+    shader.update_uniform_f32(voxel_size_loc, vox_sphere.voxel_size);
 
     let mut cur_time = (std::time::precise_time_ns() / 10000) as f32; // Hundredth of a second
     let mut last_time = cur_time;
@@ -105,6 +107,7 @@ fn main() {
 
       check!(gl::clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT));
       {
+        //check!(gl::draw_arrays_instanced(gl::TRIANGLES, 0, 36, (10 * 10 * 10)));
         //map.draw();
         //sphere.draw();
         vox_sphere.draw();
@@ -113,7 +116,7 @@ fn main() {
         font_renderer.end();
       } window.swap_buffers();
 
-      std::timer::sleep(@std::uv::global_loop::get(), 1000 / (camera.target_frame_rate as uint));
+      //std::timer::sleep(@std::uv::global_loop::get(), 1000 / (camera.target_frame_rate as uint));
     }
   }
 }

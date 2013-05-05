@@ -24,8 +24,7 @@ pub struct Chunk
 {
   vbo: gl::GLuint,
   dimensions: Vec3i8,
-  voxels: ~[Cube],
-  indices: ~[Cube_Index],
+  voxels: ~[Vec3i8],
 }
 
 impl Chunk
@@ -37,7 +36,6 @@ impl Chunk
       vbo: check!(gl::gen_buffers(1))[0],
       dimensions: *dim,
       voxels: ~[],
-      indices: ~[],
     };
 
     chunk
