@@ -11,7 +11,6 @@
 
 pub enum Behavior
 {
-  Invisible,
   Default,
 }
 

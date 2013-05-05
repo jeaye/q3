@@ -11,7 +11,6 @@
 
 use math::{ Vec3i8 };
 use primitive::{ Cube, Cube_Index };
-use super::Behavior;
 
 #[path = "../../gl/mod.rs"]
 mod gl;
@@ -27,20 +26,18 @@ pub struct Chunk
   dimensions: Vec3i8,
   voxels: ~[Cube],
   indices: ~[Cube_Index],
-  behaviors: ~[Behavior],
 }
 
 impl Chunk
 {
-  pub fn new() -> Chunk
+  pub fn new(dim: &Vec3i8) -> Chunk
   {
     let chunk = Chunk
     {
       vbo: check!(gl::gen_buffers(1))[0],
-      dimensions: Vec3i8::new(16, 16, 16),
+      dimensions: *dim,
       voxels: ~[],
       indices: ~[],
-      behaviors: ~[],
     };
 
     chunk
