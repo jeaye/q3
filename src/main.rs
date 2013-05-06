@@ -82,11 +82,15 @@ fn main() {
 
     /* Shader Creation. */
     let shader = @mut gl::Shader_Builder::new_with_files("data/shaders/voxel.vert", "data/shaders/voxel.frag");
+    let color_shader = @mut gl::Shader_Builder::new_with_files("data/shaders/color.vert", "data/shaders/color.frag");
     shader.bind();
 
     let proj_loc = shader.get_uniform_location(~"proj");
     let world_loc = shader.get_uniform_location(~"world");
     let voxel_size_loc = shader.get_uniform_location(~"voxel_size");
+    let color_proj_loc = color_shader.get_uniform_location(~"proj");
+    let color_world_loc = color_shader.get_uniform_location(~"world");
+    let color_voxel_size_loc = color_shader.get_uniform_location(~"voxel_size");
 
     let mut cur_time = (std::time::precise_time_ns() / 10000) as f32; // Hundredth of a second
     let mut last_time = cur_time;
@@ -103,17 +107,22 @@ fn main() {
       shader.bind();
       shader.update_uniform_mat(proj_loc, camera.projection);
       shader.update_uniform_mat(world_loc, camera.view);
+      color_shader.bind();
+      color_shader.update_uniform_mat(color_proj_loc, camera.projection);
+      color_shader.update_uniform_mat(color_world_loc, camera.view);
 
       let fps = camera.frame_rate;
 
       check!(gl::clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT));
       {
         //check!(gl::draw_arrays_instanced(gl::TRIANGLES, 0, 36, (10 * 10 * 10)));
-        //map.draw();
+        color_shader.bind();
+        map.draw();
         //sphere.draw();
 
+        shader.bind();
         shader.update_uniform_f32(voxel_size_loc, vox_sphere.voxel_size);
-        vox_sphere.draw();
+        //vox_sphere.draw();
 
         shader.update_uniform_f32(voxel_size_loc, vox_map.voxel_size);
         vox_map.draw();
