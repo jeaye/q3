@@ -15,7 +15,7 @@ use primitive::{ Triangle, Triangle_Index };
 #[packed]
 struct Cube
 {
-  triangles: ([Triangle, ..12]),
+  tris: ([Triangle, ..12]),
 }
 impl Cube
 {
@@ -24,7 +24,7 @@ impl Cube
     let half = size / 2.0;
     Cube
     {
-      triangles:
+      tris:
       ([
           Triangle::new_with_position(Vec3f::new(-half,-half,-half) + center, 
                                       Vec3f::new(-half,-half, half) + center,

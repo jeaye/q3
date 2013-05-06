@@ -16,7 +16,10 @@ uniform mat4x4 world;
 uniform float voxel_size = 1.0f;
 
 layout (location = 0) in vec3 in_position;
+
+/* Per instance */
 layout (location = 1) in vec3 in_offset;
+layout (location = 2) in vec3 in_color;
 
 out vec4 trans_color;
 
@@ -25,6 +28,7 @@ void main()
   vec4 position = vec4(in_position + (in_offset * voxel_size), 1.0f);
   gl_Position = proj * world * position;
 
-  trans_color = position;
+  trans_color = vec4(1.0f, 1.0f, 1.0f, 1.0f); //position;
+  trans_color = vec4(in_position * 2.0f, 1.0f);
 }
 

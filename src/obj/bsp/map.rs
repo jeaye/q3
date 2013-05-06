@@ -10,6 +10,7 @@
 */
 
 use math::{ Vec3f, Vec4u8, BB3 };
+use primitive::Triangle;
 
 #[path = "lump.rs"]
 mod lump;
@@ -23,6 +24,7 @@ pub struct Map
 {
   header: lump::Header,
   entity: lump::Entity,
+  tris: ~[Triangle],
   verts: ~[lump::Vertex],
   faces: ~[lump::Face],
   mesh_verts: ~[lump::Mesh_Vert], 
@@ -40,6 +42,7 @@ impl Map
     {
       header: lump::Header::new(),
       entity: lump::Entity::new(),
+      tris: ~[],
       verts: ~[],
       faces: ~[],
       mesh_verts: ~[],
@@ -182,6 +185,10 @@ impl Map
             verts.push(self.verts[face.start_vertex]);
             verts.push(self.verts[face.start_vertex + i + 2]);
             verts.push(self.verts[face.start_vertex + i + 1]);
+
+            self.tris.push(Triangle::new_with_position( self.verts[face.start_vertex].position,
+                                                        self.verts[face.start_vertex + i + 2].position,
+                                                        self.verts[face.start_vertex + i + 1].position));
           }
         }
         /* Something else. */

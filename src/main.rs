@@ -66,17 +66,19 @@ fn main() {
 
     let mut sphere = primitive::Sphere::new(100.0, 5);
 
+    let map = bsp::Map::new("data/q3ctf1.bsp");
+    //let map = map::Map::new("data/dk.bsp");
+
+    io::println(fmt!("Map has %? tris", map.tris.len()));
     let st = std::time::precise_time_s();
-    let vox_sphere = voxel::Map::new(sphere.tris, 30);
+    let vox_sphere = voxel::Map::new(sphere.tris, 10);
+    let vox_map = voxel::Map::new(map.tris, 100);
     let et = std::time::precise_time_s();
     io::println(fmt!("Voxel map creation took %? seconds.", (et - st)));
 
     /* Temp test for font loading. */
     let mut font_renderer = ttf::Renderer::new();
     let mut font = ttf::Font::new("data/test.ttf", 50);
-
-    let map = bsp::Map::new("data/q3ctf1.bsp");
-    //let map = map::Map::new("data/dk.bsp");
 
     /* Shader Creation. */
     let shader = @mut gl::Shader_Builder::new_with_files("data/shaders/voxel.vert", "data/shaders/voxel.frag");
@@ -85,7 +87,6 @@ fn main() {
     let proj_loc = shader.get_uniform_location(~"proj");
     let world_loc = shader.get_uniform_location(~"world");
     let voxel_size_loc = shader.get_uniform_location(~"voxel_size");
-    shader.update_uniform_f32(voxel_size_loc, vox_sphere.voxel_size);
 
     let mut cur_time = (std::time::precise_time_ns() / 10000) as f32; // Hundredth of a second
     let mut last_time = cur_time;
@@ -110,7 +111,13 @@ fn main() {
         //check!(gl::draw_arrays_instanced(gl::TRIANGLES, 0, 36, (10 * 10 * 10)));
         //map.draw();
         //sphere.draw();
+
+        shader.update_uniform_f32(voxel_size_loc, vox_sphere.voxel_size);
         vox_sphere.draw();
+
+        shader.update_uniform_f32(voxel_size_loc, vox_map.voxel_size);
+        vox_map.draw();
+
         font_renderer.begin(camera);
         font_renderer.render(fmt!("%?", fps), math::Vec2f::new(0.0, 0.0), &font);
         font_renderer.end();

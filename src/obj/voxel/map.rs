@@ -10,10 +10,11 @@
       into OpenGL-ready cubes.
 */
 
-use math::{ Vec3f, Vec3i, Vec3i8 };
+use math::{ Vec3f, Vec3i, Vec3i8, Vec3u8 };
 use primitive::Vertex_PC;
 use primitive::Triangle;
 use primitive::{ Cube, Cube_Index };
+use super::Vertex;
 
 #[path = "../../gl/mod.rs"]
 mod gl;
@@ -33,7 +34,7 @@ struct Map
   ibo: gl::GLuint,
 
   voxels: ~[Cube],
-  indices: ~[Vec3i8],
+  indices: ~[Vertex],
 }
 
 impl Map
@@ -79,9 +80,14 @@ impl Map
     check!(gl::enable_vertex_attrib_array(0));
 
     check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.ibo));
-    check!(gl::vertex_attrib_pointer_i8(1, 3, false, (sys::size_of::<Vec3i8>()) as i32, 0));
+
+    check!(gl::vertex_attrib_pointer_i8(1, 3, false, (sys::size_of::<Vertex>()) as i32, 0));
     check!(gl::enable_vertex_attrib_array(1));
     check!(gl::vertex_attrib_divisor(1, 1));
+
+    check!(gl::vertex_attrib_pointer_u8(2, 3, true, (sys::size_of::<Vertex>()) as i32, (sys::size_of::<Vec3i8>()) as u32));
+    check!(gl::enable_vertex_attrib_array(2));
+    check!(gl::vertex_attrib_divisor(2, 1));
 
     //check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::LINE));
     check!(gl::draw_arrays_instanced(gl::TRIANGLES, 0, 36, self.indices.len() as i32));
@@ -89,6 +95,7 @@ impl Map
 
     check!(gl::disable_vertex_attrib_array(0));
     check!(gl::disable_vertex_attrib_array(1));
+    check!(gl::disable_vertex_attrib_array(2));
     check!(gl::bind_vertex_array(0));
     check!(gl::bind_buffer(gl::ARRAY_BUFFER, 0));
     check!(gl::bind_buffer(gl::ELEMENT_ARRAY_BUFFER, 0));
@@ -98,6 +105,7 @@ impl Map
   {
     /* Require at least one triangle. */
     assert!(tris.len() >= 1);
+    debug!("VOXEL: Incoming triangles: %?", tris.len());
 
     /* Bounding box of vert dimensions. */
     let mut min = Vec3f::new(tris[0].verts[0].position.x, tris[0].verts[0].position.y, tris[0].verts[0].position.z);
@@ -115,20 +123,27 @@ impl Map
         max.z = cmp::max(max.z, vert.position.z);
       }
     }
+    debug!("VOXEL: Min: %s Max: %s", min.to_str(), max.to_str());
     let center = Vec3f::new(max.x - ((max.x - min.x) / 2.0), max.y - ((max.y - min.y) / 2.0), max.z - ((max.z - min.z) / 2.0));
+    debug!("VOXEL: Center of mesh is %s", center.to_str());
 
     /* Calculate, given resolution (how many voxels across), the dimensions of a voxel. */
     self.voxel_size = cmp::max(max.x - min.x, cmp::max(max.y - min.y, max.z - min.z)) / (self.resolution as f32);
+    debug!("VOXEL: Voxel size is %?", self.voxel_size);
 
     /* Create 3D array of voxels. */
     let mid_offset = (((self.resolution  as f32) / 2.0) * self.voxel_size);
+    debug!("VOXEL: Midpoint offset is %?", mid_offset);
+
     self.voxels = vec::with_capacity((f32::pow((self.resolution + 1) as f32, 3.0)) as uint);
     self.indices = vec::with_capacity((f32::pow((self.resolution + 1) as f32, 3.0)) as uint);
     for uint::range(0, self.resolution as uint) |z| 
     { for uint::range(0, self.resolution as uint) |y|
       { for uint::range(0, self.resolution as uint) |x|
         {
-          let c = Vec3f::new((x as f32 * self.voxel_size) - mid_offset + (self.voxel_size / 2.0), (y as f32 * self.voxel_size) - mid_offset + (self.voxel_size / 2.0), (z as f32 * self.voxel_size) - mid_offset + (self.voxel_size / 2.0)) - center;
+          let c = Vec3f::new( (x as f32 * self.voxel_size) - mid_offset + (self.voxel_size / 2.0), 
+                              (y as f32 * self.voxel_size) - mid_offset + (self.voxel_size / 2.0), 
+                              (z as f32 * self.voxel_size) - mid_offset + (self.voxel_size / 2.0)) - center;
           let cube = Cube::new(self.voxel_size, c);
           self.voxels.push(cube);
         }
@@ -172,36 +187,51 @@ impl Map
       { vox_amount.y = 1; }
       if vox_amount.z < 1
       { vox_amount.z = 1; }
+      //debug!("VOXEL: [Per voxel] Checking %s surrounding voxels with SAT", vox_amount.to_str());
+
       let start_indices = Vec3i::new( ((min.x - -mid_offset) / self.voxel_size) as i32,
                                       ((min.y - -mid_offset) / self.voxel_size) as i32,
                                       ((min.z - -mid_offset) / self.voxel_size) as i32);
+      //debug!("VOXEL: [Per voxel] Starting indices are %s", start_indices.to_str());
 
       /* Test intersection with each accepted voxel. */
       /* TODO: Better loop syntax. */
       let mut z = start_indices.z;
       'collision: loop
       {
-        if z == start_indices.z + vox_amount.z
+        if z == start_indices.z + vox_amount.z || z >= self.resolution as i32
         { break; }
 
         let mut y = start_indices.y;
         loop
         {
-          if y == start_indices.y + vox_amount.y
+          if y == start_indices.y + vox_amount.y || y >= self.resolution as i32
           { break; }
 
           let mut x = start_indices.x;
           loop
           {
-            if x == start_indices.x + vox_amount.x
+            if x == start_indices.x + vox_amount.x || x >= self.resolution as i32
             { break; }
 
             let index = (z * ((self.resolution * self.resolution) as i32)) + (y * (self.resolution as i32)) + x;
-            let c = Vec3f::new((x as f32 * self.voxel_size) - mid_offset, (y as f32 * self.voxel_size) - mid_offset, (z as f32 * self.voxel_size) - mid_offset) - center;
-            if tri_cube_intersect(c, self.voxel_size, tri)
+            if index > self.voxels.len() as i32
             {
-              self.indices.push(Vec3i8::new(x as i8, y as i8, z as i8));
-              break 'collision; 
+              error!("VOXEL: Invalid index %? where (%?, %?, %?)", index, x, y, z);
+              break 'collision;
+            }
+
+            let c = Vec3f::new( (x as f32 * self.voxel_size) - mid_offset + (self.voxel_size / 2.0), 
+                                (y as f32 * self.voxel_size) - mid_offset + (self.voxel_size / 2.0), 
+                                (z as f32 * self.voxel_size) - mid_offset + (self.voxel_size / 2.0)) - center;
+            //if tri_cube_intersect(c, self.voxel_size, tri)
+            {
+              self.indices.push(Vertex {  position: Vec3i8::new(x as i8, y as i8, z as i8), 
+                                          color: Vec3u8::new(self.voxels[index].tris[0].verts[0].color.x as u8,
+                                                             self.voxels[index].tris[0].verts[0].color.y as u8,
+                                                             self.voxels[index].tris[0].verts[0].color.z as u8)
+                                        });
+              //break 'collision; 
             }
             
             x += 1;
@@ -211,7 +241,7 @@ impl Map
         z += 1;
       }
     }
-    io::println(fmt!("Running with %? voxels.", self.indices.len()));
+    debug!("VOXEL: Enabled %? of %? voxels", self.indices.len(), self.voxels.len());
   }
 }
 
@@ -338,6 +368,7 @@ priv fn tri_cube_intersect(box_center: Vec3f, box_size: f32, tri: &Triangle) -> 
   e1 = v2 - v1; /* Edge 1. */
   e2 = v0 - v2; /* Edge 2. */
 
+  //debug!("VOXEL: [Per voxel SAT] Testing bullet 3 edge 0");
   /* Bullet 3. */
   fex = f32::abs(e0.x);
   fey = f32::abs(e0.y);
@@ -346,6 +377,7 @@ priv fn tri_cube_intersect(box_center: Vec3f, box_size: f32, tri: &Triangle) -> 
   axis_test_y02!(e0.z, e0.x, fez, fex);
   axis_test_z12!(e0.y, e0.x, fey, fex);
 
+  //debug!("VOXEL: [Per voxel SAT] Testing bullet 3 edge 1");
   fex = f32::abs(e1.x);
   fey = f32::abs(e1.y);
   fez = f32::abs(e1.z);
@@ -353,6 +385,7 @@ priv fn tri_cube_intersect(box_center: Vec3f, box_size: f32, tri: &Triangle) -> 
   axis_test_y02!(e1.z, e1.x, fez, fex);
   axis_test_z0!(e1.y, e1.x, fey, fex);
 
+  //debug!("VOXEL: [Per voxel SAT] Testing bullet 3 edge 2");
   fex = f32::abs(e2.x);
   fey = f32::abs(e2.y);
   fez = f32::abs(e2.z);
@@ -360,6 +393,7 @@ priv fn tri_cube_intersect(box_center: Vec3f, box_size: f32, tri: &Triangle) -> 
   axis_test_y1!(e2.z, e2.x, fez, fex);
   axis_test_z12!(e2.y, e2.x, fey, fex);
 
+  //debug!("VOXEL: [Per voxel SAT] Testing bullet 1");
   /* Bullet 1. */
   /* Test in X-direction */
   find_min_max!(v0.x, v1.x, v2.x);
@@ -373,6 +407,7 @@ priv fn tri_cube_intersect(box_center: Vec3f, box_size: f32, tri: &Triangle) -> 
   find_min_max!(v0.z, v1.z, v2.z);
   if min > box_size || max < -box_size { return false; }
 
+  //debug!("VOXEL: [Per voxel SAT] Testing bullet 2");
   /* Bullet 2. */
   normal = e0.cross(&e1);
   plane_cube_intersect(&normal, &v0, box_size)

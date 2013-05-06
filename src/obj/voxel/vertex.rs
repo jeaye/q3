@@ -17,19 +17,18 @@ pub struct Vertex
 {
   position: Vec3i8,
   color: Vec3u8,
-  behavior: Behavior,
 }
 
 impl Vertex
 {
   #[inline(always)]
   pub fn new(pos: Vec3i8, col: Vec3u8) -> Vertex
-  { Vertex { position: pos, behavior: Default, color: col } }
+  { Vertex { position: pos, color: col } }
   #[inline(always)]
   pub fn new_with_position(pos: Vec3i8) -> Vertex
-  { Vertex { position: pos, behavior: Default, color: Vec3u8::new(pos.x as u8, pos.y as u8, pos.z as u8) } }
+  { Vertex { position: pos, color: Vec3u8::new(pos.x as u8, pos.y as u8, pos.z as u8) } }
   #[inline(always)]
   pub fn zero() -> Vertex
-  { Vertex { position: Vec3i8::zero(), behavior: Default, color: Vec3u8::new(1, 1, 1) } }
+  { Vertex { position: Vec3i8::zero(), color: Vec3u8::new(1, 1, 1) } }
 }
 
