@@ -14,7 +14,7 @@ use math::{ Vec3f, Vec3i, Vec3i8, Vec3u8 };
 use primitive::Vertex_PC;
 use primitive::Triangle;
 use primitive::{ Cube, Cube_Index };
-use super::Vertex;
+use super::{ Vertex, Behavior, Default };
 
 #[path = "../../gl/mod.rs"]
 mod gl;
@@ -33,7 +33,7 @@ struct Map
   vbo: gl::GLuint,
   ibo: gl::GLuint,
 
-  voxels: ~[Cube],
+  voxels: ~[Behavior],
   indices: ~[Vertex],
 }
 
@@ -149,11 +149,7 @@ impl Map
     { for uint::range(0, self.resolution as uint) |y|
       { for uint::range(0, self.resolution as uint) |x|
         {
-          let c = Vec3f::new( (x as f32 * self.voxel_size) - mid_offset + (self.voxel_size / 2.0), 
-                              (y as f32 * self.voxel_size) - mid_offset + (self.voxel_size / 2.0), 
-                              (z as f32 * self.voxel_size) - mid_offset + (self.voxel_size / 2.0)) - center;
-          let cube = Cube::new(self.voxel_size, c);
-          self.voxels.push(cube);
+          self.voxels.push(Default);
         }
       }
     }
@@ -241,11 +237,9 @@ impl Map
                 position: Vec3i8::new(x as i8 - (self.resolution / 2) as i8,
                                       y as i8 - (self.resolution / 2) as i8,
                                       z as i8 - (self.resolution / 2) as i8), 
-                color: Vec3u8::new( self.voxels[index].tris[0].verts[0].color.x as u8,
-                                    self.voxels[index].tris[0].verts[0].color.y as u8,
-                                    self.voxels[index].tris[0].verts[0].color.z as u8)
+                color: Vec3u8::new(1, 1, 1),
               });
-              break 'collision; 
+              //break 'collision; 
             }
             
             x += 1;

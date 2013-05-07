@@ -72,7 +72,7 @@ fn main() {
     io::println(fmt!("Map has %? tris", map.tris.len()));
     let st = std::time::precise_time_s();
     let vox_sphere = voxel::Map::new(sphere.tris, 10);
-    let vox_map = voxel::Map::new(map.tris, 100);
+    let vox_map = voxel::Map::new(map.tris, 200);
     let et = std::time::precise_time_s();
     io::println(fmt!("Voxel map creation took %? seconds.", (et - st)));
 
@@ -117,7 +117,7 @@ fn main() {
       {
         //check!(gl::draw_arrays_instanced(gl::TRIANGLES, 0, 36, (10 * 10 * 10)));
         color_shader.bind();
-        map.draw();
+        //map.draw();
         //sphere.draw();
 
         shader.bind();
