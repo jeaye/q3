@@ -216,7 +216,7 @@ impl Shader for Release_Shader
 
   #[inline(always)]
   pub fn update_uniform_f32(&self, location: gl::GLint, i: f32)
-  { if self.valid { shared::update_uniform_f32(location, i); } }
+  { shared::update_uniform_f32(location, i); }
 
   #[inline(always)]
   pub fn update_uniform_mat(&self, location: gl::GLint, mat: &Mat4x4)
