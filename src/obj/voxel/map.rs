@@ -85,7 +85,8 @@ impl Map
     check!(gl::enable_vertex_attrib_array(1));
     check!(gl::vertex_attrib_divisor(1, 1));
 
-    check!(gl::vertex_attrib_pointer_u8(2, 3, true, (sys::size_of::<Vertex>()) as i32, (sys::size_of::<Vec3i8>()) as u32));
+    check!(gl::vertex_attrib_pointer_u8(2, 3, true, (sys::size_of::<Vertex>()) as i32, 
+                                        (sys::size_of::<Vec3i8>()) as u32));
     check!(gl::enable_vertex_attrib_array(2));
     check!(gl::vertex_attrib_divisor(2, 1));
 
@@ -108,8 +109,12 @@ impl Map
     debug!("VOXEL: Incoming triangles: %?", tris.len());
 
     /* Bounding box of vert dimensions. */
-    let mut min = Vec3f::new(tris[0].verts[0].position.x, tris[0].verts[0].position.y, tris[0].verts[0].position.z);
-    let mut max = Vec3f::new(tris[0].verts[0].position.x, tris[0].verts[0].position.y, tris[0].verts[0].position.z);
+    let mut min = Vec3f::new( tris[0].verts[0].position.x,
+                              tris[0].verts[0].position.y, 
+                              tris[0].verts[0].position.z);
+    let mut max = Vec3f::new( tris[0].verts[0].position.x,
+                              tris[0].verts[0].position.y,
+                              tris[0].verts[0].position.z);
     for tris.each |curr|
     {
       for curr.verts.each |vert|
@@ -124,15 +129,18 @@ impl Map
       }
     }
     debug!("VOXEL: Min: %s Max: %s", min.to_str(), max.to_str());
-    let center = Vec3f::new(max.x - ((max.x - min.x) / 2.0), max.y - ((max.y - min.y) / 2.0), max.z - ((max.z - min.z) / 2.0));
+    let center = Vec3f::new(max.x - ((max.x - min.x) / 2.0),
+                            max.y - ((max.y - min.y) / 2.0),
+                            max.z - ((max.z - min.z) / 2.0));
     debug!("VOXEL: Center of mesh is %s", center.to_str());
 
     /* Calculate, given resolution (how many voxels across), the dimensions of a voxel. */
-    self.voxel_size = cmp::max(max.x - min.x, cmp::max(max.y - min.y, max.z - min.z)) / (self.resolution as f32);
+    self.voxel_size = cmp::max( max.x - min.x,
+                                cmp::max(max.y - min.y, max.z - min.z)) / (self.resolution as f32);
     debug!("VOXEL: Voxel size is %?", self.voxel_size);
 
     /* Create 3D array of voxels. */
-    let mid_offset = (((self.resolution  as f32) / 2.0) * self.voxel_size);
+    let mid_offset = (((self.resolution as f32) / 2.0) * self.voxel_size);
     debug!("VOXEL: Midpoint offset is %?", mid_offset);
 
     self.voxels = vec::with_capacity((f32::pow((self.resolution + 1) as f32, 3.0)) as uint);
@@ -167,9 +175,10 @@ impl Map
         max.z = cmp::max(max.z, vert.position.z);
       }
       /* TODO: 
-        There're some cases that aren't caught that allow some triangles to slip through voxelization.
-        I have alleviated this a bit by widening the area of searching by another half of a voxel,
-        but artifacts still show on very dense (high res) voxel meshes. Shouldn't be a problem for me. */
+        There're some cases that aren't caught that allow some triangles to slip through
+        voxelization. I have alleviated this a bit by widening the area of searching by another
+        half of a voxel, but artifacts still show on very dense (high res) voxel meshes. Shouldn't 
+        be a problem for me. */
       min.x -= self.voxel_size / 2.0;
       min.y -= self.voxel_size / 2.0;
       min.z -= self.voxel_size / 2.0;
@@ -214,24 +223,29 @@ impl Map
             if x == start_indices.x + vox_amount.x || x >= self.resolution as i32
             { break; }
 
-            let index = (z * ((self.resolution * self.resolution) as i32)) + (y * (self.resolution as i32)) + x;
+            let index = (z * ((self.resolution * self.resolution) as i32)) + 
+                        (y * (self.resolution as i32)) + x;
             if index > self.voxels.len() as i32
             {
               error!("VOXEL: Invalid index %? where (%?, %?, %?)", index, x, y, z);
               break 'collision;
             }
 
-            let c = Vec3f::new( (x as f32 * self.voxel_size) - mid_offset + (self.voxel_size / 2.0), 
-                                (y as f32 * self.voxel_size) - mid_offset + (self.voxel_size / 2.0), 
-                                (z as f32 * self.voxel_size) - mid_offset + (self.voxel_size / 2.0)) - center;
-            //if tri_cube_intersect(c, self.voxel_size, tri)
+            let c = Vec3f::new( ((x as f32 - (self.resolution as f32 / 2.0)) * self.voxel_size),
+                                ((y as f32 - (self.resolution as f32 / 2.0)) * self.voxel_size),
+                                ((z as f32 - (self.resolution as f32 / 2.0)) * self.voxel_size));
+            if tri_cube_intersect(c, self.voxel_size, tri)
             {
-              self.indices.push(Vertex {  position: Vec3i8::new(x as i8, y as i8, z as i8), 
-                                          color: Vec3u8::new(self.voxels[index].tris[0].verts[0].color.x as u8,
-                                                             self.voxels[index].tris[0].verts[0].color.y as u8,
-                                                             self.voxels[index].tris[0].verts[0].color.z as u8)
-                                        });
-              //break 'collision; 
+              self.indices.push(Vertex
+              {
+                position: Vec3i8::new(x as i8 - (self.resolution / 2) as i8,
+                                      y as i8 - (self.resolution / 2) as i8,
+                                      z as i8 - (self.resolution / 2) as i8), 
+                color: Vec3u8::new( self.voxels[index].tris[0].verts[0].color.x as u8,
+                                    self.voxels[index].tris[0].verts[0].color.y as u8,
+                                    self.voxels[index].tris[0].verts[0].color.z as u8)
+              });
+              break 'collision; 
             }
             
             x += 1;
