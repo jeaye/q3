@@ -81,12 +81,12 @@ impl Map
 
     check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.ibo));
 
-    check!(gl::vertex_attrib_pointer_i8(1, 3, false, (sys::size_of::<Vertex>()) as i32, 0));
+    check!(gl::vertex_attrib_pointer_i32(1, 3, false, (sys::size_of::<Vertex>()) as i32, 0));
     check!(gl::enable_vertex_attrib_array(1));
     check!(gl::vertex_attrib_divisor(1, 1));
 
     check!(gl::vertex_attrib_pointer_u8(2, 3, true, (sys::size_of::<Vertex>()) as i32, 
-                                        (sys::size_of::<Vec3i8>()) as u32));
+                                        (sys::size_of::<Vec3i>()) as u32));
     check!(gl::enable_vertex_attrib_array(2));
     check!(gl::vertex_attrib_divisor(2, 1));
 
@@ -183,7 +183,7 @@ impl Map
       { vox_amount.z = 1; }
       //debug!("VOXEL: [Per voxel] Checking %s surrounding voxels with SAT", vox_amount.to_str());
 
-      let start_indices = Vec3i::new( ((min.x - -mid_offset) / self.voxel_size) as i32, /* TODO: mid_offset still used? */
+      let start_indices = Vec3i::new( ((min.x - -mid_offset) / self.voxel_size) as i32, 
                                       ((min.y - -mid_offset) / self.voxel_size) as i32,
                                       ((min.z - -mid_offset) / self.voxel_size) as i32);
       //debug!("VOXEL: [Per voxel] Starting indices are %s", start_indices.to_str());
@@ -218,7 +218,7 @@ impl Map
             }
 
             /* Check for intersection. */
-            let c = Vec3f::new( ((x as f32 - (self.resolution as f32 / 2.0)) * self.voxel_size) + (self.voxel_size / 2.0), /* TODO: Positional offset? */
+            let c = Vec3f::new( ((x as f32 - (self.resolution as f32 / 2.0)) * self.voxel_size) + (self.voxel_size / 2.0), 
                                 ((y as f32 - (self.resolution as f32 / 2.0)) * self.voxel_size) + (self.voxel_size / 2.0),
                                 ((z as f32 - (self.resolution as f32 / 2.0)) * self.voxel_size) + (self.voxel_size / 2.0));
             if tri_cube_intersect(c, self.voxel_size, tri)
@@ -226,9 +226,9 @@ impl Map
               /* We have intersection; add a reference to this voxel to the index map. */
               self.indices.push(Vertex
               {
-                position: Vec3i8::new(x as i8 - (self.resolution / 2) as i8, /* TODO: Remove duplicates. */
-                                      y as i8 - (self.resolution / 2) as i8,
-                                      z as i8 - (self.resolution / 2) as i8), 
+                position: Vec3i::new( x - (self.resolution / 2) as i32, /* TODO: Remove duplicates. */
+                                      y - (self.resolution / 2) as i32,
+                                      z - (self.resolution / 2) as i32), 
                 color: Vec3u8::new(1, 1, 1),
               });
             }

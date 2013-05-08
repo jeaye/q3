@@ -71,7 +71,7 @@ fn main() {
 
     let st = std::time::precise_time_s();
     let vox_sphere = voxel::Map::new(sphere.tris, 10);
-    let vox_map = voxel::Map::new(map.tris, 300);
+    let vox_map = voxel::Map::new(map.tris, 500);
     let et = std::time::precise_time_s();
     io::println(fmt!("Voxel map creation took %? seconds.", (et - st)));
 
