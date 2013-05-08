@@ -64,15 +64,14 @@ fn main() {
       key_callback(window, key, action);
     }
 
-    let mut sphere = primitive::Sphere::new(100.0, 5);
+    let mut sphere = primitive::Sphere::new(100.0, 7);
 
     let map = bsp::Map::new("data/q3ctf1.bsp");
     //let map = map::Map::new("data/dk.bsp");
 
-    io::println(fmt!("Map has %? tris", map.tris.len()));
     let st = std::time::precise_time_s();
     let vox_sphere = voxel::Map::new(sphere.tris, 10);
-    let vox_map = voxel::Map::new(map.tris, 200);
+    let vox_map = voxel::Map::new(map.tris, 300);
     let et = std::time::precise_time_s();
     io::println(fmt!("Voxel map creation took %? seconds.", (et - st)));
 

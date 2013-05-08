@@ -170,17 +170,6 @@ impl Map
         max.y = cmp::max(max.y, vert.position.y);
         max.z = cmp::max(max.z, vert.position.z);
       }
-      /* TODO: 
-        There're some cases that aren't caught that allow some triangles to slip through
-        voxelization. I have alleviated this a bit by widening the area of searching by another
-        half of a voxel, but artifacts still show on very dense (high res) voxel meshes. Shouldn't 
-        be a problem for me. */
-      min.x -= self.voxel_size / 2.0;
-      min.y -= self.voxel_size / 2.0;
-      min.z -= self.voxel_size / 2.0;
-      max.x += self.voxel_size / 2.0;
-      max.y += self.voxel_size / 2.0;
-      max.z += self.voxel_size / 2.0;
 
       /* Determine what voxels lie in the bounding box. */
       let mut vox_amount = Vec3i::new(f32::ceil(((max.x - min.x) / self.voxel_size)) as i32,
@@ -194,7 +183,7 @@ impl Map
       { vox_amount.z = 1; }
       //debug!("VOXEL: [Per voxel] Checking %s surrounding voxels with SAT", vox_amount.to_str());
 
-      let start_indices = Vec3i::new( ((min.x - -mid_offset) / self.voxel_size) as i32,
+      let start_indices = Vec3i::new( ((min.x - -mid_offset) / self.voxel_size) as i32, /* TODO: mid_offset still used? */
                                       ((min.y - -mid_offset) / self.voxel_size) as i32,
                                       ((min.z - -mid_offset) / self.voxel_size) as i32);
       //debug!("VOXEL: [Per voxel] Starting indices are %s", start_indices.to_str());
@@ -221,25 +210,27 @@ impl Map
 
             let index = (z * ((self.resolution * self.resolution) as i32)) + 
                         (y * (self.resolution as i32)) + x;
-            if index > self.voxels.len() as i32
+            /* Sanity bounds checking. */
+            if index >= self.voxels.len() as i32
             {
               error!("VOXEL: Invalid index %? where (%?, %?, %?)", index, x, y, z);
               break 'collision;
             }
 
-            let c = Vec3f::new( ((x as f32 - (self.resolution as f32 / 2.0)) * self.voxel_size),
-                                ((y as f32 - (self.resolution as f32 / 2.0)) * self.voxel_size),
-                                ((z as f32 - (self.resolution as f32 / 2.0)) * self.voxel_size));
+            /* Check for intersection. */
+            let c = Vec3f::new( ((x as f32 - (self.resolution as f32 / 2.0)) * self.voxel_size) + (self.voxel_size / 2.0), /* TODO: Positional offset? */
+                                ((y as f32 - (self.resolution as f32 / 2.0)) * self.voxel_size) + (self.voxel_size / 2.0),
+                                ((z as f32 - (self.resolution as f32 / 2.0)) * self.voxel_size) + (self.voxel_size / 2.0));
             if tri_cube_intersect(c, self.voxel_size, tri)
             {
+              /* We have intersection; add a reference to this voxel to the index map. */
               self.indices.push(Vertex
               {
-                position: Vec3i8::new(x as i8 - (self.resolution / 2) as i8,
+                position: Vec3i8::new(x as i8 - (self.resolution / 2) as i8, /* TODO: Remove duplicates. */
                                       y as i8 - (self.resolution / 2) as i8,
                                       z as i8 - (self.resolution / 2) as i8), 
                 color: Vec3u8::new(1, 1, 1),
               });
-              //break 'collision; 
             }
             
             x += 1;

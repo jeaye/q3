@@ -29,6 +29,6 @@ void main()
   gl_Position = proj * world * position;
 
   trans_color = vec4(1.0f, 1.0f, 1.0f, 1.0f); //position;
-  trans_color = vec4(in_position * 2.0f, 1.0f);
+  trans_color = vec4(in_position * 200.0f, 1.0f);
 }
 
