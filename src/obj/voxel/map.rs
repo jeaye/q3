@@ -92,7 +92,7 @@ impl Map
 
     //check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::LINE));
     check!(gl::draw_arrays_instanced(gl::TRIANGLES, 0, 36, self.indices.len() as i32));
-    check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::FILL));
+    //check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::FILL));
 
     check!(gl::disable_vertex_attrib_array(0));
     check!(gl::disable_vertex_attrib_array(1));
@@ -193,29 +193,23 @@ impl Map
       let mut z = start_indices.z;
       'collision: loop
       {
-        if z == start_indices.z + vox_amount.z || z >= self.resolution as i32
+        if z == start_indices.z + vox_amount.z
         { break; }
 
         let mut y = start_indices.y;
         loop
         {
-          if y == start_indices.y + vox_amount.y || y >= self.resolution as i32
+          if y == start_indices.y + vox_amount.y
           { break; }
 
           let mut x = start_indices.x;
           loop
           {
-            if x == start_indices.x + vox_amount.x || x >= self.resolution as i32
+            if x == start_indices.x + vox_amount.x
             { break; }
 
             let index = (z * ((self.resolution * self.resolution) as i32)) + 
                         (y * (self.resolution as i32)) + x;
-            /* Sanity bounds checking. */
-            if index >= self.voxels.len() as i32
-            {
-              error!("VOXEL: Invalid index %? where (%?, %?, %?)", index, x, y, z);
-              break 'collision;
-            }
 
             /* Check for intersection. */
             let c = Vec3f::new( ((x as f32 - (self.resolution as f32 / 2.0)) * self.voxel_size) + (self.voxel_size / 2.0), 
@@ -229,7 +223,7 @@ impl Map
                 position: Vec3i::new( x - (self.resolution / 2) as i32, /* TODO: Remove duplicates. */
                                       y - (self.resolution / 2) as i32,
                                       z - (self.resolution / 2) as i32), 
-                color: Vec3u8::new(1, 1, 1),
+                color: Vec3u8::new(tri.verts[0].color.x as u8, tri.verts[0].color.y as u8, tri.verts[0].color.z as u8), /* TODO: Conversion between Vec types. */
               });
             }
             

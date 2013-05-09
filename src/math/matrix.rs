@@ -157,23 +157,27 @@ impl Mat4x4
   { return 4; }
 
   #[inline(always)]
-  pub fn up(&self) -> Vec3f
+  pub fn get_up(&self) -> Vec3f
   { Vec3f::new(self.data[0][1], self.data[1][1], self.data[2][1]) }
   #[inline(always)]
-  pub fn down(&self) -> Vec3f
+  pub fn get_down(&self) -> Vec3f
   { Vec3f::new(-self.data[0][1], -self.data[1][1], -self.data[2][1]) }
   #[inline(always)]
-  pub fn left(&self) -> Vec3f
+  pub fn get_left(&self) -> Vec3f
   { Vec3f::new(-self.data[0][0], -self.data[1][0], -self.data[2][0]) }
   #[inline(always)]
-  pub fn right(&self) -> Vec3f
+  pub fn get_right(&self) -> Vec3f
   { Vec3f::new(self.data[0][0], self.data[1][0], self.data[2][0]) }
   #[inline(always)]
-  pub fn forward(&self) -> Vec3f
+  pub fn get_forward(&self) -> Vec3f
   { Vec3f::new(-self.data[0][2], -self.data[1][2], -self.data[2][2]) }
   #[inline(always)]
-  pub fn backward(&self) -> Vec3f
+  pub fn get_backward(&self) -> Vec3f
   { Vec3f::new(self.data[0][2], self.data[1][2], self.data[2][2]) }
+
+  #[inline(always)]
+  pub fn get_position(&self) -> Vec3f
+  { Vec3f::new(self.data[3][0], self.data[3][1], self.data[3][2]) }
 
   #[inline(always)]
   pub fn identity(&mut self)

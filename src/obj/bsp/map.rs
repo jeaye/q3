@@ -10,7 +10,7 @@
 */
 
 use math::{ Vec3f, Vec4u8, BB3 };
-use primitive::Triangle;
+use primitive::{ Triangle, Vertex_PC };
 
 #[path = "lump.rs"]
 mod lump;
@@ -186,9 +186,22 @@ impl Map
             verts.push(self.verts[face.start_vertex + i + 2]);
             verts.push(self.verts[face.start_vertex + i + 1]);
 
-            self.tris.push(Triangle::new_with_position( self.verts[face.start_vertex].position,
-                                                        self.verts[face.start_vertex + i + 2].position,
-                                                        self.verts[face.start_vertex + i + 1].position));
+            self.tris.push(Triangle::new( 
+                        Vertex_PC::new(
+                            self.verts[face.start_vertex].position,
+                            Vec3f::new( self.verts[face.start_vertex].color.x as f32,
+                                        self.verts[face.start_vertex].color.y as f32,
+                                        self.verts[face.start_vertex].color.z as f32)),
+                        Vertex_PC::new(
+                            self.verts[face.start_vertex + i + 2].position,
+                            Vec3f::new( self.verts[face.start_vertex + i + 2].color.x as f32,
+                                        self.verts[face.start_vertex + i + 2].color.y as f32,
+                                        self.verts[face.start_vertex + i + 2].color.z as f32)),
+                        Vertex_PC::new(
+                            self.verts[face.start_vertex + i + 1].position,
+                            Vec3f::new( self.verts[face.start_vertex + i + 1].color.x as f32,
+                                        self.verts[face.start_vertex + i + 1].color.y as f32,
+                                        self.verts[face.start_vertex + i + 1].color.z as f32))));
           }
         }
         /* Something else. */

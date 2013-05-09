@@ -188,8 +188,8 @@ impl Camera
                                     Vec3f::new(0.0, 1.0, 0.0));
 
     /* Move based on the keyboard input. */
-    let forward = self.view.forward();
-    let right = self.view.right();
+    let forward = self.view.get_forward();
+    let right = self.view.get_right();
     if self.move_to & Move_Left > 0
     { self.position -= right * self.move_speed * dt; }
     if self.move_to & Move_Right  > 0
