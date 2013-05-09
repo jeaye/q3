@@ -28,6 +28,5 @@ Hi! I'm Jeaye, a professional C++ game developer.
 **LinkedIn:** http://www.linkedin.com/in/jeaye  
 **IRC:** #rust on irc.mozilla.org:6697 
 
-![Screenshot](pics/007_camera.png)
-![Screenshot](pics/007_camera.png)
+![Screenshot](pics/012_1_no_wire.png)
 
