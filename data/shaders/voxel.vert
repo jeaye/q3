@@ -16,19 +16,64 @@ uniform mat4x4 world;
 uniform float voxel_size = 1.0f;
 
 /* Per vertex. */
-layout (location = 0) in vec3 in_position;
+layout (location = 0) in vec4 in_position;
 
 /* Per instance */
-layout (location = 1) in vec3 in_offset;
-layout (location = 2) in vec3 in_color;
+layout (location = 1) in vec4 in_offset;
+layout (location = 2) in vec4 in_color;
 
 out vec4 trans_color;
 
+/*
+vec4 verts[36] = vec4[36]
+(
+  vec4(-0.5f,-0.5f,-0.5f, 1.0f), 
+  vec4(-0.5f,-0.5f, 0.5f, 1.0f),
+  vec4(-0.5f, 0.5f, 0.5f, 1.0f),
+  vec4(0.5f, 0.5f,-0.5f, 1.0f),
+  vec4(-0.5f,-0.5f,-0.5f, 1.0f),
+  vec4(-0.5f, 0.5f,-0.5f, 1.0f),
+  vec4(0.5f,-0.5f, 0.5f, 1.0f),
+  vec4(-0.5f,-0.5f,-0.5f, 1.0f),
+  vec4(0.5f,-0.5f,-0.5f, 1.0f),
+  vec4(0.5f, 0.5f,-0.5f, 1.0f),
+  vec4(0.5f,-0.5f,-0.5f, 1.0f),
+  vec4(-0.5f,-0.5f,-0.5f, 1.0f),
+  vec4(-0.5f,-0.5f,-0.5f, 1.0f),
+  vec4(-0.5f, 0.5f, 0.5f, 1.0f),
+  vec4(-0.5f, 0.5f,-0.5f, 1.0f),
+  vec4(0.5f,-0.5f, 0.5f, 1.0f),
+  vec4(-0.5f,-0.5f, 0.5f, 1.0f),
+  vec4(-0.5f,-0.5f,-0.5f, 1.0f),
+  vec4(-0.5f, 0.5f, 0.5f, 1.0f),
+  vec4(-0.5f,-0.5f, 0.5f, 1.0f),
+  vec4(0.5f,-0.5f, 0.5f, 1.0f),
+  vec4(0.5f, 0.5f, 0.5f, 1.0f),
+  vec4(0.5f,-0.5f,-0.5f, 1.0f),
+  vec4(0.5f, 0.5f,-0.5f, 1.0f),
+  vec4(0.5f,-0.5f,-0.5f, 1.0f),
+  vec4(0.5f, 0.5f, 0.5f, 1.0f),
+  vec4(0.5f,-0.5f, 0.5f, 1.0f),
+  vec4(0.5f, 0.5f, 0.5f, 1.0f),
+  vec4(0.5f, 0.5f,-0.5f, 1.0f),
+  vec4(-0.5f, 0.5f,-0.5f, 1.0f),
+  vec4(0.5f, 0.5f, 0.5f, 1.0f),
+  vec4(-0.5f, 0.5f,-0.5f, 1.0f),
+  vec4(-0.5f, 0.5f, 0.5f, 1.0f),
+  vec4(0.5f, 0.5f, 0.5f, 1.0f),
+  vec4(-0.5f, 0.5f, 0.5f, 1.0f),
+  vec4(0.5f,-0.5f, 0.5f, 1.0f)
+);
+*/
+
 void main()
 {
-  vec4 position = vec4(in_position + (in_offset * voxel_size), 1.0f);
+  //vec4 position = vec4(verts[gl_VertexID] + (in_offset * voxel_size), 1.0f);
+  vec4 position = in_position + (in_offset * voxel_size);
+  position.w = 1.0f;
   gl_Position = proj * world * position;
 
-  trans_color = vec4(in_color, 1.0f);
+  trans_color = in_color;
+  //trans_color = position;
 }
 

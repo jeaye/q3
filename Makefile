@@ -1,7 +1,7 @@
-DEBUG_CONFIGS=--cfg debug_shader
+DEBUG_CONFIGS=--cfg debug_shader --cfg no_check_gl
 DEBUG_OPTIMIZATION=3 # TODO: Change for debug info
 
-RELEASE_CONFIGS=--cfg release_shader
+RELEASE_CONFIGS=--cfg release_shader --cfg no_check_gl
 RELEASE_OPTIMIZATION=3
 
 

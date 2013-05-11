@@ -65,8 +65,8 @@ impl Map
     check!(gl::bind_buffer(gl::ARRAY_BUFFER, map.vbo));
     check!(gl::buffer_data(gl::ARRAY_BUFFER, voxel, gl::STATIC_DRAW));
 
-    check!(gl::bind_buffer(gl::ELEMENT_ARRAY_BUFFER, map.ibo));
-    check!(gl::buffer_data(gl::ELEMENT_ARRAY_BUFFER, map.indices, gl::STATIC_DRAW));
+    check!(gl::bind_buffer(gl::ARRAY_BUFFER, map.ibo));
+    check!(gl::buffer_data(gl::ARRAY_BUFFER, map.indices, gl::STATIC_DRAW));
 
     map
   }
@@ -99,7 +99,6 @@ impl Map
     check!(gl::disable_vertex_attrib_array(2));
     check!(gl::bind_vertex_array(0));
     check!(gl::bind_buffer(gl::ARRAY_BUFFER, 0));
-    check!(gl::bind_buffer(gl::ELEMENT_ARRAY_BUFFER, 0));
   }
 
   priv fn voxelize(&mut self, tris: &[Triangle])
