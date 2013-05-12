@@ -10,10 +10,10 @@
       into OpenGL-ready cubes.
 */
 
-use math::{ Vec3f, Vec3i, Vec3i8, Vec3u8 };
+use math::{ Vec3f, Vec3i, Vec3u8 };
 use primitive::Vertex_PC;
 use primitive::Triangle;
-use primitive::{ Cube, Cube_Index };
+use primitive::{ Cube };
 use super::{ Vertex, Behavior, Default };
 
 #[path = "../../gl/mod.rs"]

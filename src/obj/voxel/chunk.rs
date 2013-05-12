@@ -10,7 +10,6 @@
 */
 
 use math::{ Vec3i8 };
-use primitive::{ Cube, Cube_Index };
 
 #[path = "../../gl/mod.rs"]
 mod gl;

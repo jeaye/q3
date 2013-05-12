@@ -9,7 +9,7 @@
       A voxel-specific triangle.
 */
 
-use math::{ Vec3i, Vec3u8 };
+use math::{ Vec3i };
 use Vert = super::Vertex;
 
 #[packed]

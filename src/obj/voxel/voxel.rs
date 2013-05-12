@@ -9,7 +9,6 @@
       A 3D volumetric unit.
 */
 
-use math::Vec3f;
 use super::{ Triangle, Triangle_Index };
 
 #[packed]

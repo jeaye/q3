@@ -10,7 +10,6 @@
 */
 
 use math::{ Vec3i, Vec3u8 };
-use super::{ Behavior, Default };
 
 #[packed]
 pub struct Vertex
