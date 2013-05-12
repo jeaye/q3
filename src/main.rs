@@ -64,6 +64,8 @@ fn main() {
       key_callback(window, key, action);
     }
 
+    let tex = gl::Texture::new(gl::TEXTURE_2D, "data/img/face.png");
+
     let mut sphere = primitive::Sphere::new(100.0, 7);
 
     let map = bsp::Map::new("data/q3ctf1.bsp");

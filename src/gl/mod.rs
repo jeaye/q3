@@ -9,16 +9,16 @@
       An aggregator of OpenGL items.
 */
 
-extern mod glfw;
 extern mod opengles;
 
-pub use glfw::*;
 pub use opengles::gl2::*;
 pub use self::camera::Camera;
 pub use self::shader::{ Shader, Shader_Builder };
+pub use self::texture::Texture;
 pub use self::util::*;
 
 mod camera;
 mod shader;
+mod texture;
 mod util;
 

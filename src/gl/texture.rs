@@ -17,12 +17,12 @@ use gl = opengles::gl2;
 mod util;
 
 #[macro_escape]
-mod check;
+mod check_internal;
 
 struct Texture
 {
   target: gl::GLenum,
-  obj: ~[gl::GLuint],
+  obj: gl::GLuint,
   filename: @str,
 }
 
@@ -34,28 +34,32 @@ impl Texture
     let mut tex = Texture
     {
       target: targ,
-      obj: check!(gl::gen_textures(1)),
-      filename: file
+      obj: check!(gl::gen_textures(1))[0],
+      filename: file.to_managed(),
     };
 
-    check!(gl::bind_texture(tex.target, tes.obj));
+    check!(gl::bind_texture(tex.target, tex.obj));
 
-    match stb_image::image::load_with_depth("resources/sample.png", 3)
+    match stb_image::image::load(file.to_owned())
     {
-      Some(ref image) => 
+      stb_image::image::ImageU8(image) => 
       {
+        debug!(fmt!("Loaded image %s with %?x%?:%?", 
+                    tex.filename, image.width, image.height, image.depth));
         unsafe {
-          gl::tex_image_2d(
-              gl::TEXTURE_2D, 0,
-              gl::RGB as gl::GLint,
-              image.width as gl::GLsizei,
-              image.height as gl::GLsizei,
-              0, gl::RGB, gl::UNSIGNED_BYTE,
-              &cast::transmute(&image.data))
-            );
+          check!(gl::tex_image_2d
+          (
+            gl::TEXTURE_2D, 0,
+            gl::RGB as gl::GLint,
+            image.width as gl::GLsizei,
+            image.height as gl::GLsizei,
+            0, gl::RGB, gl::UNSIGNED_BYTE,
+            Some(cast::transmute((copy image.data, image.data.len())))
+            //(cast::transmute(&image.data[0]))
+          ));
         }
       }
-      None => fail!(~"Failed to load texture.")
+      _ => fail!(fmt!("Failed to load texture %s", tex.filename))
     }
 
     tex
@@ -64,8 +68,8 @@ impl Texture
   #[inline(always)]
   pub fn bind(&self, unit: gl::GLenum)
   {
-    check!(gl::active_texture(unit));
-    check!(gl::bind_texture(self.obj));
+    //check!(gl::active_texture(unit));
+    check!(gl::bind_texture(gl::TEXTURE0 + unit, self.obj));
   }
 }
  
