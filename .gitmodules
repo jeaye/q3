@@ -7,3 +7,6 @@
 [submodule "lib/glfw-rs"]
 	path = lib/glfw-rs
 	url = git://github.com/Jeaye/glfw-rs.git
+[submodule "lib/stb-image"]
+	path = lib/stb-image
+	url = git://github.com/mozilla-servo/rust-stb-image.git

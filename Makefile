@@ -5,7 +5,7 @@ RELEASE_CONFIGS=--cfg release_shader --cfg no_check_gl
 RELEASE_OPTIMIZATION=3
 
 
-LIBS=-L lib/glfw-rs/lib -L lib/rust-opengles -L /opt/local/lib
+LIBS=-L lib/glfw-rs/lib -L lib/rust-opengles -L lib/stb-image -L /opt/local/lib
 
 .SILENT:
 

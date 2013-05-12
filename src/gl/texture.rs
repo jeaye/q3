@@ -11,21 +11,19 @@
 
 extern mod std;
 extern mod opengles;
+extern mod stb_image;
 use gl = opengles::gl2;
 
 mod util;
-#[path = "../math/math.rs"]
-mod math;
 
 #[macro_escape]
 mod check;
 
-/* TODO: Find a texture library. */
 struct Texture
 {
   target: gl::GLenum,
   obj: ~[gl::GLuint],
-  filename: @str
+  filename: @str,
 }
 
 impl Texture
@@ -33,7 +31,12 @@ impl Texture
   #[inline(always)]
   pub fn new(targ: gl::GLenum, file: &str) -> Texture
   {
-    let tex = Texture{ target: targ, obj: check!(gl::gen_textures(1)), filename: file };
+    let mut tex = Texture
+    {
+      target: targ,
+      obj: check!(gl::gen_textures(1)),
+      filename: file
+    };
 
     check!(gl::bind_texture(tex.target, tes.obj));
 

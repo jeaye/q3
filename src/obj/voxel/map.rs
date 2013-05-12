@@ -223,6 +223,7 @@ impl Map
                                       y - (self.resolution / 2) as i32,
                                       z - (self.resolution / 2) as i32), 
                 color: Vec3u8::new(tri.verts[0].color.x as u8, tri.verts[0].color.y as u8, tri.verts[0].color.z as u8), /* TODO: Conversion between Vec types. */
+                unused: 0,
               });
             }
             
