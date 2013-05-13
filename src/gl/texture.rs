@@ -42,7 +42,7 @@ impl Texture
 
     match stb_image::image::load(file.to_owned())
     {
-      stb_image::image::ImageU8(image) => 
+      stb_image::image::ImageU8(ref image) => 
       {
         debug!(fmt!("Loaded image %s with %?x%?:%?", 
                     tex.filename, image.width, image.height, image.depth));
