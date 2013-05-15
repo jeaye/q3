@@ -50,7 +50,7 @@ impl Renderer
     renderer.vbo = check!(gl::gen_buffers(1))[0];
     check!(gl::bind_buffer(gl::ARRAY_BUFFER, renderer.vbo));
     let data: ~[u8] = ~[];
-    check!(gl::buffer_data(gl::ARRAY_BUFFER, data, gl::DYNAMIC_DRAW)); /* TODO: STREAM */
+    check!(gl::buffer_data(gl::ARRAY_BUFFER, data, gl::STREAM_DRAW));
     check!(gl::enable_vertex_attrib_array(0));
 
     renderer
