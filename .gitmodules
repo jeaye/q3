@@ -9,4 +9,4 @@
 	url = git://github.com/Jeaye/glfw-rs.git
 [submodule "lib/stb-image"]
 	path = lib/stb-image
-	url = git://github.com/mozilla-servo/rust-stb-image.git
+	url = git://github.com/Jeaye/rust-stb-image.git
