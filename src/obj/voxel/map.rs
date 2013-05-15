@@ -144,9 +144,9 @@ impl Map
 
     self.voxels = vec::with_capacity((f32::pow((self.resolution + 1) as f32, 3.0)) as uint);
     self.indices = vec::with_capacity((f32::pow((self.resolution + 1) as f32, 3.0)) as uint);
-    for uint::range(0, self.resolution as uint) |z| 
-    { for uint::range(0, self.resolution as uint) |y|
-      { for uint::range(0, self.resolution as uint) |x|
+    for uint::range(0, self.resolution as uint) |_z| 
+    { for uint::range(0, self.resolution as uint) |_y|
+      { for uint::range(0, self.resolution as uint) |_x|
         {
           self.voxels.push(Default);
         }
@@ -207,9 +207,6 @@ impl Map
             if x == start_indices.x + vox_amount.x
             { break; }
 
-            let index = (z * ((self.resolution * self.resolution) as i32)) + 
-                        (y * (self.resolution as i32)) + x;
-
             /* Check for intersection. */
             let c = Vec3f::new( ((x as f32 - (self.resolution as f32 / 2.0)) * self.voxel_size) + (self.voxel_size / 2.0), 
                                 ((y as f32 - (self.resolution as f32 / 2.0)) * self.voxel_size) + (self.voxel_size / 2.0),
@@ -243,13 +240,13 @@ macro_rules! find_min_max
   ($x0:expr, $x1:expr, $x2:expr) =>
   (
     {
-      min = $x0;
-      max = $x0;
+      _min = $x0;
+      _max = $x0;
 
-      if($x1 < min){ min = $x1; }
-      if($x1 > max){ max = $x1; }
-      if($x2 < min){ min = $x2; }
-      if($x2 > max){ max = $x2; }
+      if($x1 < _min){ _min = $x1; }
+      if($x1 > _max){ _max = $x1; }
+      if($x2 < _min){ _min = $x2; }
+      if($x2 > _max){ _max = $x2; }
     }
   )
 )
@@ -260,11 +257,11 @@ macro_rules! axis_test_x01
   ($a:expr, $b:expr, $fa:expr, $fb:expr) =>
   (
     {
-      p0 = $a * v0.y - $b * v0.z;
-      p2 = $a * v2.y - $b * v2.z;
-      if p0 < p2  { min = p0; max = p2;} else { min = p2; max = p0; }
-      rad = $fa * box_size + $fb * box_size;
-      if min > rad || max < -rad  { return false; }
+      _p0 = $a * _v0.y - $b * _v0.z;
+      _p2 = $a * _v2.y - $b * _v2.z;
+      if _p0 < _p2  { _min = _p0; _max = _p2; } else { _min = _p2; _max = _p0; }
+      _rad = $fa * box_size + $fb * box_size;
+      if _min > _rad || _max < -_rad  { return false; }
     }
   )
 )
@@ -274,11 +271,11 @@ macro_rules! axis_test_x2
   ($a:expr, $b:expr, $fa:expr, $fb:expr) =>
   (
     {
-      p0 = $a * v0.y - $b * v0.z;
-      p1 = $a * v1.y - $b * v1.z;
-      if p0 < p1 { min = p0; max = p1; } else { min = p1; max = p0; }
-      rad = $fa * box_size + $fb * box_size;
-      if min > rad || max < -rad { return false; }
+      _p0 = $a * _v0.y - $b * _v0.z;
+      _p1 = $a * _v1.y - $b * _v1.z;
+      if _p0 < _p1 { _min = _p0; _max = _p1; } else { _min = _p1; _max = _p0; }
+      _rad = $fa * box_size + $fb * box_size;
+      if _min > _rad || _max < -_rad { return false; }
     }
   )
 )
@@ -290,11 +287,11 @@ macro_rules! axis_test_y02
   ($a:expr, $b:expr, $fa:expr, $fb:expr) =>
   (
     {
-      p0 = -$a * v0.x + $b * v0.z;
-      p2 = -$a * v2.x + $b * v2.z;
-      if p0 < p2 { min = p0; max = p2; } else { min = p2; max = p0; }
-      rad = $fa * box_size + $fb * box_size;
-      if min > rad || max < -rad { return false; }
+      _p0 = -$a * _v0.x + $b * _v0.z;
+      _p2 = -$a * _v2.x + $b * _v2.z;
+      if _p0 < _p2 { _min = _p0; _max = _p2; } else { _min = _p2; _max = _p0; }
+      _rad = $fa * box_size + $fb * box_size;
+      if _min > _rad || _max < -_rad { return false; }
     }
   )
 )
@@ -304,11 +301,11 @@ macro_rules! axis_test_y1
   ($a:expr, $b:expr, $fa:expr, $fb:expr) =>
   (
     {
-      p0 = -$a * v0.x + $b * v0.z;
-      p1 = -$a * v1.x + $b * v1.z;
-      if p0 < p1 { min = p0; max = p1; } else { min = p1; max = p0; }
-      rad = $fa * box_size + $fb * box_size;
-      if min > rad || max < -rad { return false; }
+      _p0 = -$a * _v0.x + $b * _v0.z;
+      _p1 = -$a * _v1.x + $b * _v1.z;
+      if _p0 < _p1 { _min = _p0; _max = _p1; } else { _min = _p1; _max = _p0; }
+      _rad = $fa * box_size + $fb * box_size;
+      if _min > _rad || _max < -_rad { return false; }
     }
   )
 )
@@ -320,11 +317,11 @@ macro_rules! axis_test_z12
   ($a:expr, $b:expr, $fa:expr, $fb:expr) =>
   (
     {
-      p1 = $a * v1.x - $b * v1.y;
-      p2 = $a * v2.x - $b * v2.y;
-      if p2 < p1 { min = p2; max = p1;} else { min = p1; max = p2; }
-      rad = $fa * box_size + $fb * box_size;
-      if min > rad || max < -rad { return false; }
+      _p1 = $a * _v1.x - $b * _v1.y;
+      _p2 = $a * _v2.x - $b * _v2.y;
+      if _p2 < _p1 { _min = _p2; _max = _p1;} else { _min = _p1; _max = _p2; }
+      _rad = $fa * box_size + $fb * box_size;
+      if _min > _rad || _max < -_rad { return false; }
     }
   )
 )
@@ -335,11 +332,11 @@ macro_rules! axis_test_z0
   ($a:expr, $b:expr, $fa:expr, $fb:expr) =>
   (
     {
-      p0 = $a * v0.x - $b * v0.y;
-      p1 = $a * v1.x - $b * v1.y;
-      if p0 < p1 { min = p0; max = p1; } else { min = p1; max = p0; }
-      rad = $fa * box_size + $fb * box_size;
-      if min > rad || max < -rad { return false; }
+      _p0 = $a * _v0.x - $b * _v0.y;
+      _p1 = $a * _v1.x - $b * _v1.y;
+      if _p0 < _p1 { _min = _p0; _max = _p1; } else { _min = _p1; _max = _p0; }
+      _rad = $fa * box_size + $fb * box_size;
+      if _min > _rad || _max < -_rad { return false; }
     }
   )
 )
@@ -347,63 +344,63 @@ macro_rules! axis_test_z0
 #[inline(always)]
 priv fn tri_cube_intersect(box_center: Vec3f, box_size: f32, tri: &Triangle) -> bool
 {
-  let mut v0, v1, v2;
-  let mut min, max, p0, p1, p2, rad, fex, fey, fez;
-  let mut normal, e0, e1, e2;
+  let mut _v0, _v1, _v2;
+  let mut _min, _max, _p0, _p1, _p2, _rad, _fex, _fey, _fez;
+  let mut _normal, _e0, _e1, _e2;
 
   /* Move everything so that the box's center is in (0, 0, 0). */
-  v0 = tri.verts[0].position - box_center;
-  v1 = tri.verts[1].position - box_center;
-  v2 = tri.verts[2].position - box_center;
+  _v0 = tri.verts[0].position - box_center;
+  _v1 = tri.verts[1].position - box_center;
+  _v2 = tri.verts[2].position - box_center;
 
   /* Computer triangle edges. */
-  e0 = v1 - v0; /* Edge 0. */
-  e1 = v2 - v1; /* Edge 1. */
-  e2 = v0 - v2; /* Edge 2. */
+  _e0 = _v1 - _v0; /* Edge 0. */
+  _e1 = _v2 - _v1; /* Edge 1. */
+  _e2 = _v0 - _v2; /* Edge 2. */
 
   //debug!("VOXEL: [Per voxel SAT] Testing bullet 3 edge 0");
   /* Bullet 3. */
-  fex = f32::abs(e0.x);
-  fey = f32::abs(e0.y);
-  fez = f32::abs(e0.z);
-  axis_test_x01!(e0.z, e0.y, fez, fey);
-  axis_test_y02!(e0.z, e0.x, fez, fex);
-  axis_test_z12!(e0.y, e0.x, fey, fex);
+  _fex = f32::abs(_e0.x);
+  _fey = f32::abs(_e0.y);
+  _fez = f32::abs(_e0.z);
+  axis_test_x01!(_e0.z, _e0.y, _fez, _fey);
+  axis_test_y02!(_e0.z, _e0.x, _fez, _fex);
+  axis_test_z12!(_e0.y, _e0.x, _fey, _fex);
 
   //debug!("VOXEL: [Per voxel SAT] Testing bullet 3 edge 1");
-  fex = f32::abs(e1.x);
-  fey = f32::abs(e1.y);
-  fez = f32::abs(e1.z);
-  axis_test_x01!(e1.z, e1.y, fez, fey);
-  axis_test_y02!(e1.z, e1.x, fez, fex);
-  axis_test_z0!(e1.y, e1.x, fey, fex);
+  _fex = f32::abs(_e1.x);
+  _fey = f32::abs(_e1.y);
+  _fez = f32::abs(_e1.z);
+  axis_test_x01!(_e1.z, _e1.y, _fez, _fey);
+  axis_test_y02!(_e1.z, _e1.x, _fez, _fex);
+  axis_test_z0!(_e1.y, _e1.x, _fey, _fex);
 
   //debug!("VOXEL: [Per voxel SAT] Testing bullet 3 edge 2");
-  fex = f32::abs(e2.x);
-  fey = f32::abs(e2.y);
-  fez = f32::abs(e2.z);
-  axis_test_x2!(e2.z, e2.y, fez, fey);
-  axis_test_y1!(e2.z, e2.x, fez, fex);
-  axis_test_z12!(e2.y, e2.x, fey, fex);
+  _fex = f32::abs(_e2.x);
+  _fey = f32::abs(_e2.y);
+  _fez = f32::abs(_e2.z);
+  axis_test_x2!(_e2.z, _e2.y, _fez, _fey);
+  axis_test_y1!(_e2.z, _e2.x, _fez, _fex);
+  axis_test_z12!(_e2.y, _e2.x, _fey, _fex);
 
   //debug!("VOXEL: [Per voxel SAT] Testing bullet 1");
   /* Bullet 1. */
   /* Test in X-direction */
-  find_min_max!(v0.x, v1.x, v2.x);
-  if min > box_size || max < -box_size { return false; }
+  find_min_max!(_v0.x, _v1.x, _v2.x);
+  if _min > box_size || _max < -box_size { return false; }
 
   /* Test in Y-direction */
-  find_min_max!(v0.y, v1.y, v2.y);
-  if min > box_size || max < -box_size { return false; }
+  find_min_max!(_v0.y, _v1.y, _v2.y);
+  if _min > box_size || _max < -box_size { return false; }
 
   /* Test in Z-direction */
-  find_min_max!(v0.z, v1.z, v2.z);
-  if min > box_size || max < -box_size { return false; }
+  find_min_max!(_v0.z, _v1.z, _v2.z);
+  if _min > box_size || _max < -box_size { return false; }
 
   //debug!("VOXEL: [Per voxel SAT] Testing bullet 2");
   /* Bullet 2. */
-  normal = e0.cross(&e1);
-  plane_cube_intersect(&normal, &v0, box_size)
+  _normal = _e0.cross(&_e1);
+  plane_cube_intersect(&_normal, &_v0, box_size)
 }
 
 #[inline(always)]

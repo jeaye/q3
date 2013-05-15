@@ -52,7 +52,7 @@ impl Map
       bb: BB3::zero(),
     };
 
-    let mut fio = io::file_reader(@path::PosixPath(file)).unwrap();
+    let fio = io::file_reader(@path::PosixPath(file)).unwrap();
     unsafe {  fio.read( cast::transmute((&map.header, sys::size_of::<lump::Header>())),
                         sys::size_of::<lump::Header>()); }
 
@@ -142,8 +142,7 @@ impl Map
                     (sys::size_of::<lump::Face>() as i32);
     assert!(num_faces > 0);
 
-    let mut face = lump::Face::new();
-
+    let face = lump::Face::new();
     for i32::range(0, num_faces) |_|
     {
       unsafe { fio.read( cast::transmute((&face, sys::size_of::<lump::Face>())),
@@ -159,8 +158,7 @@ impl Map
                     (sys::size_of::<lump::Mesh_Vert>() as i32);
     assert!(num_obj > 0);
 
-    let mut obj = lump::Mesh_Vert::new();
-
+    let obj = lump::Mesh_Vert::new();
     for i32::range(0, num_obj) |_|
     {
       unsafe { fio.read( cast::transmute((&obj, sys::size_of::<lump::Mesh_Vert>())),

@@ -66,7 +66,7 @@ fn main() {
 
     let tex = gl::Texture::new(gl::TEXTURE_2D, "data/img/face.png");
 
-    let mut sphere = primitive::Sphere::new(100.0, 7);
+    let sphere = primitive::Sphere::new(100.0, 7);
 
     let map = bsp::Map::new("data/q3ctf1.bsp");
 
@@ -78,7 +78,7 @@ fn main() {
 
     /* Temp test for font loading. */
     let mut font_renderer = ttf::Renderer::new();
-    let mut font = ttf::Font::new("data/test.ttf", 30);
+    let font = ttf::Font::new("data/test.ttf", 30);
 
     /* Shader Creation. */
     let vox_shader = @mut gl::Shader_Builder::new_with_files("data/shaders/voxel.vert", "data/shaders/voxel.frag");
@@ -90,7 +90,6 @@ fn main() {
     let voxel_size_loc = vox_shader.get_uniform_location(~"voxel_size");
     let color_proj_loc = color_shader.get_uniform_location(~"proj");
     let color_world_loc = color_shader.get_uniform_location(~"world");
-    let color_voxel_size_loc = color_shader.get_uniform_location(~"voxel_size");
 
     let mut cur_time = (std::time::precise_time_ns() / 10000) as f32; // Hundredth of a second
     let mut last_time = cur_time;

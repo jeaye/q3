@@ -142,7 +142,7 @@ impl Font /* TODO: Check macro for Freetype. */
       row_height = 0;
       for chars.each |curr|
       {
-        let mut glyph = match font.glyphs.find_mut(&(curr as u8))
+        let glyph = match font.glyphs.find_mut(&(curr as u8))
         {
           Some(g) => g,
           None => fail!(fmt!("Invalid char (%?) in font %?", curr, filename))
