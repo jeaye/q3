@@ -15,8 +15,10 @@ rm lib/*.so
 # GLFW3
 cd lib/glfw
 #git pull origin master
+cmake CMakeLists.txt -DBUILD_SHARED_LIBS=OFF
+make glfw
 cmake CMakeLists.txt -DBUILD_SHARED_LIBS=ON
-make
+make glfw
 cd ../../
 
 # Rust's GLFW3
