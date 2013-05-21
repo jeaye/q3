@@ -172,7 +172,7 @@ impl Camera
     { self.frames_this_sec += 1f32; }
 
 
-    self.projection = @Mat4x4::new_perspective( 
+    self.projection = @Mat4x4::new_perspective(  /* TODO: Only on resize */
                                       self.fov,
                                       (self.window_size.x / self.window_size.y) as f32,
                                       self.near_far.x,
@@ -183,7 +183,7 @@ impl Camera
     lookat.x = f32::sin(self.angles.x) * f32::cos(self.angles.y);
     lookat.y = f32::sin(self.angles.y);
     lookat.z = f32::cos(self.angles.x) * f32::cos(self.angles.y);
-    self.view = @Mat4x4::new_lookat(self.position,
+    self.view = @Mat4x4::new_lookat(self.position, /* TODO: Managed? */
                                     self.position + lookat, /* TODO: * focus for zoom */
                                     Vec3f::new(0.0, 1.0, 0.0));
 

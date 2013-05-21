@@ -14,6 +14,7 @@ use math::vec3::Vec3f;
 
 type Component = f32; /* TODO: Template. */
 
+//#[deriving(Clone)]
 struct Mat4x4
 {
   data: [[f32, ..4], ..4]
@@ -187,6 +188,23 @@ impl Mat4x4
                   [0.0, 0.0, 1.0, 0.0],
                   [0.0, 0.0, 0.0, 1.0]];
   }
+
+  /* TODO: Figure out how to do this. >.< */
+  //#[inline(always)]
+  //pub fn translate(&mut self, pos: &Vec3f)
+  //{
+  //  let mat = Mat4x4::new_translation(pos.x, pos.y, pos.z);
+  //  let res = self.clone();
+  //  *self = (*res * mat);
+  //}
+
+  //#[inline(always)]
+  //pub fn scale(&mut self, scaler: &Vec3f)
+  //{
+  //  let mat = Mat4x4::new_scale(scaler.x, scaler.y, scaler.z);
+  //  let res = self.clone();
+  //  *self = (*res * mat);
+  //}
 
   #[inline(always)]
   pub unsafe fn to_ptr(&self) -> *Mat4x4

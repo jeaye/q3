@@ -24,6 +24,7 @@ mod util;
 #[path = "../../gl/check.rs"]
 mod check;
 
+/* TODO: Voxels should have indexed verts or should be drawn as a fan. */
 struct Map
 {
   resolution: u32,

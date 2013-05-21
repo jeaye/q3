@@ -175,7 +175,7 @@ impl Release_Shader
   #[inline(always)]
   pub fn new(vert_src : &str, frag_src : &str) -> @Shaderable
   {
-    let mut shader = @mut Release_Shader{ prog: 0, vert_obj: 0, frag_obj: 0 };
+    let shader = @mut Release_Shader{ prog: 0, vert_obj: 0, frag_obj: 0 };
 
     assert!(shared::load(shader, vert_src, frag_src));
 
@@ -317,7 +317,14 @@ mod shared
 
   #[inline(always)]
   pub fn get_uniform_location(shader: &super::Shader_Builder, uniform: &str) -> gl::GLint
-  { check!(gl::get_uniform_location(shader.prog, uniform.to_owned())) }
+  {
+    let name = check!(gl::get_uniform_location(shader.prog, uniform.to_owned()));
+    match name
+    {
+      -1 => { error!(fmt!("Uniform '%s' not found!", uniform)); name }
+      _ => { name }
+    }
+  }
 
   #[inline(always)]
   pub fn update_uniform_i32(location: gl::GLint, i: i32)

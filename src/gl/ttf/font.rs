@@ -125,7 +125,7 @@ impl Font /* TODO: Check macro for Freetype. */
       check!(gl::active_texture(gl::TEXTURE0));
       font.texture_atlas = check!(gl::gen_textures(1))[0];
       check!(gl::bind_texture(gl::TEXTURE_2D, font.texture_atlas));
-      check!(gl::tex_image_2d(gl::TEXTURE_2D, 0, gl::RGB as i32,
+      check!(gl::tex_image_2d(gl::TEXTURE_2D, 0, gl::RGB as gl::GLint,
                               font.atlas_dimensions.x, font.atlas_dimensions.y,
                               0, gl::RED, gl::UNSIGNED_BYTE, None));
 

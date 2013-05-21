@@ -29,6 +29,9 @@ mod bsp;
 #[path = "gl/ttf/mod.rs"]
 mod ttf;
 
+#[path = "ui/mod.rs"]
+mod ui;
+
 #[path = "obj/primitive/mod.rs"]
 mod primitive;
 
@@ -64,7 +67,8 @@ fn main() {
       key_callback(window, key, action);
     }
 
-    let tex = gl::Texture::new(gl::TEXTURE_2D, "data/img/face.png");
+    let tex = gl::Texture::new(gl::TEXTURE_2D, "data/img/console/bg.png");
+    let mut ui_renderer = ui::Renderer::new();
 
     let sphere = primitive::Sphere::new(100.0, 7);
 
@@ -72,7 +76,7 @@ fn main() {
 
     let st = std::time::precise_time_s();
     let vox_sphere = voxel::Map::new(sphere.tris, 10);
-    let vox_map = voxel::Map::new(map.tris, 300);
+    let vox_map = voxel::Map::new(map.tris, 200);
     let et = std::time::precise_time_s();
     io::println(fmt!("Voxel map creation took %? seconds.", (et - st)));
 
@@ -126,11 +130,16 @@ fn main() {
         vox_map.draw();
 
         font_renderer.begin(camera);
+        
+        ui_renderer.shader.bind();
+        ui_renderer.render_texture(&tex, &math::Vec2f::new(0.0, 0.0));
+
+        font_renderer.shader.bind();
         font_renderer.render(fmt!("%?", fps), math::Vec2f::new(0.0, 0.0), &font);
         font_renderer.end();
       } window.swap_buffers();
 
-      //std::timer::sleep(@std::uv::global_loop::get(), 1000 / (camera.target_frame_rate as uint));
+      std::timer::sleep(@std::uv::global_loop::get(), 1000 / (camera.target_frame_rate as uint));
     }
   }
 }
