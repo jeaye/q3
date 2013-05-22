@@ -49,7 +49,7 @@ fn main() {
     let window_res = glfw::Window::create(1024, 768, "Q^3", glfw::Windowed);
     if window_res.is_err()
     { fail!(window_res.get_err()); }
-    let window = @window_res.get();
+    let window = @window_res.unwrap();
     window.make_context_current();
 
     let camera = @mut gl::Camera::new(window);
