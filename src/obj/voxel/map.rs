@@ -56,8 +56,29 @@ impl Map
     map.voxelize(tris);
 
     /* Single voxel that will be instance-rendered. */
-    let mut voxel = ~[];
-    voxel.push(Cube::new(map.voxel_size, Vec3f::zero()));
+    //let mut voxel = ~[];
+    //voxel.push(Cube::new(map.voxel_size, Vec3f::zero()));
+    let h: f32 = map.voxel_size / 2.0;
+    let voxel: ~[f32] =
+    ~[
+      -h,-h,h,  h,-h,h,   
+      -h,h,h,   h,h,h,    
+
+      h,-h,h,   h,-h,-h,  
+      h,h,h,    h,h,-h,   
+
+      h,-h,-h,  -h,-h,-h, 
+      h,h,-h,   -h,h,-h,  
+
+      -h,-h,-h, -h,-h,h,  
+      -h,h,-h,  -h,h,h,   
+
+      -h,-h,-h, h,-h,-h,  
+      -h,-h,h,  h,-h,h,   
+
+      -h,h,h,   h,h,h,    
+      -h,h,-h,  h,h,-h,   
+    ];
 
     map.vao = check!(gl::gen_vertex_arrays(1))[0]; /* TODO: Check these. */
     map.vbo = check!(gl::gen_buffers(1))[0];
@@ -77,7 +98,8 @@ impl Map
     check!(gl::bind_vertex_array(self.vao));
 
     check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.vbo));
-    check!(gl::vertex_attrib_pointer_f32(0, 3, false, (sys::size_of::<Vertex_PC>()) as i32, 0));
+    //check!(gl::vertex_attrib_pointer_f32(0, 3, false, (sys::size_of::<Vertex_PC>()) as i32, 0));
+    check!(gl::vertex_attrib_pointer_f32(0, 3, false, 0, 0));
     check!(gl::enable_vertex_attrib_array(0));
 
     check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.ibo));
@@ -92,7 +114,7 @@ impl Map
     check!(gl::vertex_attrib_divisor(2, 1));
 
     //check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::LINE));
-    check!(gl::draw_arrays_instanced(gl::TRIANGLES, 0, 36, self.indices.len() as i32));
+    check!(gl::draw_arrays_instanced(gl::TRIANGLE_STRIP, 0, 24, self.indices.len() as i32));
     //check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::FILL));
 
     check!(gl::disable_vertex_attrib_array(0));
