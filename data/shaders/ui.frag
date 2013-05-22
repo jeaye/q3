@@ -21,7 +21,7 @@ out vec4 frag_color;
 
 void main()
 {
-  frag_color = texture2D(texture0, trans_coord);
+  frag_color = texture(texture0, trans_coord);
   frag_color.a *= trans_alpha;
 }
 

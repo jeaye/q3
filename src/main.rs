@@ -141,7 +141,7 @@ fn main() {
         font_renderer.end();
       } window.swap_buffers();
 
-      std::timer::sleep(@std::uv::global_loop::get(), 1000 / (camera.target_frame_rate as uint));
+      //std::timer::sleep(@std::uv::global_loop::get(), 1000 / (camera.target_frame_rate as uint));
     }
   }
 }
