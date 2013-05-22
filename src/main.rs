@@ -47,15 +47,17 @@ fn main() {
     glfw::window_hint::opengl_forward_compat(true);
 
     let window_res = glfw::Window::create(1024, 768, "Q^3", glfw::Windowed);
-    if window_res.is_err()
-    { fail!(window_res.get_err()); }
-    let window = @window_res.unwrap();
+    let window = match window_res
+    {
+      Some(win) => { @win },
+      None => { fail!("Failed to create window!") }
+    };
     window.make_context_current();
 
     let camera = @mut gl::Camera::new(window);
     camera.init();
 
-    /* Setup callbacks. */
+    /* Setup callbacks. */ /* TODO: Crash on close with these callbacks. */
     window.set_cursor_mode(glfw::CURSOR_CAPTURED);
     do window.set_size_callback |_, width, height|
     { camera.resize(width as i32, height as i32); }
