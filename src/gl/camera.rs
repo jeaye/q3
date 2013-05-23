@@ -34,10 +34,10 @@ pub struct Camera
   angles: Vec2f,
   
   /* Projection. */
-  projection: @Mat4x4,
+  projection: Mat4x4,
   near_far: Vec2f,
   fov: f32,
-  view: @Mat4x4,
+  view: Mat4x4,
 
   /* Mouse. */
   look_speed: f32,
@@ -61,21 +61,23 @@ impl Camera
   #[inline(always)]
   pub fn new(win: @glfw::Window) -> Camera
   {
-    Camera {  position: Vec3f::zero(),
-              angles: Vec2f::zero(),
-              projection: @Mat4x4::new(),
-              near_far: Vec2f::new(0.1, 50.0),
-              fov: 100.0,
-              view: @Mat4x4::new(), /* TODO: s/new/identity/g */
-              look_speed: 0.001,
-              move_to: 0,
-              move_speed: 0.0001,
-              target_frame_rate: 60.0,
-              frame_rate: 0.0,
-              frames_this_sec: 0.0,
-              this_sec: 0.0,
-              window: win,
-              window_size: Vec2i::zero(),
+    Camera
+    {
+      position: Vec3f::zero(),
+      angles: Vec2f::zero(),
+      projection: Mat4x4::new(),
+      near_far: Vec2f::new(0.1, 50.0),
+      fov: 100.0,
+      view: Mat4x4::new(),
+      look_speed: 0.001,
+      move_to: 0,
+      move_speed: 0.0001,
+      target_frame_rate: 60.0,
+      frame_rate: 0.0,
+      frames_this_sec: 0.0,
+      this_sec: 0.0,
+      window: win,
+      window_size: Vec2i::zero(),
     }
   }
 
@@ -94,10 +96,20 @@ impl Camera
   #[inline(always)]
   pub fn resize(&mut self, new_width: i32, new_height: i32)
   {
+    /* Avoid division by zero if the window is being fondled. */
+    if new_width == 0 || new_height == 0
+    { return; }
+
     self.window_size.x = new_width;
     self.window_size.y = new_height;
 
     check!(gl::viewport(0, 0, self.window_size.x, self.window_size.y));
+
+    self.projection = Mat4x4::new_perspective(
+                                      self.fov,
+                                      (self.window_size.x / self.window_size.y) as f32,
+                                      self.near_far.x,
+                                      self.near_far.y);
   }
 
   pub fn mouse_moved(&mut self, x: float, y: float) 
@@ -172,18 +184,14 @@ impl Camera
     { self.frames_this_sec += 1f32; }
 
 
-    self.projection = @Mat4x4::new_perspective(  /* TODO: Only on resize */
-                                      self.fov,
-                                      (self.window_size.x / self.window_size.y) as f32,
-                                      self.near_far.x,
-                                      self.near_far.y);
-
     /* Update where the camera is looking. */
-    let mut lookat = Vec3f::zero();
-    lookat.x = f32::sin(self.angles.x) * f32::cos(self.angles.y);
-    lookat.y = f32::sin(self.angles.y);
-    lookat.z = f32::cos(self.angles.x) * f32::cos(self.angles.y);
-    self.view = @Mat4x4::new_lookat(self.position, /* TODO: Managed? */
+    let lookat = Vec3f::new
+    (
+      f32::sin(self.angles.x) * f32::cos(self.angles.y),
+      f32::sin(self.angles.y),
+      f32::cos(self.angles.x) * f32::cos(self.angles.y)
+    );
+    self.view = Mat4x4::new_lookat(self.position, 
                                     self.position + lookat, /* TODO: * focus for zoom */
                                     Vec3f::new(0.0, 1.0, 0.0));
 

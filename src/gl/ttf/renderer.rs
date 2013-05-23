@@ -40,7 +40,7 @@ impl Renderer
         shader: Shader_Builder::new_with_files("data/shaders/text.vert", "data/shaders/text.frag"),
         proj_loc: 0,
     };
-    renderer.proj_loc = renderer.shader.get_uniform_location(~"proj");
+    renderer.proj_loc = renderer.shader.get_uniform_location("proj");
     let tex_loc = renderer.shader.get_uniform_location("tex0"); 
     renderer.shader.bind();
     renderer.shader.update_uniform_i32(tex_loc, 0);

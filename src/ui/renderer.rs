@@ -60,10 +60,10 @@ impl Renderer
       texture0_loc: 0,
     };
 
-    renderer.proj_loc = renderer.shader.get_uniform_location(~"proj");
-    renderer.world_loc = renderer.shader.get_uniform_location(~"world");
-    renderer.alpha_loc = renderer.shader.get_uniform_location(~"alpha");
-    renderer.tex_world_loc = renderer.shader.get_uniform_location(~"tex_world");
+    renderer.proj_loc = renderer.shader.get_uniform_location("proj");
+    renderer.world_loc = renderer.shader.get_uniform_location("world");
+    renderer.alpha_loc = renderer.shader.get_uniform_location("alpha");
+    renderer.tex_world_loc = renderer.shader.get_uniform_location("tex_world");
     renderer.texture0_loc = renderer.shader.get_uniform_location("texture0"); 
     renderer.shader.bind();
     renderer.shader.update_uniform_i32(renderer.texture0_loc, 0);

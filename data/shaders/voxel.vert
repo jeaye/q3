@@ -23,57 +23,12 @@ layout (location = 1) in vec4 in_offset;
 layout (location = 2) in vec4 in_color;
 
 out vec4 trans_color;
-
-/*
-vec4 verts[36] = vec4[36]
-(
-  vec4(-0.5f,-0.5f,-0.5f, 1.0f), 
-  vec4(-0.5f,-0.5f, 0.5f, 1.0f),
-  vec4(-0.5f, 0.5f, 0.5f, 1.0f),
-  vec4(0.5f, 0.5f,-0.5f, 1.0f),
-  vec4(-0.5f,-0.5f,-0.5f, 1.0f),
-  vec4(-0.5f, 0.5f,-0.5f, 1.0f),
-  vec4(0.5f,-0.5f, 0.5f, 1.0f),
-  vec4(-0.5f,-0.5f,-0.5f, 1.0f),
-  vec4(0.5f,-0.5f,-0.5f, 1.0f),
-  vec4(0.5f, 0.5f,-0.5f, 1.0f),
-  vec4(0.5f,-0.5f,-0.5f, 1.0f),
-  vec4(-0.5f,-0.5f,-0.5f, 1.0f),
-  vec4(-0.5f,-0.5f,-0.5f, 1.0f),
-  vec4(-0.5f, 0.5f, 0.5f, 1.0f),
-  vec4(-0.5f, 0.5f,-0.5f, 1.0f),
-  vec4(0.5f,-0.5f, 0.5f, 1.0f),
-  vec4(-0.5f,-0.5f, 0.5f, 1.0f),
-  vec4(-0.5f,-0.5f,-0.5f, 1.0f),
-  vec4(-0.5f, 0.5f, 0.5f, 1.0f),
-  vec4(-0.5f,-0.5f, 0.5f, 1.0f),
-  vec4(0.5f,-0.5f, 0.5f, 1.0f),
-  vec4(0.5f, 0.5f, 0.5f, 1.0f),
-  vec4(0.5f,-0.5f,-0.5f, 1.0f),
-  vec4(0.5f, 0.5f,-0.5f, 1.0f),
-  vec4(0.5f,-0.5f,-0.5f, 1.0f),
-  vec4(0.5f, 0.5f, 0.5f, 1.0f),
-  vec4(0.5f,-0.5f, 0.5f, 1.0f),
-  vec4(0.5f, 0.5f, 0.5f, 1.0f),
-  vec4(0.5f, 0.5f,-0.5f, 1.0f),
-  vec4(-0.5f, 0.5f,-0.5f, 1.0f),
-  vec4(0.5f, 0.5f, 0.5f, 1.0f),
-  vec4(-0.5f, 0.5f,-0.5f, 1.0f),
-  vec4(-0.5f, 0.5f, 0.5f, 1.0f),
-  vec4(0.5f, 0.5f, 0.5f, 1.0f),
-  vec4(-0.5f, 0.5f, 0.5f, 1.0f),
-  vec4(0.5f,-0.5f, 0.5f, 1.0f)
-);
-*/
-
 void main()
 {
-  //vec4 position = vec4(verts[gl_VertexID] + (in_offset * voxel_size), 1.0f);
   vec4 position = in_position + (in_offset * voxel_size);
   position.w = 1.0f;
   gl_Position = proj * world * position;
 
   trans_color = in_color;
-  //trans_color = position;
 }
 

@@ -11,9 +11,7 @@
 */
 
 use math::{ Vec3f, Vec3i, Vec3u8 };
-use primitive::Vertex_PC;
 use primitive::Triangle;
-use primitive::{ Cube };
 use super::{ Vertex, Behavior, Default };
 
 #[path = "../../gl/mod.rs"]
@@ -24,7 +22,6 @@ mod util;
 #[path = "../../gl/check.rs"]
 mod check;
 
-/* TODO: Voxels should have indexed verts or should be drawn as a fan. */
 struct Map
 {
   resolution: u32,
@@ -56,10 +53,8 @@ impl Map
     map.voxelize(tris);
 
     /* Single voxel that will be instance-rendered. */
-    //let mut voxel = ~[];
-    //voxel.push(Cube::new(map.voxel_size, Vec3f::zero()));
     let h: f32 = map.voxel_size / 2.0;
-    let voxel: ~[f32] =
+    let voxel: ~[f32] = /* TRIANGLE_STRIP style. */
     ~[
       -h,-h,h,  h,-h,h,   
       -h,h,h,   h,h,h,    
@@ -80,9 +75,14 @@ impl Map
       -h,h,-h,  h,h,-h,   
     ];
 
-    map.vao = check!(gl::gen_vertex_arrays(1))[0]; /* TODO: Check these. */
-    map.vbo = check!(gl::gen_buffers(1))[0];
-    map.ibo = check!(gl::gen_buffers(1))[0];
+    let names = check!(gl::gen_vertex_arrays(1));
+    assert!(names.len() == 1);
+    map.vao = names[0];
+
+    let names = check!(gl::gen_buffers(2));
+    assert!(names.len() == 2);
+    map.vbo = names[0];
+    map.ibo = names[1];
     check!(gl::bind_vertex_array(map.vao));
     check!(gl::bind_buffer(gl::ARRAY_BUFFER, map.vbo));
     check!(gl::buffer_data(gl::ARRAY_BUFFER, voxel, gl::STATIC_DRAW));
@@ -98,7 +98,6 @@ impl Map
     check!(gl::bind_vertex_array(self.vao));
 
     check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.vbo));
-    //check!(gl::vertex_attrib_pointer_f32(0, 3, false, (sys::size_of::<Vertex_PC>()) as i32, 0));
     check!(gl::vertex_attrib_pointer_f32(0, 3, false, 0, 0));
     check!(gl::enable_vertex_attrib_array(0));
 

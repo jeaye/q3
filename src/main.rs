@@ -91,11 +91,11 @@ fn main() {
     let color_shader = @mut gl::Shader_Builder::new_with_files("data/shaders/color.vert", "data/shaders/color.frag");
     vox_shader.bind();
 
-    let proj_loc = vox_shader.get_uniform_location(~"proj");
-    let world_loc = vox_shader.get_uniform_location(~"world");
-    let voxel_size_loc = vox_shader.get_uniform_location(~"voxel_size");
-    let color_proj_loc = color_shader.get_uniform_location(~"proj");
-    let color_world_loc = color_shader.get_uniform_location(~"world");
+    let proj_loc = vox_shader.get_uniform_location("proj");
+    let world_loc = vox_shader.get_uniform_location("world");
+    let voxel_size_loc = vox_shader.get_uniform_location("voxel_size");
+    let color_proj_loc = color_shader.get_uniform_location("proj");
+    let color_world_loc = color_shader.get_uniform_location("world");
 
     let mut cur_time = (std::time::precise_time_ns() / 10000) as f32; // Hundredth of a second
     let mut last_time = cur_time;
@@ -110,11 +110,11 @@ fn main() {
 
       camera.update(delta);
       vox_shader.bind();
-      vox_shader.update_uniform_mat(proj_loc, camera.projection);
-      vox_shader.update_uniform_mat(world_loc, camera.view);
+      vox_shader.update_uniform_mat(proj_loc, &camera.projection);
+      vox_shader.update_uniform_mat(world_loc, &camera.view);
       color_shader.bind();
-      color_shader.update_uniform_mat(color_proj_loc, camera.projection);
-      color_shader.update_uniform_mat(color_world_loc, camera.view);
+      color_shader.update_uniform_mat(color_proj_loc, &camera.projection);
+      color_shader.update_uniform_mat(color_world_loc, &camera.view);
 
       let fps = camera.frame_rate;
 
