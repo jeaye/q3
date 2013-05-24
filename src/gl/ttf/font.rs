@@ -9,8 +9,8 @@
       TrueType font atlas.
 */
 
-use core::hashmap::HashMap;
-use core::libc::{ c_uint };
+use std::hashmap::HashMap;
+use std::libc::{ c_uint };
 use gl = opengles::gl2;
 use math::*;
 use self::glyph::Glyph;

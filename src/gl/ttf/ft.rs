@@ -19,7 +19,7 @@ extern { }
 #[nolink]
 pub mod ll 
 {
-  use core::libc::{ c_void, c_char, c_uchar, c_int, c_uint, c_short, c_ushort, c_long };
+  use std::libc::{ c_void, c_char, c_uchar, c_int, c_uint, c_short, c_ushort, c_long };
 
   /* Types. */
   pub type Error = int;
