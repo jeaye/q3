@@ -112,7 +112,7 @@ impl Renderer
     self.shader.bind();
 
     /* TODO: Begin and end for ui rendering should manage this. */
-    let proj =  Mat4x4::new_orthographic(0.0, 1024.0, 768.0, 0.0,  1.0, 100.0);
+    let proj =  Mat4x4::new_orthographic(0.0, 1024.0, 768.0, 0.0, 1.0, 100.0);
     self.shader.update_uniform_mat(self.proj_loc, &proj);
 
     self.world = Mat4x4::new_scale(tex.dimensions.x as f32, tex.dimensions.y as f32, 1.0);
