@@ -8,10 +8,10 @@ RELEASE_OPTIMIZATION=3
 UNAME=$(shell uname)
 
 # Colors
-COLOR_OFF="\e[0m"
-COLOR_RED="\e[0;31m"
-COLOR_YELLOW="\e[0;33m"
-COLOR_GREEN="\e[0;32m"
+COLOR_OFF=`tput sgr0`
+COLOR_RED=`tput setaf 1`
+COLOR_YELLOW=`tput setaf 3`
+COLOR_GREEN=`tput setaf 2`
 
 # Output colorizing
 ECHO_PREFIX="${COLOR_RED}»»»${COLOR_OFF}"
