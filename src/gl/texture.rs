@@ -68,17 +68,17 @@ impl Texture
         };
 
         let data = copy image.data;
-        let len = data.len();
-
         unsafe {
-          check!(gl::tex_image_2d
+          check!(gl::glTexImage2D
           (
-            gl::TEXTURE_2D, 0,
-            gl::RGBA8 as gl::GLint,
-            tex.dimensions.x as gl::GLsizei,
-            tex.dimensions.y as gl::GLsizei,
-            0, format, gl::UNSIGNED_BYTE,
-            Some(cast::transmute((data, len)))
+            /* target */ gl::TEXTURE_2D, 
+            /* mipmap */ 0, 
+            /* internal */ gl::RGBA8 as gl::GLint, 
+            /* dimensions */ tex.dimensions.x as gl::GLsizei, tex.dimensions.y as gl::GLsizei, 
+            /* border */ 0, 
+            /* external */ format, 
+            /* size type */ gl::UNSIGNED_BYTE, 
+            /* data */ cast::transmute(vec::raw::to_ptr(data))
           ));
         }
       }

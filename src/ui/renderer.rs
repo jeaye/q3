@@ -94,12 +94,10 @@ impl Renderer
     let data =
     [
       /*(X , Y) (U , V)*/
-      Point::new(0.0, 0.0, 0.0, 1.0),
-      Point::new(0.0, 1.0, 0.0, 0.0),
-      Point::new(1.0, 1.0, 1.0, 0.0),
-      Point::new(0.0, 0.0, 0.0, 1.0),
-      Point::new(1.0, 1.0, 1.0, 0.0),
-      Point::new(1.0, 0.0, 1.0, 1.0),
+      Point::new(0.0, 0.0, 0.0, 0.0),
+      Point::new(0.0, 1.0, 0.0, 1.0),
+      Point::new(1.0, 1.0, 1.0, 1.0),
+      Point::new(1.0, 0.0, 1.0, 0.0),
     ];
     check!(gl::buffer_data(gl::ARRAY_BUFFER, data, gl::STATIC_DRAW));
     check!(gl::enable_vertex_attrib_array(0));
@@ -134,7 +132,7 @@ impl Renderer
     check!(gl::enable_vertex_attrib_array(0));
     check!(gl::vertex_attrib_pointer_f32(0, 4, false, 0, 0));
 
-    check!(gl::draw_arrays(gl::TRIANGLES, 0, 6));
+    check!(gl::draw_arrays(gl::TRIANGLE_STRIP, 0, 6));
 
     tex.unbind();
 
