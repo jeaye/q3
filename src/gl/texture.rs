@@ -46,7 +46,8 @@ impl Texture
     tex.obj = name[0];
     tex.bind(0);
 
-    check!(gl::tex_parameter_i(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::NEAREST as gl::GLint));
+    check!(gl::pixel_store_i(gl::UNPACK_ALIGNMENT, 4));
+    check!(gl::tex_parameter_i(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR as gl::GLint));
     check!(gl::tex_parameter_i(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as gl::GLint));
     check!(gl::tex_parameter_i(gl::TEXTURE_2D, gl::TEXTURE_WRAP_S, gl::CLAMP_TO_EDGE as gl::GLint));
     check!(gl::tex_parameter_i(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, gl::CLAMP_TO_EDGE as gl::GLint));
@@ -73,7 +74,7 @@ impl Texture
           check!(gl::tex_image_2d
           (
             gl::TEXTURE_2D, 0,
-            format as gl::GLint,
+            gl::RGBA8 as gl::GLint,
             tex.dimensions.x as gl::GLsizei,
             tex.dimensions.y as gl::GLsizei,
             0, format, gl::UNSIGNED_BYTE,

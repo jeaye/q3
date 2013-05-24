@@ -175,6 +175,9 @@ impl Font /* TODO: Check macro for Freetype. */
       }
     }
 
+    /* Reset the state. */
+    check!(gl::pixel_store_i(gl::UNPACK_ALIGNMENT, 4));
+
     assert!(font.height > 0);
 
     font

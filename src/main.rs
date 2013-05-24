@@ -134,7 +134,7 @@ fn main() {
         font_renderer.begin(camera);
         
         ui_renderer.shader.bind();
-        ui_renderer.render_texture(&tex, &math::Vec2f::new(0.0, 0.0));
+        ui_renderer.render_texture(&tex, &math::Vec2f::new(100.0, 100.0));
 
         font_renderer.shader.bind();
         font_renderer.render(fmt!("%?", fps), math::Vec2f::new(0.0, 0.0), &font);
