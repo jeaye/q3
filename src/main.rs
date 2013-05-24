@@ -58,12 +58,12 @@ fn main() {
     camera.init();
 
     /* Setup callbacks. */ /* TODO: Crash on close with these callbacks. */
-    window.set_cursor_mode(glfw::CURSOR_CAPTURED);
+    window.set_cursor_mode(glfw::CURSOR_HIDDEN);
     do window.set_size_callback |_, width, height|
     { camera.resize(width as i32, height as i32); }
-    do window.set_cursor_pos_callback |_, x, y|
+    do window.set_cursor_pos_callback |_, x, y| 
     { camera.mouse_moved(x, y); }
-    do window.set_key_callback |window, key, action|
+    do window.set_key_callback |window, key, action, _| /* TODO: Last is modifier key. */
     {
       camera.key_action(key, action);
       key_callback(window, key, action);
