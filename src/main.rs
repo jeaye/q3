@@ -129,7 +129,7 @@ fn main() {
 
         ui_renderer.begin(camera);
         
-        ui_renderer.render_texture(&tex, &math::Vec2f::new(100.0, 100.0));
+        //ui_renderer.render_texture(&tex, &math::Vec2f::new(100.0, 100.0));
 
         ui_renderer.render_font(fmt!("%?", fps), math::Vec2f::new(0.0, 0.0), &font);
         ui_renderer.end();
