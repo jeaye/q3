@@ -37,7 +37,7 @@ struct Font
   height: i32,
 }
 
-impl Font /* TODO: Check macro for Freetype. */
+impl Font
 {
   pub fn new(filename: &str, size: i32) -> Font
   {
@@ -78,11 +78,7 @@ impl Font /* TODO: Check macro for Freetype. */
         /* If we've exhausted the width for this row, add another. */
         if row_width + (*ft_glyph).bitmap.width + 1 >= max_width
         {
-          font.atlas_dimensions.x = 
-            if font.atlas_dimensions.x > row_width /* TODO: Max? */
-            { font.atlas_dimensions.x }
-            else
-            { row_width };
+          font.atlas_dimensions.x = cmp::max(font.atlas_dimensions.x, row_width);
           font.atlas_dimensions.y += row_height;
           row_width = 0; row_height = 0;
         }
@@ -98,25 +94,13 @@ impl Font /* TODO: Check macro for Freetype. */
                                       (glyph.dimensions.x * glyph.dimensions.y) as uint);
 
         row_width += (glyph.dimensions.x + 1.0) as i32;
-        row_height = /* TODO: Max? */
-          if row_height > (*ft_glyph).bitmap.rows
-          { row_height }
-          else
-          { (*ft_glyph).bitmap.rows };
-        font.height = /* TODO: Max? */
-          if font.height > row_height
-          { font.height }
-          else
-          { row_height };
+        row_height = cmp::max(row_height, (*ft_glyph).bitmap.rows);
+        font.height = cmp::max(font.height, row_height);
 
         font.glyphs.insert(curr, glyph);
       }
 
-      font.atlas_dimensions.x = next_power_of_2( /* TODO: Max? */
-                                          if font.atlas_dimensions.x > row_width
-                                          { font.atlas_dimensions.x }
-                                          else
-                                          { row_width });
+      font.atlas_dimensions.x = next_power_of_2(cmp::max(font.atlas_dimensions.x, row_width));
       font.atlas_dimensions.y = next_power_of_2(font.atlas_dimensions.y + row_height);
 
       /* We're using 1 byte alignment buffering. */
@@ -167,11 +151,7 @@ impl Font /* TODO: Check macro for Freetype. */
         glyph.tex.y = (offset.y as f32 / (font.atlas_dimensions.y as f32));
 
         offset.x += glyph.dimensions.x as i32;
-        row_height = /* TODO: Max? */
-                if row_height > glyph.dimensions.y as i32
-                { row_height }
-                else
-                { glyph.dimensions.y as i32 };
+        row_height = cmp::max(row_height, glyph.dimensions.y as i32);
       }
     }
 
