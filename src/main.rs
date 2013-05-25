@@ -55,7 +55,7 @@ fn main() {
     camera.init();
 
     /* Setup callbacks. */ /* TODO: Crash on close with these callbacks. */
-    window.set_cursor_mode(glfw::CURSOR_HIDDEN);
+    window.set_cursor_mode(glfw::CURSOR_DISABLED);
     do window.set_size_callback |_, width, height|
     { camera.resize(width as i32, height as i32); }
     do window.set_cursor_pos_callback |_, x, y| 
