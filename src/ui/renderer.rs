@@ -9,8 +9,10 @@
       A UI component renderer.
 */
 
-use gl::{ Shader, Shader_Builder, Texture };
+use gl::{ Shader, Shader_Builder, Texture, Camera };
 use math::{ Vec2f, Mat4x4 };
+use TTF_Renderer = super::ttf::Renderer;
+use TTF_Font = super::ttf::Font;
 
 #[path = "../gl/mod.rs"]
 mod gl;
@@ -19,9 +21,6 @@ mod util;
 #[path = "../gl/check.rs"]
 mod check;
 
-/* TODO: 
-  Bring ttf to ui module
-*/
 struct Renderer
 {
   vao: gl::GLuint,
@@ -38,9 +37,10 @@ struct Renderer
   alpha_loc: gl::GLint,
   tex_world_loc: gl::GLint,
   texture0_loc: gl::GLint,
-}
 
-/* TODO: Begin and end with projection setup -- share with font. */
+  /* Font support. */
+  font_renderer: TTF_Renderer,
+}
 
 impl Renderer
 {
@@ -58,6 +58,7 @@ impl Renderer
       alpha_loc: 0,
       tex_world_loc: 0,
       texture0_loc: 0,
+      font_renderer: TTF_Renderer::new(),
     };
 
     renderer.proj_loc = renderer.shader.get_uniform_location("proj");
@@ -105,14 +106,34 @@ impl Renderer
     renderer
   }
 
+  #[inline(always)]
+  pub fn begin(&mut self, camera: &Camera)
+  {
+    check!(gl::disable(gl::DEPTH_TEST));
+
+    /* Enable transparency. */
+    check!(gl::enable(gl::BLEND));
+    check!(gl::blend_func(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA));
+
+    /* Update the projection information. */
+    let proj = Mat4x4::new_orthographic(0.0, camera.window_size.x as f32, camera.window_size.y as f32, 0.0,  1.0, 100.0);
+
+    self.font_renderer.shader.bind();
+    self.font_renderer.shader.update_uniform_mat(self.font_renderer.proj_loc, &proj);
+    
+    self.shader.bind();
+    self.shader.update_uniform_mat(self.proj_loc, &proj);
+  }
+
+  #[inline(always)]
+  pub fn end(&mut self)
+  {
+    check!(gl::enable(gl::DEPTH_TEST));
+    check!(gl::disable(gl::BLEND));
+  }
+
   pub fn render_texture(&mut self, tex: &Texture, pos: &Vec2f)
   {
-    self.shader.bind();
-
-    /* TODO: Begin and end for ui rendering should manage this. */
-    let proj =  Mat4x4::new_orthographic(0.0, 1024.0, 768.0, 0.0, 1.0, 100.0);
-    self.shader.update_uniform_mat(self.proj_loc, &proj);
-
     self.world = Mat4x4::new_scale(tex.dimensions.x as f32, tex.dimensions.y as f32, 1.0);
     self.world *= Mat4x4::new_translation(pos.x, pos.y, 0.0);
     self.shader.update_uniform_mat(self.world_loc, &self.world);
@@ -121,6 +142,13 @@ impl Renderer
     self.shader.update_uniform_mat(self.tex_world_loc, &self.tex_world);
 
     self.render(tex);
+  }
+
+  pub fn render_font(&mut self, text: &str, pos: Vec2f, font: &TTF_Font)
+  {
+    self.font_renderer.shader.bind();
+    self.font_renderer.render(text, pos, font);
+    self.shader.bind();
   }
 
   priv fn render(&mut self, tex: &Texture)

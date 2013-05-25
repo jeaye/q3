@@ -26,9 +26,6 @@ mod check;
 #[path = "obj/bsp/mod.rs"]
 mod bsp; 
 
-#[path = "gl/ttf/mod.rs"]
-mod ttf;
-
 #[path = "ui/mod.rs"]
 mod ui;
 
@@ -83,8 +80,7 @@ fn main() {
     io::println(fmt!("Voxel map creation took %? seconds.", (et - st)));
 
     /* Temp test for font loading. */
-    let mut font_renderer = ttf::Renderer::new();
-    let font = ttf::Font::new("data/test.ttf", 30);
+    let font = ui::Font::new("data/test.ttf", 30);
 
     /* Shader Creation. */
     let vox_shader = @mut gl::Shader_Builder::new_with_files("data/shaders/voxel.vert", "data/shaders/voxel.frag");
@@ -131,14 +127,12 @@ fn main() {
         vox_shader.update_uniform_f32(voxel_size_loc, vox_map.voxel_size);
         vox_map.draw();
 
-        font_renderer.begin(camera);
+        ui_renderer.begin(camera);
         
-        ui_renderer.shader.bind();
         ui_renderer.render_texture(&tex, &math::Vec2f::new(100.0, 100.0));
 
-        font_renderer.shader.bind();
-        font_renderer.render(fmt!("%?", fps), math::Vec2f::new(0.0, 0.0), &font);
-        font_renderer.end();
+        ui_renderer.render_font(fmt!("%?", fps), math::Vec2f::new(0.0, 0.0), &font);
+        ui_renderer.end();
       } window.swap_buffers();
 
       //extra::timer::sleep(@extra::uv::global_loop::get(), 1000 / (camera.target_frame_rate as uint));

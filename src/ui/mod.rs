@@ -10,6 +10,9 @@
 */
 
 pub use self::renderer::Renderer;
+pub use self::ttf::Font;
 
 mod renderer;
+#[path = "ttf/mod.rs"]
+mod ttf;
 
