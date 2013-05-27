@@ -54,15 +54,18 @@ fn main() {
     let camera = @mut gl::Camera::new(window);
     camera.init();
 
+    let ui_input = @mut ui::Input_State::new();
+    ui_input.push(camera as @mut ui::Input_Listener);
+
     /* Setup callbacks. */ /* TODO: Crash on close with these callbacks. */
     window.set_cursor_mode(glfw::CURSOR_DISABLED);
     do window.set_size_callback |_, width, height|
     { camera.resize(width as i32, height as i32); }
     do window.set_cursor_pos_callback |_, x, y| 
-    { camera.mouse_moved(x, y); }
-    do window.set_key_callback |window, key, action, _| /* TODO: Last is modifier key. */
+    { ui_input.mouse_moved(x as f32, y as f32); }
+    do window.set_key_callback |window, key, action, mods|
     {
-      camera.key_action(key, action);
+      ui_input.key_action(key, action, mods);
       key_callback(window, key, action);
     }
 

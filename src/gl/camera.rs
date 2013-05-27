@@ -15,6 +15,7 @@ use gl = opengles::gl2;
 use math::vec2::{ Vec2f, Vec2i };
 use math::vec3::Vec3f;
 use math::matrix::Mat4x4;
+use ui::Input_Listener;
 
 mod util;
 
@@ -112,61 +113,6 @@ impl Camera
                                       self.near_far.y);
   }
 
-  pub fn mouse_moved(&mut self, x: float, y: float) 
-  {
-    let dx = x - (self.window_size.x / 2) as float;
-    let dy = y - (self.window_size.y / 2) as float;
-
-    self.angles.x -= dx as f32 * self.look_speed;
-    self.angles.y -= dy as f32 * self.look_speed;
-    
-    /* Wrap X. */
-    if self.angles.x < -f32::consts::pi
-    { self.angles.x += f32::consts::pi * 2.0; }
-    else if self.angles.x > f32::consts::pi
-    { self.angles.x -= f32::consts::pi * 2.0; }
-
-    /* Clamp Y. */
-    if self.angles.y < -f32::consts::pi * 0.49
-    { self.angles.y = -f32::consts::pi * 0.49; }
-    else if self.angles.y > f32::consts::pi * 0.49
-    { self.angles.y = f32::consts::pi * 0.49; }
-
-    self.window.set_cursor_pos( (self.window_size.x / 2) as float, 
-                                (self.window_size.y / 2) as float);
-  }
-
-  pub fn key_action(&mut self, key: libc::c_int, action: libc::c_int) 
-  {
-    if action == glfw::PRESS /* TODO: Clean up by creating a closure and running that on all. */
-    {
-      match key
-      {
-        glfw::KEY_W => { self.move_to |= Move_Forward; }
-        glfw::KEY_A => { self.move_to |= Move_Left; }
-        glfw::KEY_S => { self.move_to |= Move_Backward; }
-        glfw::KEY_D => { self.move_to |= Move_Right; }
-        glfw::KEY_LEFT_CONTROL => { self.move_to |= Move_Down; }
-        glfw::KEY_SPACE => { self.move_to |= Move_Up; }
-        _ => { }
-      }
-    }
-    else if action == glfw::RELEASE
-    {
-      match key
-      {
-        glfw::KEY_W => { self.move_to &= !Move_Forward; }
-        glfw::KEY_A => { self.move_to &= !Move_Left; }
-        glfw::KEY_S => { self.move_to &= !Move_Backward; }
-        glfw::KEY_D => { self.move_to &= !Move_Right; }
-        glfw::KEY_LEFT_CONTROL => { self.move_to &= !Move_Down; }
-        glfw::KEY_SPACE => { self.move_to &= !Move_Up; }
-        glfw::KEY_F => { io::println(fmt!("FPS: %?", self.frame_rate)); }
-        _ => { }
-      }
-    }
-  }
-
   pub fn update(&mut self, dt: f32)
   {
     /* Avoid division by zero if the window is being fondled. */
@@ -210,6 +156,71 @@ impl Camera
     { self.position.y += self.move_speed * dt; }
     if self.move_to & Move_Down > 0
     { self.position.y -= self.move_speed * dt; }
+  }
+}
+
+impl Input_Listener for Camera
+{
+  pub fn key_action(&mut self, key: i32, action: i32, mods: i32) -> bool
+  {
+    if action == glfw::PRESS 
+    {
+      match key
+      {
+        glfw::KEY_W => { self.move_to |= Move_Forward; }
+        glfw::KEY_A => { self.move_to |= Move_Left; }
+        glfw::KEY_S => { self.move_to |= Move_Backward; }
+        glfw::KEY_D => { self.move_to |= Move_Right; }
+        glfw::KEY_LEFT_CONTROL => { self.move_to |= Move_Down; }
+        glfw::KEY_SPACE => { self.move_to |= Move_Up; }
+        _ => { }
+      }
+    }
+    else if action == glfw::RELEASE
+    {
+      match key
+      {
+        glfw::KEY_W => { self.move_to &= !Move_Forward; }
+        glfw::KEY_A => { self.move_to &= !Move_Left; }
+        glfw::KEY_S => { self.move_to &= !Move_Backward; }
+        glfw::KEY_D => { self.move_to &= !Move_Right; }
+        glfw::KEY_LEFT_CONTROL => { self.move_to &= !Move_Down; }
+        glfw::KEY_SPACE => { self.move_to &= !Move_Up; }
+        glfw::KEY_F => { io::println(fmt!("FPS: %?", self.frame_rate)); }
+        _ => { }
+      }
+    }
+
+    true
+  }
+  pub fn key_char(&mut self, _ch: char) -> bool
+  { false }
+  pub fn mouse_action(&mut self, _button: i32, _action: i32, _mods: i32) -> bool
+  { false }
+  pub fn mouse_moved(&mut self, x: f32, y: f32) -> bool
+  {
+    let dx = x - (self.window_size.x / 2) as f32;
+    let dy = y - (self.window_size.y / 2) as f32;
+
+    self.angles.x -= dx as f32 * self.look_speed;
+    self.angles.y -= dy as f32 * self.look_speed;
+    
+    /* Wrap X. */
+    if self.angles.x < -f32::consts::pi
+    { self.angles.x += f32::consts::pi * 2.0; }
+    else if self.angles.x > f32::consts::pi
+    { self.angles.x -= f32::consts::pi * 2.0; }
+
+    /* Clamp Y. */
+    if self.angles.y < -f32::consts::pi * 0.49
+    { self.angles.y = -f32::consts::pi * 0.49; }
+    else if self.angles.y > f32::consts::pi * 0.49
+    { self.angles.y = f32::consts::pi * 0.49; }
+
+    self.window.set_cursor_pos( (self.window_size.x / 2) as float, 
+                                (self.window_size.y / 2) as float);
+
+    true
   }
 }
 
