@@ -54,8 +54,13 @@ fn main() {
     let camera = @mut gl::Camera::new(window);
     camera.init();
 
+    /* Setup UI elements. */
     let ui_input = @mut ui::Input_State::new();
     ui_input.push(camera as @mut ui::Input_Listener);
+
+    let console = @mut ui::Console::new();
+    let console_activator = @mut ui::Console_Activator::new(console);
+    ui_input.push(console_activator as @mut ui::Input_Listener);
 
     /* Setup callbacks. */ /* TODO: Crash on close with these callbacks. */
     window.set_cursor_mode(glfw::CURSOR_DISABLED);
@@ -69,12 +74,11 @@ fn main() {
       key_callback(window, key, action);
     }
 
-    let tex = gl::Texture::new(gl::TEXTURE_2D, "data/img/console/bg.png");
-    let mut ui_renderer = ui::Renderer::new();
+    let ui_renderer = @mut ui::Renderer::new();
 
     let sphere = primitive::Sphere::new(100.0, 7);
 
-    let map = bsp::Map::new("data/q3ctf1.bsp");
+    let map = bsp::Map::new("data/maps/q3ctf1.bsp");
 
     let st = extra::time::precise_time_s();
     let vox_sphere = voxel::Map::new(sphere.tris, 10);
@@ -83,7 +87,7 @@ fn main() {
     io::println(fmt!("Voxel map creation took %? seconds.", (et - st)));
 
     /* Temp test for font loading. */
-    let font = ui::Font::new("data/test.ttf", 30);
+    let font = ui::Font::new("data/fonts/test.ttf", 30);
 
     /* Shader Creation. */
     let vox_shader = @mut gl::Shader_Builder::new_with_files("data/shaders/voxel.vert", "data/shaders/voxel.frag");
@@ -134,6 +138,7 @@ fn main() {
         
         //ui_renderer.render_texture(&tex, &math::Vec2f::new(100.0, 100.0));
 
+        console.render(ui_renderer);
         ui_renderer.render_font(fmt!("%?", fps), math::Vec2f::new(0.0, 0.0), &font);
         ui_renderer.end();
       } window.swap_buffers();

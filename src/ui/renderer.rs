@@ -10,7 +10,7 @@
 */
 
 use gl::{ Shader, Shader_Builder, Texture, Camera };
-use math::{ Vec2f, Mat4x4 };
+use math::{ Vec2f, Vec2i, Mat4x4 };
 use TTF_Renderer = super::ttf::Renderer;
 use TTF_Font = super::ttf::Font;
 
@@ -40,6 +40,9 @@ struct Renderer
 
   /* Font support. */
   font_renderer: TTF_Renderer,
+
+  /* Window. */
+  window_size: Vec2i,
 }
 
 impl Renderer
@@ -50,15 +53,20 @@ impl Renderer
     {
       vao: 0,
       vbo: 0,
+
       shader: Shader_Builder::new_with_files("data/shaders/ui.vert", "data/shaders/ui.frag"),
       world: Mat4x4::new(),
       tex_world: Mat4x4::new(),
+
       proj_loc: 0,
       world_loc: 0,
       alpha_loc: 0,
       tex_world_loc: 0,
       texture0_loc: 0,
+
       font_renderer: TTF_Renderer::new(),
+
+      window_size: Vec2i::zero(),
     };
 
     renderer.proj_loc = renderer.shader.get_uniform_location("proj");
@@ -116,7 +124,8 @@ impl Renderer
     check!(gl::blend_func(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA));
 
     /* Update the projection information. */
-    let proj = Mat4x4::new_orthographic(0.0, camera.window_size.x as f32, camera.window_size.y as f32, 0.0,  1.0, 100.0);
+    self.window_size = camera.window_size;
+    let proj = Mat4x4::new_orthographic(0.0, self.window_size.x as f32, self.window_size.y as f32, 0.0,  1.0, 100.0);
 
     self.font_renderer.shader.bind();
     self.font_renderer.shader.update_uniform_mat(self.font_renderer.proj_loc, &proj);
@@ -134,7 +143,19 @@ impl Renderer
 
   pub fn render_texture(&mut self, tex: &Texture, pos: &Vec2f)
   {
-    self.world = Mat4x4::new_scale(tex.dimensions.x as f32, tex.dimensions.y as f32, 1.0);
+    self.world = Mat4x4::new_scale(tex.size.x as f32, tex.size.y as f32, 1.0);
+    self.world *= Mat4x4::new_translation(pos.x, pos.y, 0.0);
+    self.shader.update_uniform_mat(self.world_loc, &self.world);
+
+    self.tex_world.identity();
+    self.shader.update_uniform_mat(self.tex_world_loc, &self.tex_world);
+
+    self.render(tex);
+  }
+
+  pub fn render_texture_scale_clamp(&mut self, tex: &Texture, pos: &Vec2f, scale: &Vec2f)
+  {
+    self.world = Mat4x4::new_scale(scale.x, scale.y, 1.0);
     self.world *= Mat4x4::new_translation(pos.x, pos.y, 0.0);
     self.shader.update_uniform_mat(self.world_loc, &self.world);
 

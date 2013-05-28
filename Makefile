@@ -36,13 +36,14 @@ setup:
 
 debug: clean
 	${ECHO} "Building ${VERSION_NAME_DEBUG} Q^3 (this can take a while)"
-	rustc src/main.rs -o bin/q3 ${LIBS} ${DEBUG_CONFIGS} --opt-level ${DEBUG_OPTIMIZATION}
+	#rustc src/main.rs -o bin/q3 ${LIBS} ${DEBUG_CONFIGS} --opt-level ${DEBUG_OPTIMIZATION} 2>&1 | awk '{print $1}'
+	rustc src/main.rs -o bin/q3 ${LIBS} ${DEBUG_CONFIGS} --opt-level ${DEBUG_OPTIMIZATION} 2>&1 | sed 's/^/\t/'
 	${ECHO} "Finished building ${VERSION_NAME_DEBUG} Q^3"
 	echo
 
 release: clean
 	${ECHO} "Building ${VERSION_NAME_RELEASE} Q^3 (this can take a while)"
-	rustc src/main.rs -o bin/q3 ${LIBS} ${RELEASE_CONFIGS} --opt-level ${RELEASE_OPTIMIZATION} 
+	rustc src/main.rs -o bin/q3 ${LIBS} ${RELEASE_CONFIGS} --opt-level ${RELEASE_OPTIMIZATION} 2>&1 | sed 's/^/\t/'
 	${ECHO} "Finished building ${VERSION_NAME_RELEASE} Q^3"
 	echo
 

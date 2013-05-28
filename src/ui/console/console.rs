@@ -9,14 +9,51 @@
       A drop-down UI console for in-game tweaking.
 */
 
-struct Console
-{
+use gl::{ Texture };
+use gl = opengles::gl2;
+use ui::Renderer;
+use math::{ Vec2f };
 
+pub struct Console
+{
+  tex_left: Texture,
+  tex_middle: Texture,
+  tex_right: Texture,
+
+  position: Vec2f,
+  
+  body: ~str,
+  input: ~str,
 }
 
 impl Console
 {
+  pub fn new() -> Console
+  {
+    let c = Console
+    {
+      tex_left: Texture::new(gl::TEXTURE_2D, "data/img/console/left.png"),
+      tex_right: Texture::new(gl::TEXTURE_2D, "data/img/console/right.png"),
+      tex_middle: Texture::new(gl::TEXTURE_2D, "data/img/console/middle.png"),
 
+      position: Vec2f::zero(),
 
+      body: ~"",
+      input: ~"> ",
+    };
+
+    c
+  }
+
+  pub fn render(&self, renderer: @mut Renderer)
+  {
+    let right_pos = Vec2f::new((renderer.window_size.x - self.tex_right.size.x) as f32, self.position.y);
+    let middle_pos = Vec2f::new(self.tex_left.size.x as f32, self.position.y);
+    let middle_size = Vec2f::new(right_pos.x - self.tex_left.size.x as f32, self.tex_middle.size.y as f32);
+
+    renderer.render_texture(&self.tex_left, &self.position);
+    renderer.render_texture(&self.tex_right, &right_pos);
+    renderer.render_texture_scale_clamp(&self.tex_middle, &middle_pos, &middle_size);
+  }
 }
 

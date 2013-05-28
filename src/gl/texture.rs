@@ -25,7 +25,7 @@ struct Texture
   target: gl::GLenum,
   obj: gl::GLuint,
   filename: @str,
-  dimensions: Vec2i,
+  size: Vec2i,
 }
 
 impl Texture
@@ -38,7 +38,7 @@ impl Texture
       target: targ,
       obj: 0,
       filename: file.to_managed(),
-      dimensions: Vec2i::zero(),
+      size: Vec2i::zero(),
     };
 
     let name = check!(gl::gen_textures(1));
@@ -59,7 +59,7 @@ impl Texture
         debug!(fmt!("Loaded image %s with %?x%?:%?", 
                     tex.filename, image.width, image.height, image.depth));
 
-        tex.dimensions = Vec2i::new(image.width as i32, image.height as i32);
+        tex.size = Vec2i::new(image.width as i32, image.height as i32);
         let format = match image.depth
         {
           3 => { gl::RGB },
@@ -74,7 +74,7 @@ impl Texture
             /* target */ gl::TEXTURE_2D, 
             /* mipmap */ 0, 
             /* internal */ gl::RGBA8 as gl::GLint, 
-            /* dimensions */ tex.dimensions.x as gl::GLsizei, tex.dimensions.y as gl::GLsizei, 
+            /* size */ tex.size.x as gl::GLsizei, tex.size.y as gl::GLsizei, 
             /* border */ 0, 
             /* external */ format, 
             /* size type */ gl::UNSIGNED_BYTE, 

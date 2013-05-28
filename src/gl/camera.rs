@@ -161,8 +161,10 @@ impl Camera
 
 impl Input_Listener for Camera
 {
-  pub fn key_action(&mut self, key: i32, action: i32, mods: i32) -> bool
+  pub fn key_action(&mut self, key: i32, action: i32, _mods: i32) -> bool
   {
+    let mut captured = true;
+
     if action == glfw::PRESS 
     {
       match key
@@ -173,7 +175,7 @@ impl Input_Listener for Camera
         glfw::KEY_D => { self.move_to |= Move_Right; }
         glfw::KEY_LEFT_CONTROL => { self.move_to |= Move_Down; }
         glfw::KEY_SPACE => { self.move_to |= Move_Up; }
-        _ => { }
+        _ => { captured = false; }
       }
     }
     else if action == glfw::RELEASE
@@ -187,11 +189,11 @@ impl Input_Listener for Camera
         glfw::KEY_LEFT_CONTROL => { self.move_to &= !Move_Down; }
         glfw::KEY_SPACE => { self.move_to &= !Move_Up; }
         glfw::KEY_F => { io::println(fmt!("FPS: %?", self.frame_rate)); }
-        _ => { }
+        _ => { captured = false; }
       }
     }
 
-    true
+    captured
   }
   pub fn key_char(&mut self, _ch: char) -> bool
   { false }
