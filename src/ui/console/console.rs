@@ -11,7 +11,7 @@
 
 use gl::{ Texture };
 use gl = opengles::gl2;
-use ui::Renderer;
+use ui::{ Renderer, Font };
 use math::{ Vec2f };
 
 pub struct Console
@@ -22,6 +22,7 @@ pub struct Console
 
   position: Vec2f,
   
+  font: Font,
   body: ~str,
   input: ~str,
 }
@@ -38,8 +39,10 @@ impl Console
 
       position: Vec2f::zero(),
 
-      body: ~"",
-      input: ~"> ",
+      /* Text. */
+      font: Font::new("data/fonts/test.ttf", 16),
+      body: ~"Welcome to Q^3", /* TODO: Text wrapping. */
+      input: ~"> record my.avi",
     };
 
     c
@@ -54,6 +57,18 @@ impl Console
     renderer.render_texture(&self.tex_left, &self.position);
     renderer.render_texture(&self.tex_right, &right_pos);
     renderer.render_texture_scale_clamp(&self.tex_middle, &middle_pos, &middle_size);
+
+    renderer.render_font(self.body, Vec2f::new(self.tex_left.size.x as f32, 0.0), &self.font);
+    renderer.render_font
+    (
+      self.input,
+      Vec2f::new
+      (
+        self.tex_left.size.x as f32,
+        self.tex_left.size.y as f32 - 35.0
+      ),
+      &self.font
+    );
   }
 }
 

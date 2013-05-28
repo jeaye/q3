@@ -76,12 +76,11 @@ fn main() {
 
     let ui_renderer = @mut ui::Renderer::new();
 
-    let sphere = primitive::Sphere::new(100.0, 7);
-
     let map = bsp::Map::new("data/maps/q3ctf1.bsp");
 
+    let tex = gl::Texture::new(gl::TEXTURE_2D, "data/img/console/left.png");
+
     let st = extra::time::precise_time_s();
-    let vox_sphere = voxel::Map::new(sphere.tris, 10);
     let vox_map = voxel::Map::new(map.tris, 200);
     let et = extra::time::precise_time_s();
     io::println(fmt!("Voxel map creation took %? seconds.", (et - st)));
@@ -125,21 +124,16 @@ fn main() {
       {
         color_shader.bind();
         //map.draw();
-        //sphere.draw();
 
         vox_shader.bind();
-        vox_shader.update_uniform_f32(voxel_size_loc, vox_sphere.voxel_size);
-        //vox_sphere.draw();
-
         vox_shader.update_uniform_f32(voxel_size_loc, vox_map.voxel_size);
         vox_map.draw();
 
         ui_renderer.begin(camera);
         
-        //ui_renderer.render_texture(&tex, &math::Vec2f::new(100.0, 100.0));
-
         console.render(ui_renderer);
-        ui_renderer.render_font(fmt!("%?", fps), math::Vec2f::new(0.0, 0.0), &font);
+        ui_renderer.render_font(fmt!("%?", fps), math::Vec2f::new(camera.window_size.x as f32 - 40.0, 0.0), &font);
+        //ui_renderer.render_texture(&tex, &math::Vec2f::new(300.0, 200.0));
         ui_renderer.end();
       } window.swap_buffers();
 

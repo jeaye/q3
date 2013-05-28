@@ -23,7 +23,7 @@ macro_rules! check
     let err = gl::get_error();
     if err != gl::NO_ERROR
     {
-      stringify!($func);
+      error!(stringify!($func));
       fail!(util::get_err_str(err)); 
     }
 

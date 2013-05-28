@@ -181,7 +181,7 @@ impl Renderer
     check!(gl::enable_vertex_attrib_array(0));
     check!(gl::vertex_attrib_pointer_f32(0, 4, false, 0, 0));
 
-    check!(gl::draw_arrays(gl::TRIANGLE_STRIP, 0, 6));
+    check!(gl::draw_arrays(gl::TRIANGLE_FAN, 0, 4));
 
     tex.unbind();
 
