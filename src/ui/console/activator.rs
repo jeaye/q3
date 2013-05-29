@@ -34,7 +34,10 @@ impl Input_Listener for Console_Activator
   pub fn key_action(&mut self, key: i32, action: i32, _mods: i32) -> bool
   {
     if action == PRESS && key == KEY_GRAVE_ACCENT
-    { io::println("Toggling console..."); return true; }
+    {
+      self.console.velocity *= -1.0;
+      return true;
+    }
 
     false
   }

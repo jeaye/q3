@@ -78,8 +78,6 @@ fn main() {
 
     let map = bsp::Map::new("data/maps/q3ctf1.bsp");
 
-    let tex = gl::Texture::new(gl::TEXTURE_2D, "data/img/console/left.png");
-
     let st = extra::time::precise_time_s();
     let vox_map = voxel::Map::new(map.tris, 200);
     let et = extra::time::precise_time_s();
@@ -110,10 +108,14 @@ fn main() {
       last_time = cur_time;
       cur_time = (extra::time::precise_time_ns() / 10000) as f32;
 
+      console.update(delta);
       camera.update(delta);
+
       vox_shader.bind();
       vox_shader.update_uniform_mat(proj_loc, &camera.projection);
       vox_shader.update_uniform_mat(world_loc, &camera.view);
+      vox_shader.update_uniform_f32(voxel_size_loc, vox_map.voxel_size);
+
       color_shader.bind();
       color_shader.update_uniform_mat(color_proj_loc, &camera.projection);
       color_shader.update_uniform_mat(color_world_loc, &camera.view);
@@ -126,14 +128,12 @@ fn main() {
         //map.draw();
 
         vox_shader.bind();
-        vox_shader.update_uniform_f32(voxel_size_loc, vox_map.voxel_size);
         vox_map.draw();
 
         ui_renderer.begin(camera);
         
         console.render(ui_renderer);
         ui_renderer.render_font(fmt!("%?", fps), math::Vec2f::new(camera.window_size.x as f32 - 40.0, 0.0), &font);
-        //ui_renderer.render_texture(&tex, &math::Vec2f::new(300.0, 200.0));
         ui_renderer.end();
       } window.swap_buffers();
 
