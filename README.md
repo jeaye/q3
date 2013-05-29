@@ -8,7 +8,12 @@ The goal of this project is not to be Quake 3, but to be its own game. My goal i
 Q^3 is not a game yet! It's still a hackjob affair that I fondle every day. As of writing, it's merely a half-baked BSP renderer, a TTF renderer, and an arbitrary mesh voxelizer. This is being done using a combination of the Separating Axis Theorem, some paging, and instance rendering.
 
 ### How do I get Q^3 running on my system?
-I run on the (nearly) latest Rust incoming; I generally pull every few days. Q^3 currently has [glfw3](https://github.com/glfw/glfw), [rust-opengles](https://github.com/Jeaye/rust-opengles), and [glfw-rs](https://github.com/Jeaye/glfw-rs) as submodules. To configure, simply run:  
+I run on the (nearly) latest Rust incoming; I generally pull every few days. Q^3 currently has 
+[glfw3](https://github.com/glfw/glfw), 
+[glfw-rs](https://github.com/Jeaye/glfw-rs), 
+[rust-opengles](https://github.com/Jeaye/rust-opengles)(Servo), and 
+[rust-stb-image](https://github.com/mozilla-servo/rust-stb-image)(Servo), 
+as submodules. To configure, simply run:  
 ```bash
 ./configure
 ```
