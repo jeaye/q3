@@ -44,7 +44,7 @@ impl Console
       /* Text. */
       font: Font::new("data/fonts/test.ttf", 16),
       body: ~"Welcome to Q^3", /* TODO: Text wrapping. */
-      input: ~"> record my.avi",
+      input: ~"> record my.avi", /* TODO: Separate prefix variable and label. */
     };
 
     c

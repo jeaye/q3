@@ -68,6 +68,8 @@ fn main() {
     { camera.resize(width as i32, height as i32); }
     do window.set_cursor_pos_callback |_, x, y| 
     { ui_input.mouse_moved(x as f32, y as f32); }
+    do window.set_char_callback |_, c|
+    { ui_input.key_char(c); }
     do window.set_key_callback |window, key, action, mods|
     {
       ui_input.key_action(key, action, mods);
