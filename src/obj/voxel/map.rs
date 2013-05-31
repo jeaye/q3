@@ -367,7 +367,7 @@ macro_rules! axis_test_z0
 priv fn tri_cube_intersect(box_center: Vec3f, box_size: f32, tri: &Triangle) -> bool
 {
   let _v0, _v1, _v2;
-  let mut _min, _max, _p0, _p1, _p2, _rad, _fex, _fey, _fez;
+  let mut _min, _max, _p0 = 0.0, _p1 = 0.0, _p2 = 0.0, _rad, _fex, _fey, _fez;
   let _normal, _e0, _e1, _e2;
 
   /* Move everything so that the box's center is in (0, 0, 0). */
