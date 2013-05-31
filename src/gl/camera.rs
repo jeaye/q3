@@ -188,7 +188,6 @@ impl Input_Listener for Camera
         glfw::KEY_D => { self.move_to &= !Move_Right; }
         glfw::KEY_LEFT_CONTROL => { self.move_to &= !Move_Down; }
         glfw::KEY_SPACE => { self.move_to &= !Move_Up; }
-        glfw::KEY_F => { io::println(fmt!("FPS: %?", self.frame_rate)); }
         _ => { captured = false; }
       }
     }

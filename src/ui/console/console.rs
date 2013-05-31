@@ -25,6 +25,7 @@ pub struct Console
   
   font: Font,
   body: ~str,
+  prefix: ~str,
   input: ~str,
 }
 
@@ -44,7 +45,8 @@ impl Console
       /* Text. */
       font: Font::new("data/fonts/test.ttf", 16),
       body: ~"Welcome to Q^3", /* TODO: Text wrapping. */
-      input: ~"> record my.avi", /* TODO: Separate prefix variable and label. */
+      prefix: ~"> ",
+      input: ~"record my.avi", 
     };
 
     c
@@ -72,10 +74,20 @@ impl Console
     renderer.render_font(self.body, Vec2f::new(self.tex_left.size.x as f32, 0.0 + self.position.y), &self.font);
     renderer.render_font
     (
-      self.input,
+      self.prefix,
       Vec2f::new
       (
         self.tex_left.size.x as f32,
+        self.tex_left.size.y as f32 - 35.0 + self.position.y
+      ), 
+      &self.font
+    );
+    renderer.render_font
+    (
+      self.input,
+      Vec2f::new
+      (
+        self.tex_left.size.x as f32 + 20.0,
         self.tex_left.size.y as f32 - 35.0 + self.position.y
       ),
       &self.font

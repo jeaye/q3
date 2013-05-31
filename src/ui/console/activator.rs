@@ -48,13 +48,19 @@ impl Input_Listener for Console_Activator
         {
           /* TODO: Have the console do something here. */
           self.console.body = copy self.console.input;
-          self.console.input = ~"> ";
+          self.console.input = ~"";
           return true;
         }
         else if key == KEY_BACKSPACE
         {
-          if self.console.input.len() > 2
+          if self.console.input.len() > 0
           { str::pop_char(&mut self.console.input); }
+          return true;
+        }
+        /* Non-whitespace. */
+        else if key >= 32 && key <= 93
+        {
+          /* This will be handled when we receive it as a char. */
           return true;
         }
       }
@@ -67,21 +73,12 @@ impl Input_Listener for Console_Activator
     /* Check if the console is enabled. */
     if self.console.velocity > 0.0
     {
-      let mut handled = false;
-
-      /* Backspace. */ /* TODO: Is this ever sent? */
-      if ch == 0x08 as char || ch == 0x7F as char
-      {
-        str::pop_char(&mut self.console.input);
-        handled = true;
-      }
-      else if ch >= 0x20 as char && ch <= 0x7E as char
+      /* Non-whitespace and not ` or ~ */
+      if ch >= 0x20 as char && ch <= 0x7D as char && ch != 0x60 as char
       {
         self.console.input.push_char(ch);
-        handled = true;
+        return true;
       }
-
-      return handled;
     }
 
     false

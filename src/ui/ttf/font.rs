@@ -68,7 +68,7 @@ impl Font
       let max_width = 1024;
       let mut row_width = 0, row_height = 0;
 
-      let chars: ~str = ~" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^abcdefghijklmnopqrstuvwxyz{|}~";
+      let chars: ~str = ~" !\"#$%&'`()*+,-_./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^abcdefghijklmnopqrstuvwxyz{|}~";
 
       for chars.each |curr|
       {
