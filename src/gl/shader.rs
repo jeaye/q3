@@ -16,13 +16,16 @@
 
 extern mod std;
 extern mod opengles;
-use std::{ str, io, cast, libc };
+use std::{ str, io };
 use gl = opengles::gl2;
 use math::{ Mat4x4 };
 pub use Shader = self::Shaderable;
 
 #[cfg(debug_shader)]
 pub use Shader_Builder = self::Debug_Shader;
+#[cfg(debug_shader)]
+use std::libc;
+
 #[cfg(release_shader)]
 pub use Shader_Builder = self::Release_Shader;
 
