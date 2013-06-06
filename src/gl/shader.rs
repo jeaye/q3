@@ -16,6 +16,7 @@
 
 extern mod std;
 extern mod opengles;
+use std::{ str, io, cast, libc };
 use gl = opengles::gl2;
 use math::{ Mat4x4 };
 pub use Shader = self::Shaderable;
@@ -226,6 +227,7 @@ impl Shader for Release_Shader
 mod shared
 {
   use gl = opengles::gl2;
+  use std::{ str, cast };
   use math::{ Mat4x4 };
 
   #[path = "../util.rs"]
@@ -248,7 +250,7 @@ mod shared
       if result == 0 as gl::GLint
       {
         let err = check!(gl::get_shader_info_log(obj));
-        io::println(err);
+        println(err);
       }
       result != 0
     };

@@ -10,6 +10,7 @@
       for representing orientational data.
 */
 
+use std::{ f32, i32, ptr };
 use math::vec3::Vec3f;
 
 type Component = f32; /* TODO: Template. */
@@ -212,17 +213,17 @@ impl Mat4x4
 
   pub fn show(&self)
   {
-    io::println("----------");
+    println("----------");
     for i32::range(0, 4) |y|
     {
-      io::print("|");
+      print("|");
       for i32::range(0, 4) |x|
       {
-        io::print(f32::to_str(self.data[x][y]) + " ");
+        print(f32::to_str(self.data[x][y]) + " ");
       }
-      io::println("|");
+      println("|");
     }
-    io::println("----------");
+    println("----------");
   }
 }
 

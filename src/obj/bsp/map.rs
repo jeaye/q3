@@ -9,6 +9,7 @@
       Loader and handler of BSP maps.
 */
 
+use std::{ i32, path, io, sys, cast };
 use math::{ Vec3f, Vec4u8, BB3 };
 use primitive::{ Triangle, Vertex_PC };
 

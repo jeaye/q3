@@ -9,6 +9,7 @@
       An input listener to open/close the console.
 */
 
+use std::str;
 use glfw::{ PRESS, KEY_GRAVE_ACCENT, KEY_ENTER, KEY_BACKSPACE };
 use ui::Input_Listener;
 use super::Console;

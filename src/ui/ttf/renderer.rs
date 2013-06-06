@@ -9,6 +9,7 @@
       A TTF font renderer.
 */
 
+use std::vec;
 use gl::shader::{ Shader, Shader_Builder };
 use gl::camera::Camera;
 use super::Font;

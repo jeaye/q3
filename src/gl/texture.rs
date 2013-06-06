@@ -12,6 +12,7 @@
 extern mod std;
 extern mod opengles;
 extern mod stb_image;
+use std::{ vec, cast };
 use gl = opengles::gl2;
 use math::Vec2i;
 

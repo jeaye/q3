@@ -13,6 +13,8 @@ extern mod extra;
 extern mod opengles;
 extern mod glfw;
 
+use std::libc;
+
 #[path = "gl/mod.rs"]
 mod gl;
 
@@ -70,7 +72,7 @@ fn main() {
     { ui_input.mouse_moved(x as f32, y as f32); }
     do window.set_char_callback |_, c|
     { ui_input.key_char(c); }
-    do window.set_key_callback |window, key, action, mods|
+    do window.set_key_callback |window, key, _scancode, action, mods|
     {
       ui_input.key_action(key, action, mods);
       key_callback(window, key, action);
@@ -83,7 +85,7 @@ fn main() {
     let st = extra::time::precise_time_s();
     let vox_map = voxel::Map::new(map.tris, 200);
     let et = extra::time::precise_time_s();
-    io::println(fmt!("Voxel map creation took %? seconds.", (et - st)));
+    println(fmt!("Voxel map creation took %? seconds.", (et - st)));
 
     /* Temp test for font loading. */
     let font = ui::Font::new("data/fonts/test.ttf", 30);

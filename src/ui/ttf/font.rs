@@ -9,6 +9,7 @@
       TrueType font atlas.
 */
 
+use std::{ str, vec, cmp, ptr };
 use std::hashmap::HashMap;
 use std::libc::{ c_uint };
 use math::*;
@@ -66,7 +67,8 @@ impl Font
 
       let ft_glyph = (*font.face).glyph;
       let max_width = 1024;
-      let mut row_width = 0, row_height = 0;
+      let mut row_width = 0;
+      let mut row_height = 0;
 
       let chars: ~str = ~" !\"#$%&'`()*+,-_./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^abcdefghijklmnopqrstuvwxyz{|}~";
 

@@ -12,6 +12,7 @@
 
 use glfw;
 use gl = opengles::gl2;
+use std::f32;
 use math::vec2::{ Vec2f, Vec2i };
 use math::vec3::Vec3f;
 use math::matrix::Mat4x4;

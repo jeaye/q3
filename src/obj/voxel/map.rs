@@ -10,6 +10,7 @@
       into OpenGL-ready cubes.
 */
 
+use std::{ f32, uint, vec, cmp, sys };
 use math::{ Vec3f, Vec3i, Vec3u8 };
 use primitive::Triangle;
 use super::{ Vertex, Behavior, Default };
@@ -366,9 +367,22 @@ macro_rules! axis_test_z0
 #[inline(always)]
 priv fn tri_cube_intersect(box_center: Vec3f, box_size: f32, tri: &Triangle) -> bool
 {
-  let _v0, _v1, _v2;
-  let mut _min, _max, _p0 = 0.0, _p1 = 0.0, _p2 = 0.0, _rad, _fex, _fey, _fez;
-  let _normal, _e0, _e1, _e2;
+  let _v0;
+  let _v1;
+  let _v2;
+  let mut _min;
+  let mut _max;
+  let mut _p0 = 0.0;
+  let mut _p1 = 0.0;
+  let mut _p2 = 0.0;
+  let mut _rad;
+  let mut _fex;
+  let mut _fey;
+  let mut _fez;
+  let _normal;
+  let _e0;
+  let _e1;
+  let _e2;
 
   /* Move everything so that the box's center is in (0, 0, 0). */
   _v0 = tri.verts[0].position - box_center;

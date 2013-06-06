@@ -9,6 +9,7 @@
       An arbitrarily subdivided Icosahedron.
 */
 
+use std::{ uint, sys };
 use math::{ Vec3f };
 use primitive::Vertex_PC;
 use primitive::Triangle;
@@ -108,7 +109,9 @@ impl Sphere
       return;
     }
 
-    let mut v12 = Vertex_PC::zero(), v23 = Vertex_PC::zero(), v31 = Vertex_PC::zero();
+    let mut v12 = Vertex_PC::zero();
+    let mut v23 = Vertex_PC::zero();
+    let mut v31 = Vertex_PC::zero();
     v12.color = tri.verts[0].color;
     v23.color = tri.verts[0].color;
     v31.color = tri.verts[0].color;

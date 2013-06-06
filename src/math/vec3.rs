@@ -20,6 +20,8 @@ macro_rules! declare
   (
     mod $Mod
     {
+      use std::{ float, ptr };
+
       pub struct $Type
       {
         x: $Component,

@@ -31,7 +31,9 @@ impl Triangle
 
   pub fn get_normal(&self) -> Vec3f
   {
-    let mut a = Vec3f::zero(), b = Vec3f::zero(), res;
+    let mut a = Vec3f::zero();
+    let mut b = Vec3f::zero();
+    let mut res;
 
     /* First edge. */
     a.x = self.verts[0].position.x - self.verts[1].position.x;
@@ -68,7 +70,9 @@ impl Voxel_Triangle
 
   pub fn get_normal(&self) -> Vec3f
   {
-    let mut a = Vec3f::zero(), b = Vec3f::zero(), res;
+    let mut a = Vec3f::zero();
+    let mut b = Vec3f::zero();
+    let mut res;
 
     /* First edge. */
     a.x = self.verts[0].position.x - self.verts[1].position.x;
