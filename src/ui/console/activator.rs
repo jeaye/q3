@@ -10,13 +10,50 @@
 */
 
 use std::{ str, cast, local_data };
+use std::hashmap::HashMap;
 use glfw::{ PRESS, KEY_GRAVE_ACCENT, KEY_ENTER, KEY_BACKSPACE };
 use ui::Input_Listener;
 use super::Console;
 
+priv type Property_Accessor = @fn(&str) -> ~str;
+priv type Property_Mutator = @fn(&str, &str) -> Option<~str>;
+priv type Function = @fn(&str, &str) -> Option<~str>;
+
 pub struct Console_Activator
 {
   console: @mut Console,
+
+  /*  
+      Maps of property names to callbacks (get and set).
+      Properties are invoked with a prebuilt 'set' or 'get'
+      function. 
+      
+      The only argument to the accessor is the property name
+      and it returns the value.
+
+      The first argument of the mutator is the
+      property name and the second is everything else 
+      contained in the command. The mutator returns a string
+      containing an error message if something didn't work well.
+
+      Ex: set map.wireframe on
+      Ex: get map.wireframe
+  */
+  accessors: HashMap<~str, Property_Accessor>,
+  mutators: HashMap<~str, Property_Mutator>,
+
+  /*
+      A map of arbitrary functions to callbacks.
+
+      The first argument is the function name and the second
+      is whatever else is supplied in the command. The return
+      value is a string containing an error message if something
+      didn't go well.
+
+      Ex: record my.avi
+      Ex: callvote kick annoying_dude
+  */
+  functions: HashMap<~str, Function>,
 }
 
 impl Console_Activator
@@ -30,6 +67,9 @@ impl Console_Activator
     let ca = @mut Console_Activator
     {
       console: new_console,
+      accessors: HashMap::new::<~str, Property_Accessor>(),
+      mutators: HashMap::new::<~str, Property_Mutator>(),
+      functions: HashMap::new::<~str, Function>(),
     };
 
     /* Store the activator in task-local storage. (singleton) */
@@ -41,6 +81,48 @@ impl Console_Activator
         @cast::transmute::<@mut Console_Activator, @Console_Activator>(ca)
       );
     }
+
+    ca.functions.insert(~"set",
+    |_set, params| -> Option<~str>
+    {
+      let mut error = ~"";
+      let mut property = ~"";
+      let mut params = params.to_owned();
+      for params.each_split_char(' ') |x|
+      { property = x.to_owned(); break; }
+
+      /* Remove the property from the string. */
+      for property.each |_|
+      { str::shift_char(&mut params); }
+      str::shift_char(&mut params);
+
+      /* We require a property and a value. */
+      if property.len() == 0
+      { error = fmt!("Invalid len for 'set' function arg list: %s", params); }
+      else
+      {
+        /* Check if this property exists. */
+        match ca.mutators.find(&property)
+        {
+          Some(func) =>
+          {
+            /* Pass the args to the property mutator. */
+            match (*func)(property, params)
+            {
+              /* Check if the mutator liked the args. */
+              Some(err) => { error = err; }
+              None => { }
+            }
+          }
+          None => { error = fmt!("The property %s does not exist.", property); }
+        }
+      }
+
+      if error.len() > 0
+      { Some(fmt!("Error: %s", error)) }
+      else
+      { None }
+    });
 
     ca
   }
@@ -56,6 +138,9 @@ impl Console_Activator
       )
     }
   }
+
+  pub fn add_mutator(&mut self, name: &str, mutator: Property_Mutator)
+  { self.mutators.insert(name.to_owned(), mutator); }
 }
 
 impl Input_Listener for Console_Activator
@@ -75,8 +160,35 @@ impl Input_Listener for Console_Activator
       {
         if key == KEY_ENTER
         {
-          /* TODO: Have the console do something here. */
-          self.console.body = copy self.console.input;
+          if self.console.input.len() == 0
+          { return true; }
+
+          /* Extract the function name. */
+          let mut func = ~"";
+          for self.console.input.each_split_char(' ') |x|
+          { func = x.to_owned(); break; };
+
+          /* Remove the function from the string. */
+          for func.each |_|
+          { str::shift_char(&mut self.console.input); }
+          str::shift_char(&mut self.console.input);
+
+          /* Look for the function in the cached map. */
+          match self.functions.find(&func)
+          {
+            Some(f) =>
+            {
+              match (*f)(func, self.console.input)
+              {
+                /* TODO: Output to console. */
+                Some(err) => { error!(err); }
+                None => { }
+              }
+            }
+            /* TODO: Output to console. */
+            None => { error!("Error: Invalid function"); }
+          }
+
           self.console.input = ~"";
           return true;
         }

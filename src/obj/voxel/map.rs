@@ -34,6 +34,8 @@ struct Map
 
   voxels: ~[Behavior],
   indices: ~[Vertex],
+
+  wireframe: bool,
 }
 
 impl Map
@@ -49,6 +51,7 @@ impl Map
       ibo: 0,
       voxels: ~[],
       indices: ~[],
+      wireframe: false,
     };
 
     map.voxelize(tris);
@@ -113,9 +116,13 @@ impl Map
     check!(gl::enable_vertex_attrib_array(2));
     check!(gl::vertex_attrib_divisor(2, 1));
 
-    //check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::LINE));
+    if self.wireframe
+    { check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::LINE)); }
+
     check!(gl::draw_arrays_instanced(gl::TRIANGLE_STRIP, 0, 24, self.indices.len() as i32));
-    //check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::FILL));
+
+    if self.wireframe
+    { check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::FILL)); }
 
     check!(gl::disable_vertex_attrib_array(0));
     check!(gl::disable_vertex_attrib_array(1));

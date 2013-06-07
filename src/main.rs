@@ -85,7 +85,7 @@ fn main()
     let map = bsp::Map::new("data/maps/q3ctf1.bsp");
 
     let st = extra::time::precise_time_s();
-    let vox_map = voxel::Map::new(map.tris, 200);
+    let vox_map = @mut voxel::Map::new(map.tris, 200);
     let et = extra::time::precise_time_s();
     println(fmt!("Voxel map creation took %? seconds.", (et - st)));
 
@@ -105,6 +105,16 @@ fn main()
 
     let mut cur_time = (extra::time::precise_time_ns() / 10000) as f32; // Hundredth of a second
     let mut last_time = cur_time;
+
+    /* Console functions. */
+    console_activator.add_mutator("map.wireframe", |_, x|
+    {
+      vox_map.wireframe = if x == "on"
+                          { true }
+                          else
+                          { false };
+      None
+    });
 
     while !window.should_close()
     {

@@ -46,7 +46,7 @@ impl Console
       font: Font::new("data/fonts/test.ttf", 16),
       body: ~"Welcome to Q^3", /* TODO: Text wrapping. */
       prefix: ~"> ",
-      input: ~"record my.avi", 
+      input: ~"", 
     };
 
     c
