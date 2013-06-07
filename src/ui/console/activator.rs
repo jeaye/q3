@@ -9,7 +9,7 @@
       An input listener to open/close the console.
 */
 
-use std::str;
+use std::{ str, cast, local_data };
 use glfw::{ PRESS, KEY_GRAVE_ACCENT, KEY_ENTER, KEY_BACKSPACE };
 use ui::Input_Listener;
 use super::Console;
@@ -21,11 +21,39 @@ pub struct Console_Activator
 
 impl Console_Activator
 {
-  pub fn new(new_console: @mut Console) -> Console_Activator
+  /*  Key function used to index our singleton in
+      task-local storage. */
+  priv fn tls_key(_: @@Console_Activator) { }
+
+  pub fn new(new_console: @mut Console) -> @mut Console_Activator
   {
-    Console_Activator
+    let ca = @mut Console_Activator
     {
       console: new_console,
+    };
+
+    /* Store the activator in task-local storage. (singleton) */
+    unsafe
+    {
+      local_data::local_data_set
+      (
+        Console_Activator::tls_key,
+        @cast::transmute::<@mut Console_Activator, @Console_Activator>(ca)
+      );
+    }
+
+    ca
+  }
+
+  /* Accesses the singleton activator from task-local storage. */
+  pub fn get() -> @mut Console_Activator
+  {
+    unsafe 
+    {
+      cast::transmute::<@Console_Activator, @mut Console_Activator>
+      (
+        *local_data::local_data_get(Console_Activator::tls_key).get()
+      )
     }
   }
 }

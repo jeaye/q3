@@ -37,10 +37,12 @@ mod primitive;
 #[path = "obj/voxel/mod.rs"]
 mod voxel;
 
-fn main() {
+fn main()
+{
   glfw::set_error_callback(error_callback);
 
-  do glfw::spawn {
+  do glfw::spawn
+  {
     glfw::window_hint::context_version(3, 2);
     glfw::window_hint::opengl_profile(glfw::OPENGL_CORE_PROFILE);
     glfw::window_hint::opengl_forward_compat(true);
@@ -61,7 +63,7 @@ fn main() {
     ui_input.push(camera as @mut ui::Input_Listener);
 
     let console = @mut ui::Console::new();
-    let console_activator = @mut ui::Console_Activator::new(console);
+    let console_activator = ui::Console_Activator::new(console);
     ui_input.push(console_activator as @mut ui::Input_Listener);
 
     /* Setup callbacks. */ /* TODO: Crash on close with these callbacks. */
@@ -104,7 +106,8 @@ fn main() {
     let mut cur_time = (extra::time::precise_time_ns() / 10000) as f32; // Hundredth of a second
     let mut last_time = cur_time;
 
-    while !window.should_close() {
+    while !window.should_close()
+    {
       glfw::poll_events();
 
       /* Delta time. */
@@ -128,7 +131,7 @@ fn main() {
 
       check!(gl::clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT));
       {
-        color_shader.bind();
+        //color_shader.bind();
         //map.draw();
 
         vox_shader.bind();
