@@ -14,6 +14,7 @@ use std::{ f32, uint, vec, cmp, sys };
 use math::{ Vec3f, Vec3i, Vec3u8 };
 use primitive::Triangle;
 use super::{ Vertex, Behavior, Default };
+use ui::Console_Activator;
 
 #[path = "../../gl/mod.rs"]
 mod gl;
@@ -40,9 +41,9 @@ struct Map
 
 impl Map
 {
-  pub fn new(tris: &[Triangle], res: u32) -> Map
+  pub fn new(tris: &[Triangle], res: u32) -> @mut Map
   {
-    let mut map = Map
+    let map = @mut Map
     {
       resolution: res,
       voxel_size: 0.0,
@@ -93,6 +94,16 @@ impl Map
 
     check!(gl::bind_buffer(gl::ARRAY_BUFFER, map.ibo));
     check!(gl::buffer_data(gl::ARRAY_BUFFER, map.indices, gl::STATIC_DRAW));
+
+    /* Console functions. */
+    Console_Activator::get().add_accessor("map.wireframe", |_|
+    { map.wireframe.to_str() });
+    Console_Activator::get().add_mutator("map.wireframe", |_, x|
+    {
+      map.wireframe = if x == "true" { true }
+                          else { false };
+      None
+    });
 
     map
   }

@@ -82,6 +82,27 @@ impl Console_Activator
       );
     }
 
+    /* The 'get' and 'set' functions are built in to the console. */
+    ca.functions.insert(~"get",
+    |_get, property| -> Option<~str>
+    {
+      let mut err = ~"";
+
+      /* Check if this property exists. */
+      match ca.accessors.find(&property.to_owned())
+      {
+        Some(func) =>
+        { println(fmt!("%s = %s", property, (*func)(property))); /* TODO: Output to console. */ }
+        None =>
+        { err = fmt!("Error: Invalid property %s", property); }
+      }
+
+      if err.len() == 0
+      { None }
+      else
+      { Some(err) }
+    });
+
     ca.functions.insert(~"set",
     |_set, params| -> Option<~str>
     {
@@ -139,6 +160,8 @@ impl Console_Activator
     }
   }
 
+  pub fn add_accessor(&mut self, name: &str, accessor: Property_Accessor)
+  { self.accessors.insert(name.to_owned(), accessor); }
   pub fn add_mutator(&mut self, name: &str, mutator: Property_Mutator)
   { self.mutators.insert(name.to_owned(), mutator); }
 }
