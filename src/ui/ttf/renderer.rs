@@ -9,7 +9,7 @@
       A TTF font renderer.
 */
 
-use std::vec;
+use std::{ str, vec };
 use gl::shader::{ Shader, Shader_Builder };
 use gl::camera::Camera;
 use super::Font;
@@ -102,43 +102,49 @@ impl Renderer
       pub fn new(nx: f32, ny: f32, nu: f32, nv: f32) -> Point
       { Point { x: nx, y: ny, u: nu, v: nv } }
     }
-    let mut coords = vec::with_capacity::<Point>(text.len());
 
-    let mut temp_pos = pos;
-    temp_pos.y += font.height as f32;
-
-    let mut count = 0;
-    for text.each |curr|
+    /* Render each line separately. */
+    let mut line_count = 0;
+    for str::each_line(text) |line|
     {
-      let glyph = match font.glyphs.find(&curr)
+      line_count += 1;
+      let mut coords = vec::with_capacity::<Point>(line.len());
+      let mut temp_pos = pos;
+      temp_pos.y += (font.height * line_count) as f32;
+
+      let mut count = 0;
+      for line.each |curr|
       {
-        Some(g) => g,
-        None => fail!(fmt!("Invalid char (%?) in font %? len %?", curr, font.file, font.glyphs.len()))
-      };
+        let glyph = match font.glyphs.find(&curr)
+        {
+          Some(g) => g,
+          None => fail!(fmt!("Invalid char (%?) in font %? len %?", curr, font.file, font.glyphs.len()))
+        };
 
-      let end_x = temp_pos.x + glyph.offset.x;
-      let end_y = -temp_pos.y - (glyph.dimensions.y - glyph.offset.y);
-      let end_w = glyph.dimensions.x; /* TODO: Use this everywhere. */
-      let end_h = glyph.dimensions.y;
+        let end_x = temp_pos.x + glyph.offset.x;
+        let end_y = -temp_pos.y - (glyph.dimensions.y - glyph.offset.y);
+        let end_w = glyph.dimensions.x; /* TODO: Use this everywhere. */
+        let end_h = glyph.dimensions.y;
 
-      temp_pos.x += glyph.advance.x; 
-      temp_pos.y += glyph.advance.y; 
+        temp_pos.x += glyph.advance.x; 
+        temp_pos.y += glyph.advance.y; 
 
-      /* Skip empty glyphs. */
-      if end_w <= 0.1 || end_h <= 0.1
-      { loop; }
+        /* Skip empty glyphs. */
+        if end_w <= 0.1 || end_h <= 0.1
+        { loop; }
 
-      coords.push(Point::new(end_x, -end_y - end_h, glyph.tex.x, glyph.tex.y));
-      coords.push(Point::new(end_x, -end_y, glyph.tex.x, glyph.tex.y + (glyph.dimensions.y / (font.atlas_dimensions.y as f32))));
-      coords.push(Point::new(end_x + end_w, -end_y, glyph.tex.x + (glyph.dimensions.x / (font.atlas_dimensions.x as f32)), glyph.tex.y + (glyph.dimensions.y / (font.atlas_dimensions.y as f32))));
-      coords.push(Point::new(end_x, -end_y - end_h, glyph.tex.x, glyph.tex.y));
-      coords.push(Point::new(end_x + end_w, -end_y, glyph.tex.x + (glyph.dimensions.x / (font.atlas_dimensions.x as f32)), glyph.tex.y + (glyph.dimensions.y / (font.atlas_dimensions.y as f32))));
-      coords.push(Point::new(end_x + end_w, -end_y - end_h, glyph.tex.x + (glyph.dimensions.x / (font.atlas_dimensions.x as f32)), glyph.tex.y));
-      count += 6;
+        coords.push(Point::new(end_x, -end_y - end_h, glyph.tex.x, glyph.tex.y));
+        coords.push(Point::new(end_x, -end_y, glyph.tex.x, glyph.tex.y + (glyph.dimensions.y / (font.atlas_dimensions.y as f32))));
+        coords.push(Point::new(end_x + end_w, -end_y, glyph.tex.x + (glyph.dimensions.x / (font.atlas_dimensions.x as f32)), glyph.tex.y + (glyph.dimensions.y / (font.atlas_dimensions.y as f32))));
+        coords.push(Point::new(end_x, -end_y - end_h, glyph.tex.x, glyph.tex.y));
+        coords.push(Point::new(end_x + end_w, -end_y, glyph.tex.x + (glyph.dimensions.x / (font.atlas_dimensions.x as f32)), glyph.tex.y + (glyph.dimensions.y / (font.atlas_dimensions.y as f32))));
+        coords.push(Point::new(end_x + end_w, -end_y - end_h, glyph.tex.x + (glyph.dimensions.x / (font.atlas_dimensions.x as f32)), glyph.tex.y));
+        count += 6;
+      }
+
+      check!(gl::buffer_data(gl::ARRAY_BUFFER, coords, gl::STREAM_DRAW)); 
+      check!(gl::draw_arrays(gl::TRIANGLES, 0, count));
     }
-
-    check!(gl::buffer_data(gl::ARRAY_BUFFER, coords, gl::STREAM_DRAW)); 
-    check!(gl::draw_arrays(gl::TRIANGLES, 0, count));
 
     check!(gl::disable_vertex_attrib_array(0));
     check!(gl::bind_buffer(gl::ARRAY_BUFFER, 0));

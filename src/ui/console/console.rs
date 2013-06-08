@@ -44,7 +44,7 @@ impl Console
 
       /* Text. */
       font: Font::new("data/fonts/test.ttf", 16),
-      body: ~"Welcome to Q^3", /* TODO: Text wrapping. */
+      body: ~"Welcome to Q^3\nVersion: 0.1",
       prefix: ~"> ",
       input: ~"", 
     };

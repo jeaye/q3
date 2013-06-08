@@ -11,7 +11,7 @@
 
 use std::{ str, cast, local_data };
 use std::hashmap::HashMap;
-use glfw::{ PRESS, KEY_GRAVE_ACCENT, KEY_ENTER, KEY_BACKSPACE };
+use glfw::{ PRESS, REPEAT, KEY_GRAVE_ACCENT, KEY_ENTER, KEY_BACKSPACE };
 use ui::Input_Listener;
 use super::Console;
 
@@ -92,7 +92,8 @@ impl Console_Activator
       match ca.accessors.find(&property.to_owned())
       {
         Some(func) =>
-        { println(fmt!("%s = %s", property, (*func)(property))); /* TODO: Output to console. */ }
+        { ca.add_log(fmt!("%s = %s", property, (*func)(property))); }
+        //{ println(fmt!("%s = %s", property, (*func)(property))); /* TODO: Output to console. */ }
         None =>
         { err = fmt!("Error: Invalid property %s", property); }
       }
@@ -154,9 +155,7 @@ impl Console_Activator
     unsafe 
     {
       cast::transmute::<@Console_Activator, @mut Console_Activator>
-      (
-        *local_data::local_data_get(Console_Activator::tls_key).get()
-      )
+      (*local_data::local_data_get(Console_Activator::tls_key).get())
     }
   }
 
@@ -164,13 +163,15 @@ impl Console_Activator
   { self.accessors.insert(name.to_owned(), accessor); }
   pub fn add_mutator(&mut self, name: &str, mutator: Property_Mutator)
   { self.mutators.insert(name.to_owned(), mutator); }
+  pub fn add_log(&mut self, text: &str)
+  { self.console.body += ~"\n" + text; }
 }
 
 impl Input_Listener for Console_Activator
 {
   pub fn key_action(&mut self, key: i32, action: i32, _mods: i32) -> bool
   {
-    if action == PRESS
+    if action == PRESS || action == REPEAT
     {
       if key == KEY_GRAVE_ACCENT
       {
