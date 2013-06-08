@@ -121,7 +121,6 @@ impl Renderer
 
     /* Enable transparency. */
     check!(gl::enable(gl::BLEND));
-    check!(gl::blend_func(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA));
 
     /* Update the projection information. */
     self.window_size = camera.window_size;

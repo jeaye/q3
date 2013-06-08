@@ -64,6 +64,7 @@ impl Font
       }
    
       ft::FT_Set_Pixel_Sizes(font.face, 0, size as c_uint);
+      check!(gl::active_texture(gl::TEXTURE0));
 
       let ft_glyph = (*font.face).glyph;
       let max_width = 1024;
@@ -108,7 +109,6 @@ impl Font
       /* We're using 1 byte alignment buffering. */
       check!(gl::pixel_store_i(gl::UNPACK_ALIGNMENT, 1));
       
-      check!(gl::active_texture(gl::TEXTURE0));
       font.texture_atlas = check!(gl::gen_textures(1))[0];
       check!(gl::bind_texture(gl::TEXTURE_2D, font.texture_atlas));
       check!(gl::tex_image_2d(gl::TEXTURE_2D, 0, gl::RGB as gl::GLint,

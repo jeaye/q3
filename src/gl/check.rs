@@ -10,6 +10,24 @@
       of an OpenGL call for errors -- use it everywhere.
 */
 
+#[cfg(check_gl)]
+pub fn check_gl()
+{
+  use gl::get_err_str;
+  use gl = opengles::gl2;
+
+  let err = gl::get_error();
+  if err != gl::NO_ERROR
+  {
+    error!(stringify!($func));
+    fail!(get_err_str(err)); 
+  }
+}
+
+#[cfg(not(check_gl))]
+pub fn check_gl()
+{ }
+
 //#[cfg(check_gl)]
 macro_rules! check
 (
@@ -19,12 +37,7 @@ macro_rules! check
     let ret = $func;
     //io::println(fmt!("%?", ret));
 
-    let err = gl::get_error();
-    if err != gl::NO_ERROR
-    {
-      error!(stringify!($func));
-      fail!(gl::get_err_str(err)); 
-    }
+    check::check_gl();
 
     ret
   });

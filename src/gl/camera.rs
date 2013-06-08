@@ -89,6 +89,7 @@ impl Camera
     check!(gl::enable(gl::CULL_FACE)); 
     check!(gl::enable(gl::DEPTH_TEST));
     check!(gl::depth_func(gl::LEQUAL));
+    check!(gl::blend_func(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA));
     check!(gl::clear_color(0.0, 0.0, 0.0, 1.0));
 
     match self.window.get_size()

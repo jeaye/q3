@@ -83,7 +83,7 @@ impl Renderer
 
   pub fn render(&mut self, text: &str, pos: Vec2f, font: &Font)
   {
-    check!(gl::active_texture(gl::TEXTURE0));
+    //check!(gl::active_texture(gl::TEXTURE0));
     check!(gl::bind_texture(gl::TEXTURE_2D, font.texture_atlas));
 
     check!(gl::bind_vertex_array(self.vao));

@@ -90,9 +90,9 @@ impl Texture
   }
 
   #[inline(always)]
-  pub fn bind(&self, unit: gl::GLenum)
+  pub fn bind(&self, _unit: gl::GLenum)
   {
-    check!(gl::active_texture(gl::TEXTURE0 + unit));
+    //check!(gl::active_texture(gl::TEXTURE0 + unit));
     check!(gl::bind_texture(gl::TEXTURE_2D, self.obj));
   }
 

@@ -12,6 +12,24 @@
       public version.
 */
 
+#[cfg(check_gl)]
+pub fn check_gl()
+{
+  use gl = opengles::gl2;
+  use super::util::get_err_str;
+
+  let err = gl::get_error();
+  if err != gl::NO_ERROR
+  {
+    error!(stringify!($func));
+    fail!(get_err_str(err)); 
+  }
+}
+
+#[cfg(not(check_gl))]
+pub fn check_gl()
+{ }
+
 macro_rules! check
 (
   ($func:expr) => 
@@ -20,12 +38,7 @@ macro_rules! check
     let ret = $func;
     //io::println(fmt!("%?", ret));
 
-    let err = gl::get_error();
-    if err != gl::NO_ERROR
-    {
-      error!(stringify!($func));
-      fail!(util::get_err_str(err)); 
-    }
+    check_internal::check_gl();
 
     ret
   });
