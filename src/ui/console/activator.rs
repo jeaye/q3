@@ -92,8 +92,7 @@ impl Console_Activator
       match ca.accessors.find(&property.to_owned())
       {
         Some(func) =>
-        //{ ca.add_log(fmt!("%s = %s", property, (*func)(property))); }
-        { println(fmt!("%s = %s", property, (*func)(property))); /* TODO: Output to console. */ }
+        { ca.add_log(fmt!("%s = %s", property, (*func)(property))); }
         None =>
         { err = fmt!("Error: Invalid property %s", property); }
       }
@@ -163,8 +162,8 @@ impl Console_Activator
   { self.accessors.insert(name.to_owned(), accessor); }
   pub fn add_mutator(&mut self, name: &str, mutator: Property_Mutator)
   { self.mutators.insert(name.to_owned(), mutator); }
-  pub fn add_log(&mut self, text: &str)
-  { self.console.body += ~"\n" + text; }
+  pub fn add_log(&self, text: &str)
+  { self.console.body = self.console.body + "\n" + text; }
 }
 
 impl Input_Listener for Console_Activator
@@ -202,7 +201,8 @@ impl Input_Listener for Console_Activator
           {
             Some(f) =>
             {
-              match (*f)(func, self.console.input)
+              let input = copy self.console.input;
+              match (*f)(func, input)
               {
                 /* TODO: Output to console. */
                 Some(err) => { error!(err); }
