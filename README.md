@@ -8,7 +8,6 @@ The goal of this project is not to be Quake 3, but to be its own game. My goal i
 
 ### What's the current state of Q^3?
 Q^3 is not a game yet! It's still a side project that I'm working on in my spare time.  
-**Current features:**
 * Half-baked BSP renderer (Quake 3 and Quake Live)
   * Quake Live map rendering is... buggy
 * TTF renderer
