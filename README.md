@@ -14,6 +14,7 @@ Q^3 is not a game yet! It's still a side project that I'm working on in my spare
 * Arbitrary mesh voxelizer (for BSP maps)
   * Using Separating Axis Theorem and instance rendering (it's not that fast)
 * Basic UI with drop-down console that provides in-game tweaking/debugging
+  * See [Console](https://github.com/Jeaye/q3/wiki/Console)
 * Tested on Linux and Mac OS X
 
 ### How do I get Q^3 running on my system?
