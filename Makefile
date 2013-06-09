@@ -7,11 +7,15 @@ RELEASE_OPTIMIZATION=3
 # Determine system
 UNAME=$(shell uname)
 
+# Get git HEAD
+export COMMIT=$(shell git rev-parse --short HEAD)
+export VERSION=0.1
+
 # Colors
-COLOR_OFF=`tput sgr0`
-COLOR_RED=`tput setaf 1`
-COLOR_YELLOW=`tput setaf 3`
-COLOR_GREEN=`tput setaf 2`
+COLOR_OFF=$(shell tput sgr0)
+COLOR_RED=$(shell tput setaf 1)
+COLOR_YELLOW=$(shell tput setaf 3)
+COLOR_GREEN=$(shell tput setaf 2)
 
 # Output colorizing
 ECHO_PREFIX="${COLOR_RED}»»»${COLOR_OFF}"
@@ -35,14 +39,13 @@ setup:
 	mkdir -p bin
 
 debug: clean
-	${ECHO} "Building ${VERSION_NAME_DEBUG} Q^3 (this can take a while)"
-	#rustc src/main.rs -o bin/q3 ${LIBS} ${DEBUG_CONFIGS} --opt-level ${DEBUG_OPTIMIZATION} 2>&1 | awk '{print $1}'
+	${ECHO} "Building ${VERSION_NAME_DEBUG} Q^3 [commit: ${COMMIT}](this can take a while)"
 	rustc src/main.rs -o bin/q3 ${LIBS} ${DEBUG_CONFIGS} --opt-level ${DEBUG_OPTIMIZATION} 2>&1 | sed 's/^/\t/'
 	${ECHO} "Finished building ${VERSION_NAME_DEBUG} Q^3"
 	echo
 
 release: clean
-	${ECHO} "Building ${VERSION_NAME_RELEASE} Q^3 (this can take a while)"
+	${ECHO} "Building ${VERSION_NAME_RELEASE} Q^3 [commit: ${COMMIT}](this can take a while)"
 	rustc src/main.rs -o bin/q3 ${LIBS} ${RELEASE_CONFIGS} --opt-level ${RELEASE_OPTIMIZATION} 2>&1 | sed 's/^/\t/'
 	${ECHO} "Finished building ${VERSION_NAME_RELEASE} Q^3"
 	echo

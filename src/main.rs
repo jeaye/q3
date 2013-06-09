@@ -106,6 +106,13 @@ fn main()
     let mut cur_time = (extra::time::precise_time_ns() / 10000) as f32; // Hundredth of a second
     let mut last_time = cur_time;
 
+    /* Console functions. */
+    console_activator.add_accessor("q3.version",
+    |_|
+    {
+      fmt!("%s.%s", env!("VERSION"), env!("COMMIT"))
+    });
+
     while !window.should_close()
     {
       glfw::poll_events();

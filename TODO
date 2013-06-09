@@ -7,8 +7,5 @@ Voxelization
   Paging
   RLE for networking
 
-#[cfg(foo)] and --cfg foo
-  Error checking in check macro
-
 QuakeLive maps aren't working
 

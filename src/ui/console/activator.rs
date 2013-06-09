@@ -92,8 +92,8 @@ impl Console_Activator
       match ca.accessors.find(&property.to_owned())
       {
         Some(func) =>
-        { ca.add_log(fmt!("%s = %s", property, (*func)(property))); }
-        //{ println(fmt!("%s = %s", property, (*func)(property))); /* TODO: Output to console. */ }
+        //{ ca.add_log(fmt!("%s = %s", property, (*func)(property))); }
+        { println(fmt!("%s = %s", property, (*func)(property))); /* TODO: Output to console. */ }
         None =>
         { err = fmt!("Error: Invalid property %s", property); }
       }
