@@ -11,6 +11,7 @@
 
 use std::{ str, cast, local_data };
 use std::hashmap::HashMap;
+use std::iterator::IteratorUtil;
 use glfw::{ PRESS, REPEAT, KEY_GRAVE_ACCENT, KEY_ENTER, KEY_BACKSPACE };
 use ui::Input_Listener;
 use super::Console;
@@ -109,11 +110,11 @@ impl Console_Activator
       let mut error = ~"";
       let mut property = ~"";
       let mut params = params.to_owned();
-      for params.each_split_char(' ') |x|
+      for params.split_iter(' ').advance |x|
       { property = x.to_owned(); break; }
 
       /* Remove the property from the string. */
-      for property.each |_|
+      for property.iter().advance |_|
       { str::shift_char(&mut params); }
       str::shift_char(&mut params);
 
@@ -188,11 +189,11 @@ impl Input_Listener for Console_Activator
 
           /* Extract the function name. */
           let mut func = ~"";
-          for self.console.input.each_split_char(' ') |x|
+          for self.console.input.split_iter(' ').advance |x|
           { func = x.to_owned(); break; };
 
           /* Remove the function from the string. */
-          for func.each |_|
+          for func.iter().advance |_|
           { str::shift_char(&mut self.console.input); }
           str::shift_char(&mut self.console.input);
 

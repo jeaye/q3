@@ -12,6 +12,7 @@
 use std::{ str, vec, cmp, ptr };
 use std::hashmap::HashMap;
 use std::libc::{ c_uint };
+use std::iterator::IteratorUtil;
 use math::*;
 use self::glyph::Glyph;
 
@@ -71,9 +72,9 @@ impl Font
       let mut row_width = 0;
       let mut row_height = 0;
 
-      let chars: ~str = ~" !\"#$%&'`()*+,-_./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^abcdefghijklmnopqrstuvwxyz{|}~";
+      let chars = &" !\"#$%&'`()*+,-_./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^abcdefghijklmnopqrstuvwxyz{|}~";
 
-      for chars.each |curr|
+      for chars.iter().advance |curr|
       {
         if ft::FT_Load_Char(font.face, curr as u32, ft::LOAD_RENDER) != 0
         { loop; }
@@ -100,7 +101,7 @@ impl Font
         row_height = cmp::max(row_height, (*ft_glyph).bitmap.rows);
         font.height = cmp::max(font.height, row_height);
 
-        font.glyphs.insert(curr, glyph);
+        font.glyphs.insert(curr as u8, glyph);
       }
 
       font.atlas_dimensions.x = next_power_of_2(cmp::max(font.atlas_dimensions.x, row_width));
@@ -126,7 +127,7 @@ impl Font
       /* Copy all glyphs into the texture atlas. */
       let mut offset = Vec2i::zero();
       row_height = 0;
-      for chars.each |curr|
+      for chars.iter().advance |curr|
       {
         let glyph = match font.glyphs.find_mut(&(curr as u8))
         {

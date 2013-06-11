@@ -9,7 +9,8 @@
       A TTF font renderer.
 */
 
-use std::{ str, vec };
+use std::vec;
+use std::iterator::IteratorUtil;
 use gl::shader::{ Shader, Shader_Builder };
 use gl::camera::Camera;
 use super::Font;
@@ -105,7 +106,7 @@ impl Renderer
 
     /* Render each line separately. */
     let mut line_count = 0;
-    for str::each_line(text) |line|
+    for text.line_iter().advance |line|
     {
       line_count += 1;
       let mut coords = vec::with_capacity::<Point>(line.len());
@@ -113,9 +114,9 @@ impl Renderer
       temp_pos.y += (font.height * line_count) as f32;
 
       let mut count = 0;
-      for line.each |curr|
+      for line.iter().advance |curr|
       {
-        let glyph = match font.glyphs.find(&curr)
+        let glyph = match font.glyphs.find(&(curr as u8))
         {
           Some(g) => g,
           None => fail!(fmt!("Invalid char (%?) in font %? len %?", curr, font.file, font.glyphs.len()))
