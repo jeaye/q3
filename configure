@@ -9,41 +9,75 @@
 #    Submodule and configuration manager.
 #
 
-git submodule update --recursive --init
-rm lib/*.so
+BWD=$PWD/build # BWD is the build directory
+SWD=`dirname $0` # SWD is the source directory
 
-# GLFW3
-cd lib/glfw
-#git pull origin master
-cmake CMakeLists.txt -DBUILD_SHARED_LIBS=OFF
-make glfw
-cmake CMakeLists.txt -DBUILD_SHARED_LIBS=ON
-make glfw
-cd ../../
+mkdir -p build
+cd build
 
-# Rust's GLFW3
-cd lib/glfw-rs
-make clean
-#git pull origin master # Pull from my fork
-#git pull git://github.com/bjz/glfw-rs.git # Pull from parent
-make
-cd ../../
+# Update submodules
+  pushd $SWD
+    git submodule update --recursive --init
+  popd
 
-# OpenGL ES
-cd lib/rust-opengles
-make clean
-#git pull origin master # Pull from my fork
-#git pull git://github.com/mozilla-servo/rust-opengles.git # Pull from parent
-sh ./configure
-make
-cd ../../
+## Build GLFW3 (doesn't support out of source builds)
+  mkdir -p glfw_static glfw_shared
 
-# STB-Image
-cd lib/stb-image
-make clean
-#git pull origin master # Pull from my fork
-#git pull git://github.com/mozilla-servo/rust-stb-image.git # Pull from parent
-sh ./configure
-make 
-cd ../../
+  # Static
+  pushd glfw_static
+    cmake ../../$SWD/lib/glfw/CMakeLists.txt -DBUILD_SHARED_LIBS=OFF
+    pushd ../../$SWD/lib/glfw
+      make glfw
+      cp src/libglfw3.a $BWD/glfw_static
+      ln $BWD/glfw_static/libglfw3.a $BWD/glfw_static/libglfw.a
+    popd
+  popd
+
+  # Dynamic
+  pushd glfw_shared
+    cmake ../../$SWD/lib/glfw/CMakeLists.txt -DBUILD_SHARED_LIBS=ON
+    pushd ../../$SWD/lib/glfw
+      make glfw
+      cp src/libglfw.so $BWD/../
+      ln $BWD/../libglfw.so $BWD/../libglfw.so.3
+      ln $BWD/../libglfw.so $BWD/../libglfw.so.3.0
+    popd
+  popd
+
+## GLFW3 Rust
+  mkdir -p glfw-rs
+  pushd glfw-rs
+    pushd ../../$SWD/lib/glfw-rs
+      make -B
+      cp lib/*.so $BWD/../
+    popd
+  popd
+
+## OpenGL ES
+  mkdir -p rust-opengles
+  pushd rust-opengles
+    sh ../../$SWD/lib/rust-opengles/configure
+    make -B
+  popd
+
+## STB-Image
+  mkdir -p stb-image
+  pushd stb-image
+    sh ../../$SWD/lib/stb-image/configure
+    make -B
+  popd
+
+## Q^3
+  cd .. # Back to the original invoking directory
+  
+  # Move over the make file
+  sed "s#%PROJ_DIR%#${SWD}#" $SWD/Makefile.stub > Makefile 
+  
+  if [ `readlink -f $SWD/build` != `readlink -f $BWD` ];
+  then
+    # Link the data directory, since this is an out of source build
+    ln -s $SWD/data data
+  fi
+
+echo "Done configuring Q^3."
 

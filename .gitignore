@@ -1,8 +1,10 @@
 bin/
+build/
 tags
 update.sh
+Makefile
 
-*.so
+*.so*
 
 *~
 *.swp
