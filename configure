@@ -17,13 +17,13 @@ function readlink() {
   (cd "$DIR" && echo "$(pwd -P)")
 }
 
-mkdir -p build
-cd build
-
 # Update submodules
   pushd $SWD
     git submodule update --recursive --init
   popd
+
+mkdir -p build
+cd build
 
 ## Build GLFW3 (doesn't support out of source builds)
   mkdir -p glfw_static glfw_shared
