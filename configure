@@ -10,7 +10,7 @@
 #
 
 BWD=$PWD/build # BWD is the build directory
-SWD=`dirname $0` # SWD is the source directory
+SWD=$(cd $(dirname $0) && pwd) # SWD is the source directory
 
 function readlink() {
   DIR=$(echo "${1%/*}")
@@ -30,8 +30,8 @@ cd build
 
   # Static
   pushd glfw_static
-    cmake ../../$SWD/lib/glfw/CMakeLists.txt -DBUILD_SHARED_LIBS=OFF
-    pushd ../../$SWD/lib/glfw
+    cmake $SWD/lib/glfw/CMakeLists.txt -DBUILD_SHARED_LIBS=OFF
+    pushd $SWD/lib/glfw
       make glfw
       cp src/libglfw3.a $BWD/glfw_static
       ln $BWD/glfw_static/libglfw3.a $BWD/glfw_static/libglfw.a
@@ -40,8 +40,8 @@ cd build
 
   # Dynamic
   pushd glfw_shared
-    cmake ../../$SWD/lib/glfw/CMakeLists.txt -DBUILD_SHARED_LIBS=ON
-    pushd ../../$SWD/lib/glfw
+    cmake $SWD/lib/glfw/CMakeLists.txt -DBUILD_SHARED_LIBS=ON
+    pushd $SWD/lib/glfw
       make glfw
 
       # Linux
@@ -59,7 +59,7 @@ cd build
 ## GLFW3 Rust
   mkdir -p glfw-rs
   pushd glfw-rs
-    pushd ../../$SWD/lib/glfw-rs
+    pushd $SWD/lib/glfw-rs
       make -B
 
       # Linux
@@ -73,14 +73,14 @@ cd build
 ## OpenGL ES
   mkdir -p rust-opengles
   pushd rust-opengles
-    sh ../../$SWD/lib/rust-opengles/configure
+    sh $SWD/lib/rust-opengles/configure
     make -B
   popd
 
 ## STB-Image
   mkdir -p stb-image
   pushd stb-image
-    sh ../../$SWD/lib/stb-image/configure
+    sh $SWD/lib/stb-image/configure
     make -B
   popd
 
