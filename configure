@@ -12,6 +12,11 @@
 BWD=$PWD/build # BWD is the build directory
 SWD=`dirname $0` # SWD is the source directory
 
+function readlink() {
+  DIR=$(echo "${1%/*}")
+  (cd "$DIR" && echo "$(pwd -P)")
+}
+
 mkdir -p build
 cd build
 
@@ -38,9 +43,16 @@ cd build
     cmake ../../$SWD/lib/glfw/CMakeLists.txt -DBUILD_SHARED_LIBS=ON
     pushd ../../$SWD/lib/glfw
       make glfw
+
+      # Linux
       cp src/libglfw.so $BWD/../
       ln $BWD/../libglfw.so $BWD/../libglfw.so.3
       ln $BWD/../libglfw.so $BWD/../libglfw.so.3.0
+
+      # Mac
+      cp src/libglfw.3.0.dylib $BWD/../
+      ln $BWD/../libglfw.3.0.dylib $BWD/../libglfw.3.dylib
+      ln $BWD/../libglfw.3.0.dylib $BWD/../libglfw.dylib
     popd
   popd
 
@@ -49,7 +61,12 @@ cd build
   pushd glfw-rs
     pushd ../../$SWD/lib/glfw-rs
       make -B
+
+      # Linux
       cp lib/*.so $BWD/../
+
+      # Mac
+      cp lib/*.dylib $BWD/../
     popd
   popd
 
@@ -73,7 +90,9 @@ cd build
   # Move over the make file
   sed "s#%PROJ_DIR%#${SWD}#" $SWD/Makefile.stub > Makefile 
   
-  if [ `readlink -f $SWD/build` != `readlink -f $BWD` ];
+  swd_link=(readlink $SWD/build)
+  bwd_link=(readlink $BWD)
+  if [ "$swd_link" != "$bwd_link" ];
   then
     # Link the data directory, since this is an out of source build
     ln -s $SWD/data data
