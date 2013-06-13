@@ -23,7 +23,7 @@ I run on the (nearly) latest Rust incoming; I generally pull every few days. Q^3
 [glfw-rs](https://github.com/Jeaye/glfw-rs), 
 [rust-opengles](https://github.com/Jeaye/rust-opengles), and 
 [rust-stb-image](https://github.com/mozilla-servo/rust-stb-image), 
-as submodules. To configure, simply run:  
+as submodules. To configure, simply run (in source and out of source builds are acceptable):  
 ```bash
 ./configure
 ```
@@ -33,7 +33,7 @@ make release && ./bin/q3
 ```
 **NOTE:** Ensure that you have Freetype2 installed.  
 **NOTE:** I don't have access to a Windows machine at the moment, so I'm not sure yet what will go into building 
-this in something like Visual Studio. If you're interested in looking into it, please feel free to send me a pull
+this under something like MinGW. If you're interested in looking into it, please feel free to send me a pull
 request!
 
 
