@@ -230,7 +230,7 @@ impl Shader for Release_Shader
 mod shared
 {
   use gl = opengles::gl2;
-  use std::{ str, cast };
+  use std::{ cast };
   use math::{ Mat4x4 };
 
   #[path = "../util.rs"]
@@ -265,7 +265,7 @@ mod shared
       assert!(shader.vert_obj != 0);
 
       let src = [vert_src];
-      check!(gl::shader_source(shader.vert_obj, src.map(|x| str::to_bytes(*x))));
+      check!(gl::shader_source(shader.vert_obj, src.map(|x| x.as_bytes().to_owned())));
       check!(gl::compile_shader(shader.vert_obj));
 
       /* Error checking. */
@@ -278,7 +278,7 @@ mod shared
       assert!(shader.frag_obj != 0);
 
       let src = [frag_src];
-      check!(gl::shader_source(shader.frag_obj, src.map(|x| str::to_bytes(*x))));
+      check!(gl::shader_source(shader.frag_obj, src.map(|x| x.as_bytes().to_owned())));
       check!(gl::compile_shader(shader.frag_obj));
 
       /* Error checking. */
