@@ -4,6 +4,7 @@ tags
 update.sh
 Makefile
 
+*.dylib
 *.so*
 
 *~
