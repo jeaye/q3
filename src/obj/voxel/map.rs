@@ -98,11 +98,20 @@ impl Map
     /* Console functions. */
     Console_Activator::get().add_accessor("map.wireframe", |_|
     { map.wireframe.to_str() });
-    Console_Activator::get().add_mutator("map.wireframe", |_, x|
+    Console_Activator::get().add_mutator("map.wireframe", |p, x|
     {
-      map.wireframe = if x == "true" { true }
-                          else { false };
-      None
+      let mut error = ~"";
+      if x == "true"
+      { map.wireframe = true; }
+      else if x == "false"
+      { map.wireframe = false; }
+      else
+      { error = fmt!("Invalid value for %s (use 'true' or 'false')", p); }
+
+      if error.len() == 0
+      { None }
+      else
+      { Some(error) }
     });
 
     map

@@ -55,15 +55,15 @@ fn main()
     };
     window.make_context_current();
 
-    let camera = @mut gl::Camera::new(window);
+    let console = @mut ui::Console::new();
+    let console_activator = ui::Console_Activator::new(console);
+
+    let camera = gl::Camera::new(window);
     camera.init();
 
     /* Setup UI elements. */
     let ui_input = @mut ui::Input_State::new();
     ui_input.push(camera as @mut ui::Input_Listener);
-
-    let console = @mut ui::Console::new();
-    let console_activator = ui::Console_Activator::new(console);
     ui_input.push(console_activator as @mut ui::Input_Listener);
 
     /* Setup callbacks. */ /* TODO: Crash on close with these callbacks. */
@@ -107,11 +107,8 @@ fn main()
     let mut last_time = cur_time;
 
     /* Console functions. */
-    console_activator.add_accessor("q3.version",
-    |_|
-    {
-      fmt!("%s.%s", env!("VERSION"), env!("COMMIT"))
-    });
+    console_activator.add_accessor("q3.version", |_|
+    { fmt!("%s.%s", env!("VERSION"), env!("COMMIT")) });
 
     while !window.should_close()
     {
@@ -147,7 +144,10 @@ fn main()
         ui_renderer.begin(camera);
         
         console.render(ui_renderer);
-        ui_renderer.render_font(fmt!("%?", fps), math::Vec2f::new(camera.window_size.x as f32 - 40.0, 0.0), &font);
+
+        if camera.show_fps
+        { ui_renderer.render_font(fmt!("%?", fps), math::Vec2f::new(camera.window_size.x as f32 - 40.0, 0.0), &font); }
+
         ui_renderer.end();
       } window.swap_buffers();
 

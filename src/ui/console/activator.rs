@@ -205,13 +205,11 @@ impl Input_Listener for Console_Activator
               let input = copy self.console.input;
               match (*f)(func, input)
               {
-                /* TODO: Output to console. */
-                Some(err) => { error!(err); }
+                Some(err) => { self.add_log(err); }
                 None => { }
               }
             }
-            /* TODO: Output to console. */
-            None => { error!("Error: Invalid function"); }
+            None => { self.add_log("Error: Invalid function"); }
           }
 
           self.console.input = ~"";

@@ -16,7 +16,7 @@ use std::f32;
 use math::vec2::{ Vec2f, Vec2i };
 use math::vec3::Vec3f;
 use math::matrix::Mat4x4;
-use ui::Input_Listener;
+use ui::{ Input_Listener, Console_Activator };
 
 mod util;
 
@@ -57,13 +57,14 @@ pub struct Camera
   /* Window. */
   window: @glfw::Window,
   window_size: Vec2i,
+  show_fps: bool,
 }
 impl Camera
 {
   #[inline(always)]
-  pub fn new(win: @glfw::Window) -> Camera
+  pub fn new(win: @glfw::Window) -> @mut Camera
   {
-    Camera
+    let c = @mut Camera
     {
       position: Vec3f::zero(),
       angles: Vec2f::zero(),
@@ -78,9 +79,51 @@ impl Camera
       frame_rate: 0.0,
       frames_this_sec: 0.0,
       this_sec: 0.0,
+
       window: win,
       window_size: Vec2i::zero(),
-    }
+      show_fps: true,
+    };
+
+    Console_Activator::get().add_accessor("camera.fov", |_|
+    { c.fov.to_str() });
+    Console_Activator::get().add_mutator("camera.fov", |p, fov|
+    {
+      let mut error = ~"";
+
+      c.fov = match f32::from_str(fov)
+      {
+        Some(x) => { x },
+        None => { error = fmt!("Invalid value for %s (use a floating point number)", p); c.fov }
+      };
+
+      /* Rebuild the projection info. */
+      c.resize(c.window_size.x, c.window_size.y);
+
+      if error.len() == 0
+      { None }
+      else
+      { Some(error) }
+    });
+    Console_Activator::get().add_accessor("ui.show_fps", |_|
+    { c.show_fps.to_str() });
+    Console_Activator::get().add_mutator("ui.show_fps", |p, x|
+    {
+      let mut error = ~"";
+      if x == "true"
+      { c.show_fps = true; }
+      else if x == "false"
+      { c.show_fps = false; }
+      else
+      { error = fmt!("Invalid value for %s (use 'true' or 'false')", p); }
+
+      if error.len() == 0
+      { None }
+      else
+      { Some(error) }
+    });
+
+    c
   }
 
   #[inline(always)]
