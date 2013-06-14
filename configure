@@ -14,7 +14,8 @@ SWD=$(cd $(dirname $0) && pwd) # SWD is the source directory
 
 function readlink() {
   DIR=$(echo "${1%/*}")
-  (cd "$DIR" && echo "$(pwd -P)")
+  cd "$DIR"
+  link_res=$(pwd -P)
 }
 
 # Update submodules
@@ -90,8 +91,10 @@ cd build
   # Move over the make file
   sed "s#%PROJ_DIR%#${SWD}#" $SWD/Makefile.stub > Makefile 
   
-  swd_link=(readlink $SWD/build)
-  bwd_link=(readlink $BWD)
+  readlink $SWD/build
+  swd_link=$link_res
+  readlink $BWD
+  bwd_link=$link_res
   if [ "$swd_link" != "$bwd_link" ];
   then
     # Link the data directory, since this is an out of source build
