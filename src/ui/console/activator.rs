@@ -9,7 +9,7 @@
       An input listener to open/close the console.
 */
 
-use std::{ str, cast, local_data };
+use std::{ cast, local_data };
 use std::hashmap::HashMap;
 use std::iterator::IteratorUtil;
 use glfw::{ PRESS, REPEAT, KEY_GRAVE_ACCENT, KEY_ENTER, KEY_BACKSPACE };
@@ -115,8 +115,8 @@ impl Console_Activator
 
       /* Remove the property from the string. */
       for property.iter().advance |_|
-      { str::shift_char(&mut params); }
-      str::shift_char(&mut params);
+      { params.shift_char(); }
+      params.shift_char();
 
       /* We require a property and a value. */
       if property.len() == 0
@@ -194,8 +194,8 @@ impl Input_Listener for Console_Activator
 
           /* Remove the function from the string. */
           for func.iter().advance |_|
-          { str::shift_char(&mut self.console.input); }
-          str::shift_char(&mut self.console.input);
+          { self.console.input.shift_char(); }
+          self.console.input.shift_char();
 
           /* Look for the function in the cached map. */
           match self.functions.find(&func)
@@ -220,7 +220,7 @@ impl Input_Listener for Console_Activator
         else if key == KEY_BACKSPACE
         {
           if self.console.input.len() > 0
-          { str::pop_char(&mut self.console.input); }
+          { self.console.input.pop_char(); }
           return true;
         }
         /* Non-whitespace. */

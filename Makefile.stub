@@ -37,7 +37,7 @@ ifeq ($(UNAME), Linux)
 	TAB=sed 's/^/\t/'
 else
 	ECHO=echo "${ECHO_PREFIX}"
-	TAB=sed 's/^/    /'
+	TAB=sed 's/^/        /'
 endif
 
 # Version names of the build types we can attempt
