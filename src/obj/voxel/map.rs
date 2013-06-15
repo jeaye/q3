@@ -240,16 +240,16 @@ impl Map
                                       ((min.y - -mid_offset) / self.voxel_size) as i32,
                                       ((min.z - -mid_offset) / self.voxel_size) as i32);
 
-      /* Ensure we don't go out of bounds. */
-      if start_voxels.x + vox_amount.x >= self.resolution as i32
-      { vox_amount.x = self.resolution as i32 - start_voxels.x; }
-      if start_voxels.y + vox_amount.y >= self.resolution as i32
-      { vox_amount.y = self.resolution as i32 - start_voxels.y; }
-      if start_voxels.z + vox_amount.z >= self.resolution as i32
-      { vox_amount.z = self.resolution as i32 - start_voxels.z; }
-      vox_amount.x = cmp::max(vox_amount.x, 0);
-      vox_amount.y = cmp::max(vox_amount.y, 0);
-      vox_amount.z = cmp::max(vox_amount.z, 0);
+      /* TODO: Ensure we don't go out of bounds. */
+      //if start_voxels.x + vox_amount.x >= self.resolution as i32
+      //{ vox_amount.x = self.resolution as i32 - start_voxels.x; }
+      //if start_voxels.y + vox_amount.y >= self.resolution as i32
+      //{ vox_amount.y = self.resolution as i32 - start_voxels.y; }
+      //if start_voxels.z + vox_amount.z >= self.resolution as i32
+      //{ vox_amount.z = self.resolution as i32 - start_voxels.z; }
+      //vox_amount.x = cmp::max(vox_amount.x, 0);
+      //vox_amount.y = cmp::max(vox_amount.y, 0);
+      //vox_amount.z = cmp::max(vox_amount.z, 0);
       //debug!("VOXEL: [Per voxel] Starting voxels are %s", start_voxels.to_str());
 
       /* Test intersection with each accepted voxel. */
@@ -289,7 +289,7 @@ impl Map
               });
 
               let index = (z * ((self.resolution * self.resolution) as i32)) + (y * (self.resolution as i32)) + x;
-              self.states[index] = Default;
+              //self.states[index] = Default; TODO
             }
             
             x += 1;
