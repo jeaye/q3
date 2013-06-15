@@ -39,7 +39,11 @@ request!
 
 ### Who're you?
 Hi! I'm Jeaye, a professional C++ game developer.  
-**Email:** jeaye (at) arrownext (dot) com  
-**LinkedIn:** http://www.linkedin.com/in/jeaye  
-**IRC:** #rust on irc.mozilla.org:6697 
+* **Email:**
+  * jeaye (at) arrownext (dot) com  
+* **LinkedIn:**
+  * http://www.linkedin.com/in/jeaye  
+* **IRC:**
+  * #rust on irc.mozilla.org:6697 
+  * #q3 on irc.freenode.net:6667 
 
