@@ -14,7 +14,7 @@ pub use self::vertex::Vertex;
 pub use self::triangle::{ Triangle, Triangle_Index };
 pub use self::voxel::Voxel;
 pub use self::chunk::Chunk;
-pub use self::behavior::{ Behavior, Default };
+pub use self::behavior::{ Behavior, Invisible, Default };
 
 mod map;
 mod vertex;

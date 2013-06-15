@@ -13,7 +13,7 @@
 use std::{ f32, uint, vec, cmp, sys };
 use math::{ Vec3f, Vec3i, Vec3u8 };
 use primitive::Triangle;
-use super::{ Vertex, Behavior, Default };
+use super::{ Vertex, Behavior, Invisible, Default };
 use ui::Console_Activator;
 
 #[path = "../../gl/mod.rs"]
@@ -32,6 +32,7 @@ struct Map
   vao: gl::GLuint,
   vox_vbo: gl::GLuint,
   offset_vbo: gl::GLuint,
+  ibo: gl::GLuint,
 
   states: ~[Behavior],
   voxels: ~[Vertex],
@@ -50,8 +51,11 @@ impl Map
       vao: 0,
       vox_vbo: 0,
       offset_vbo: 0,
+      ibo: 0,
+
       states: ~[],
       voxels: ~[],
+
       wireframe: false,
     };
 
@@ -198,7 +202,7 @@ impl Map
     { for uint::range(0, self.resolution as uint) |_y|
       { for uint::range(0, self.resolution as uint) |_x|
         {
-          self.states.push(Default);
+          self.states.push(Invisible);
         }
       }
     }
@@ -235,6 +239,17 @@ impl Map
       let start_voxels = Vec3i::new( ((min.x - -mid_offset) / self.voxel_size) as i32, 
                                       ((min.y - -mid_offset) / self.voxel_size) as i32,
                                       ((min.z - -mid_offset) / self.voxel_size) as i32);
+
+      /* Ensure we don't go out of bounds. */
+      if start_voxels.x + vox_amount.x >= self.resolution as i32
+      { vox_amount.x = self.resolution as i32 - start_voxels.x; }
+      if start_voxels.y + vox_amount.y >= self.resolution as i32
+      { vox_amount.y = self.resolution as i32 - start_voxels.y; }
+      if start_voxels.z + vox_amount.z >= self.resolution as i32
+      { vox_amount.z = self.resolution as i32 - start_voxels.z; }
+      vox_amount.x = cmp::max(vox_amount.x, 0);
+      vox_amount.y = cmp::max(vox_amount.y, 0);
+      vox_amount.z = cmp::max(vox_amount.z, 0);
       //debug!("VOXEL: [Per voxel] Starting voxels are %s", start_voxels.to_str());
 
       /* Test intersection with each accepted voxel. */
@@ -272,6 +287,9 @@ impl Map
                 color: Vec3u8::new(tri.verts[0].color.x as u8, tri.verts[0].color.y as u8, tri.verts[0].color.z as u8), /* TODO: Conversion between Vec types. */
                 unused: 0,
               });
+
+              let index = (z * ((self.resolution * self.resolution) as i32)) + (y * (self.resolution as i32)) + x;
+              self.states[index] = Default;
             }
             
             x += 1;
