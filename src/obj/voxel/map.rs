@@ -280,13 +280,19 @@ impl Map
                                 ((z as f32 - (self.resolution as f32 / 2.0)) * self.voxel_size) + (self.voxel_size / 2.0));
             if tri_cube_intersect(c, self.voxel_size, tri)
             {
+              let av_color = Vec3u8::new
+              (
+                ((tri.verts[0].color.x + tri.verts[1].color.x + tri.verts[2].color.x) / 3.0) as u8,
+                ((tri.verts[0].color.y + tri.verts[1].color.y + tri.verts[2].color.y) / 3.0) as u8,
+                ((tri.verts[0].color.z + tri.verts[1].color.z + tri.verts[2].color.z) / 3.0) as u8
+              );
               /* We have intersection; add a reference to this voxel to the index map. */
               self.voxels.push(Vertex
               {
-                position: Vec3i::new( x - (self.resolution / 2) as i32, /* TODO: Remove duplicates. */
+                position: Vec3i::new( x - (self.resolution / 2) as i32, 
                                       y - (self.resolution / 2) as i32,
                                       z - (self.resolution / 2) as i32), 
-                color: Vec3u8::new(tri.verts[0].color.x as u8, tri.verts[0].color.y as u8, tri.verts[0].color.z as u8), /* TODO: Conversion between Vec types. */
+                color: av_color,
                 unused: 0,
               });
 
