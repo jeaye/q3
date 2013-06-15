@@ -11,6 +11,8 @@
 */
 
 use std::{ f32, uint, vec, cmp, sys };
+use std::iterator::IteratorUtil;
+use extra;
 use math::{ Vec3f, Vec3i, Vec3u8 };
 use primitive::Triangle;
 use super::{ Vertex, Behavior, Invisible, Default };
@@ -299,6 +301,14 @@ impl Map
         z += 1;
       }
     }
+
+    /* Remove duplicates. */
+    let len = self.voxels.len();
+    extra::sort::quick_sort3(self.voxels);
+    vec::dedup(&mut self.voxels);
+    let new_len = self.voxels.len();
+    debug!("New voxel count is %?, down from %?", new_len, len);
+
     debug!("VOXEL: Enabled %? of %? voxels", self.voxels.len(), self.states.len());
   }
 }

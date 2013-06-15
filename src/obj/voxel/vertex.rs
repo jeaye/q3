@@ -9,6 +9,7 @@
       A vertex specific to voxels.
 */
 
+use std::cmp;
 use math::{ Vec3i, Vec3u8 };
 
 #[packed]
@@ -30,5 +31,48 @@ impl Vertex
   #[inline(always)]
   pub fn zero() -> Vertex
   { Vertex { position: Vec3i::zero(), color: Vec3u8::new(1, 1, 1), unused: 0 } }
+}
+
+impl cmp::Ord for Vertex
+{
+  fn lt(&self, other: &Vertex) -> bool
+  {
+    if self.position.x < other.position.x
+    { return true; }
+    else if self.position.x > other.position.x
+    { return false; }
+
+    if self.position.y < other.position.y
+    { return true; }
+    else if self.position.y > other.position.y
+    { return false; }
+
+    if self.position.z < other.position.z
+    { return true; }
+    else if self.position.z > other.position.z
+    { return false; }
+    else
+    { false }
+  }
+
+  /* I don't care about these. */
+  fn le(&self, _other: &Vertex) -> bool
+  { fail!("Unsupported") }
+  fn ge(&self, _other: &Vertex) -> bool
+  { fail!("Unsupported") }
+  fn gt(&self, _other: &Vertex) -> bool
+  { fail!("Unsupported") }
+}
+
+impl cmp::Eq for Vertex
+{
+  fn eq(&self, other: &Vertex) -> bool
+  {
+    self.position.x == other.position.x &&
+    self.position.y == other.position.y &&
+    self.position.z == other.position.z
+  }
+  fn ne(&self, other: &Vertex) -> bool
+  { !(self == other) }
 }
 
