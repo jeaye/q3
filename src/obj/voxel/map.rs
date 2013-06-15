@@ -30,11 +30,11 @@ struct Map
   voxel_size: f32,
 
   vao: gl::GLuint,
-  vbo: gl::GLuint,
-  ibo: gl::GLuint,
+  vox_vbo: gl::GLuint,
+  offset_vbo: gl::GLuint,
 
-  voxels: ~[Behavior],
-  indices: ~[Vertex],
+  states: ~[Behavior],
+  voxels: ~[Vertex],
 
   wireframe: bool,
 }
@@ -48,10 +48,10 @@ impl Map
       resolution: res,
       voxel_size: 0.0,
       vao: 0,
-      vbo: 0,
-      ibo: 0,
+      vox_vbo: 0,
+      offset_vbo: 0,
+      states: ~[],
       voxels: ~[],
-      indices: ~[],
       wireframe: false,
     };
 
@@ -86,14 +86,14 @@ impl Map
 
     let names = check!(gl::gen_buffers(2));
     assert!(names.len() == 2);
-    map.vbo = names[0];
-    map.ibo = names[1];
+    map.vox_vbo = names[0];
+    map.offset_vbo = names[1];
     check!(gl::bind_vertex_array(map.vao));
-    check!(gl::bind_buffer(gl::ARRAY_BUFFER, map.vbo));
+    check!(gl::bind_buffer(gl::ARRAY_BUFFER, map.vox_vbo));
     check!(gl::buffer_data(gl::ARRAY_BUFFER, voxel, gl::STATIC_DRAW));
 
-    check!(gl::bind_buffer(gl::ARRAY_BUFFER, map.ibo));
-    check!(gl::buffer_data(gl::ARRAY_BUFFER, map.indices, gl::STATIC_DRAW));
+    check!(gl::bind_buffer(gl::ARRAY_BUFFER, map.offset_vbo));
+    check!(gl::buffer_data(gl::ARRAY_BUFFER, map.voxels, gl::STATIC_DRAW));
 
     /* Console functions. */
     Console_Activator::get().add_accessor("map.wireframe", |_|
@@ -121,11 +121,11 @@ impl Map
   {
     check!(gl::bind_vertex_array(self.vao));
 
-    check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.vbo));
+    check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.vox_vbo));
     check!(gl::vertex_attrib_pointer_f32(0, 3, false, 0, 0));
     check!(gl::enable_vertex_attrib_array(0));
 
-    check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.ibo));
+    check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.offset_vbo));
 
     check!(gl::vertex_attrib_pointer_i32(1, 3, false, (sys::size_of::<Vertex>()) as i32, 0));
     check!(gl::enable_vertex_attrib_array(1));
@@ -139,7 +139,7 @@ impl Map
     if self.wireframe
     { check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::LINE)); }
 
-    check!(gl::draw_arrays_instanced(gl::TRIANGLE_STRIP, 0, 24, self.indices.len() as i32));
+    check!(gl::draw_arrays_instanced(gl::TRIANGLE_STRIP, 0, 24, self.voxels.len() as i32));
 
     if self.wireframe
     { check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::FILL)); }
@@ -183,26 +183,26 @@ impl Map
                             max.z - ((max.z - min.z) / 2.0));
     debug!("VOXEL: Center of mesh is %s", center.to_str());
 
-    /* Calculate, given resolution (how many voxels across), the dimensions of a voxel. */
+    /* Calculate, given resolution (how many states across), the dimensions of a voxel. */
     self.voxel_size = cmp::max( max.x - min.x,
                                 cmp::max(max.y - min.y, max.z - min.z)) / (self.resolution as f32);
     debug!("VOXEL: Voxel size is %?", self.voxel_size);
 
-    /* Create 3D array of voxels. */
+    /* Create 3D array of states. */
     let mid_offset = (((self.resolution as f32) / 2.0) * self.voxel_size);
     debug!("VOXEL: Midpoint offset is %?", mid_offset);
 
+    self.states = vec::with_capacity((f32::pow((self.resolution + 1) as f32, 3.0)) as uint);
     self.voxels = vec::with_capacity((f32::pow((self.resolution + 1) as f32, 3.0)) as uint);
-    self.indices = vec::with_capacity((f32::pow((self.resolution + 1) as f32, 3.0)) as uint);
     for uint::range(0, self.resolution as uint) |_z| 
     { for uint::range(0, self.resolution as uint) |_y|
       { for uint::range(0, self.resolution as uint) |_x|
         {
-          self.voxels.push(Default);
+          self.states.push(Default);
         }
       }
     }
-    assert!(self.voxels.len() == (f32::pow((self.resolution) as f32, 3.0)) as uint);
+    assert!(self.states.len() == (f32::pow((self.resolution) as f32, 3.0)) as uint);
 
     for tris.each |tri|
     {
@@ -220,7 +220,7 @@ impl Map
         max.z = cmp::max(max.z, vert.position.z);
       }
 
-      /* Determine what voxels lie in the bounding box. */
+      /* Determine what states lie in the bounding box. */
       let mut vox_amount = Vec3i::new(f32::ceil(((max.x - min.x) / self.voxel_size)) as i32,
                                       f32::ceil(((max.y - min.y) / self.voxel_size)) as i32,
                                       f32::ceil(((max.z - min.z) / self.voxel_size)) as i32);
@@ -230,31 +230,31 @@ impl Map
       { vox_amount.y = 1; }
       if vox_amount.z < 1
       { vox_amount.z = 1; }
-      //debug!("VOXEL: [Per voxel] Checking %s surrounding voxels with SAT", vox_amount.to_str());
+      //debug!("VOXEL: [Per voxel] Checking %s surrounding states with SAT", vox_amount.to_str());
 
-      let start_indices = Vec3i::new( ((min.x - -mid_offset) / self.voxel_size) as i32, 
+      let start_voxels = Vec3i::new( ((min.x - -mid_offset) / self.voxel_size) as i32, 
                                       ((min.y - -mid_offset) / self.voxel_size) as i32,
                                       ((min.z - -mid_offset) / self.voxel_size) as i32);
-      //debug!("VOXEL: [Per voxel] Starting indices are %s", start_indices.to_str());
+      //debug!("VOXEL: [Per voxel] Starting voxels are %s", start_voxels.to_str());
 
       /* Test intersection with each accepted voxel. */
       /* TODO: Better loop syntax. */
-      let mut z = start_indices.z;
+      let mut z = start_voxels.z;
       'collision: loop
       {
-        if z == start_indices.z + vox_amount.z
+        if z == start_voxels.z + vox_amount.z
         { break; }
 
-        let mut y = start_indices.y;
+        let mut y = start_voxels.y;
         loop
         {
-          if y == start_indices.y + vox_amount.y
+          if y == start_voxels.y + vox_amount.y
           { break; }
 
-          let mut x = start_indices.x;
+          let mut x = start_voxels.x;
           loop
           {
-            if x == start_indices.x + vox_amount.x
+            if x == start_voxels.x + vox_amount.x
             { break; }
 
             /* Check for intersection. */
@@ -264,7 +264,7 @@ impl Map
             if tri_cube_intersect(c, self.voxel_size, tri)
             {
               /* We have intersection; add a reference to this voxel to the index map. */
-              self.indices.push(Vertex
+              self.voxels.push(Vertex
               {
                 position: Vec3i::new( x - (self.resolution / 2) as i32, /* TODO: Remove duplicates. */
                                       y - (self.resolution / 2) as i32,
@@ -281,7 +281,7 @@ impl Map
         z += 1;
       }
     }
-    debug!("VOXEL: Enabled %? of %? voxels", self.indices.len(), self.voxels.len());
+    debug!("VOXEL: Enabled %? of %? voxels", self.voxels.len(), self.states.len());
   }
 }
 
