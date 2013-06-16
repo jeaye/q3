@@ -33,6 +33,7 @@ cd build
   pushd glfw_static
     cmake $SWD/lib/glfw/CMakeLists.txt -DBUILD_SHARED_LIBS=OFF
     pushd $SWD/lib/glfw
+      make clean
       make glfw
       cp src/libglfw3.a $BWD/glfw_static
       ln $BWD/glfw_static/libglfw3.a $BWD/glfw_static/libglfw.a
@@ -43,6 +44,7 @@ cd build
   pushd glfw_shared
     cmake $SWD/lib/glfw/CMakeLists.txt -DBUILD_SHARED_LIBS=ON
     pushd $SWD/lib/glfw
+      make clean
       make glfw
 
       # Linux
@@ -61,12 +63,15 @@ cd build
   mkdir -p glfw-rs
   pushd glfw-rs
     pushd $SWD/lib/glfw-rs
+      make clean
       make -B
 
       # Linux
+      rm $BWD/../*.so
       cp lib/*.so $BWD/../
 
       # Mac
+      rm $BWD/../*.dylib
       cp lib/*.dylib $BWD/../
     popd
   popd
@@ -75,6 +80,7 @@ cd build
   mkdir -p rust-opengles
   pushd rust-opengles
     sh $SWD/lib/rust-opengles/configure
+    make clean
     make -B
   popd
 
@@ -82,6 +88,7 @@ cd build
   mkdir -p stb-image
   pushd stb-image
     sh $SWD/lib/stb-image/configure
+    make clean
     make -B
   popd
 

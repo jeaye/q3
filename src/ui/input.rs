@@ -43,7 +43,7 @@ impl Input_State
   {
     assert!(self.listeners.len() > 0);
 
-    for self.listeners.each_mut |x|
+    for self.listeners.mut_iter().advance |x|
     {
       if x.key_action(key, action, mods)
       { break; }
@@ -54,7 +54,7 @@ impl Input_State
   {
     assert!(self.listeners.len() > 0);
 
-    for self.listeners.each_mut |x|
+    for self.listeners.mut_iter().advance |x|
     {
       if x.key_char(ch)
       { break; }
@@ -65,7 +65,7 @@ impl Input_State
   {
     assert!(self.listeners.len() > 0);
 
-    for self.listeners.each_mut |x|
+    for self.listeners.mut_iter().advance |x|
     {
       if x.mouse_action(button, action, mods)
       { break; }
@@ -76,7 +76,7 @@ impl Input_State
   {
     assert!(self.listeners.len() > 0);
 
-    for self.listeners.each_mut |list|
+    for self.listeners.mut_iter().advance |list|
     {
       if list.mouse_moved(x, y)
       { break; }
