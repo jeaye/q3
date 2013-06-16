@@ -15,6 +15,10 @@ extern mod glfw;
 
 use std::libc;
 
+#[nolink]
+#[link_args="-lX11 -lXrandr -lXi -lXxf86vm"]
+extern { }
+
 #[path = "gl/mod.rs"]
 mod gl;
 
