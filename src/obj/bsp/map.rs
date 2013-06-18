@@ -9,7 +9,7 @@
       Loader and handler of BSP maps.
 */
 
-use std::{ i32, path, io, sys, cast };
+use std::{ i32, cmp, path, io, sys, cast };
 use math::{ Vec3f, Vec4u8, BB3 };
 use primitive::{ Triangle, Vertex_PC };
 
@@ -134,6 +134,31 @@ impl Map
 
       self.verts.push(vert);
     }
+
+    /* Calculate the mesh's bounding box. */
+    let mut min = Vec3f::new( self.verts[0].position.x,
+                              self.verts[0].position.y, 
+                              self.verts[0].position.z);
+    let mut max = Vec3f::new( self.verts[0].position.x,
+                              self.verts[0].position.y,
+                              self.verts[0].position.z);
+    for self.verts.iter().advance |v|
+    {
+      min.x = cmp::min(min.x, v.position.x);
+      min.y = cmp::min(min.y, v.position.y);
+      min.z = cmp::min(min.z, v.position.z);
+
+      max.x = cmp::max(max.x, v.position.x);
+      max.y = cmp::max(max.y, v.position.y);
+      max.z = cmp::max(max.z, v.position.z);
+    }
+    let center = Vec3f::new(max.x - ((max.x - min.x) / 2.0),
+                            max.y - ((max.y - min.y) / 2.0),
+                            max.z - ((max.z - min.z) / 2.0));
+
+    /* Move the mesh by the center to the origin (easier to voxelize). */
+    for self.verts.mut_iter().advance |v|
+    { v.position -= center; }
   }
 
   priv fn read_faces(&mut self, fio: @io::Reader)

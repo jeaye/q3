@@ -11,7 +11,6 @@
 */
 
 use std::{ f32, uint, vec, cmp, sys };
-use std::iterator::IteratorUtil;
 use extra;
 use math::{ Vec3f, Vec3i, Vec3u8 };
 use primitive::Triangle;
@@ -194,12 +193,13 @@ impl Map
                                 cmp::max(max.y - min.y, max.z - min.z)) / (self.resolution as f32);
     debug!("VOXEL: Voxel size is %?", self.voxel_size);
 
-    /* Create 3D array of states. */
-    let mid_offset = (((self.resolution as f32) / 2.0) * self.voxel_size);
+    /* World space mid point of the grid. */
+    let mid_offset = (((self.resolution as f32) / 2.0) * self.voxel_size); 
     debug!("VOXEL: Midpoint offset is %?", mid_offset);
 
+    /* Create 3D array of states. */
     self.states = vec::with_capacity((f32::pow((self.resolution + 1) as f32, 3.0)) as uint);
-    self.voxels = vec::with_capacity((f32::pow((self.resolution + 1) as f32, 3.0)) as uint);
+    self.voxels = vec::with_capacity(self.states.len() / 2); 
     for uint::range(0, self.resolution as uint) |_z| 
     { for uint::range(0, self.resolution as uint) |_y|
       { for uint::range(0, self.resolution as uint) |_x|
@@ -217,16 +217,17 @@ impl Map
       max = Vec3f::new(tri.verts[0].position.x, tri.verts[0].position.y, tri.verts[0].position.z);
       for tri.verts.each |vert|
       {
-        min.x = cmp::min(min.x, vert.position.x);
-        min.y = cmp::min(min.y, vert.position.y);
-        min.z = cmp::min(min.z, vert.position.z);
+        /* Adjust by half of a voxel to account for voxel centering. */
+        min.x = cmp::min(min.x, vert.position.x - (self.voxel_size / 2.0));
+        min.y = cmp::min(min.y, vert.position.y - (self.voxel_size / 2.0));
+        min.z = cmp::min(min.z, vert.position.z - (self.voxel_size / 2.0));
 
-        max.x = cmp::max(max.x, vert.position.x);
-        max.y = cmp::max(max.y, vert.position.y);
-        max.z = cmp::max(max.z, vert.position.z);
+        max.x = cmp::max(max.x, vert.position.x - (self.voxel_size / 2.0));
+        max.y = cmp::max(max.y, vert.position.y - (self.voxel_size / 2.0));
+        max.z = cmp::max(max.z, vert.position.z - (self.voxel_size / 2.0));
       }
 
-      /* Determine what states lie in the bounding box. */
+      /* The dimensions (in voxels) of the triangle's bounding box. */
       let mut vox_amount = Vec3i::new(f32::ceil(((max.x - min.x) / self.voxel_size)) as i32,
                                       f32::ceil(((max.y - min.y) / self.voxel_size)) as i32,
                                       f32::ceil(((max.z - min.z) / self.voxel_size)) as i32);
@@ -238,21 +239,10 @@ impl Map
       { vox_amount.z = 1; }
       //debug!("VOXEL: [Per voxel] Checking %s surrounding states with SAT", vox_amount.to_str());
 
+      /* Get the starting indices of the triangle's bounding box. */
       let start_voxels = Vec3i::new( ((min.x - -mid_offset) / self.voxel_size) as i32, 
                                       ((min.y - -mid_offset) / self.voxel_size) as i32,
                                       ((min.z - -mid_offset) / self.voxel_size) as i32);
-
-      /* TODO: Ensure we don't go out of bounds. */
-      //if start_voxels.x + vox_amount.x >= self.resolution as i32
-      //{ vox_amount.x = self.resolution as i32 - start_voxels.x; }
-      //if start_voxels.y + vox_amount.y >= self.resolution as i32
-      //{ vox_amount.y = self.resolution as i32 - start_voxels.y; }
-      //if start_voxels.z + vox_amount.z >= self.resolution as i32
-      //{ vox_amount.z = self.resolution as i32 - start_voxels.z; }
-      //vox_amount.x = cmp::max(vox_amount.x, 0);
-      //vox_amount.y = cmp::max(vox_amount.y, 0);
-      //vox_amount.z = cmp::max(vox_amount.z, 0);
-      //debug!("VOXEL: [Per voxel] Starting voxels are %s", start_voxels.to_str());
 
       /* Test intersection with each accepted voxel. */
       /* TODO: Better loop syntax. */
@@ -280,24 +270,35 @@ impl Map
                                 ((z as f32 - (self.resolution as f32 / 2.0)) * self.voxel_size) + (self.voxel_size / 2.0));
             if tri_cube_intersect(c, self.voxel_size, tri)
             {
+              /* Calculate the average color from all three verts. */
               let av_color = Vec3u8::new
               (
                 ((tri.verts[0].color.x + tri.verts[1].color.x + tri.verts[2].color.x) / 3.0) as u8,
                 ((tri.verts[0].color.y + tri.verts[1].color.y + tri.verts[2].color.y) / 3.0) as u8,
                 ((tri.verts[0].color.z + tri.verts[1].color.z + tri.verts[2].color.z) / 3.0) as u8
               );
+
+              /* Update the state of the voxel. */
+              let index = (z * ((self.resolution * self.resolution) as i32)) + (y * (self.resolution as i32)) + x;
+              self.states[index] = Default;
+
+              /* Enable some debug rendering of invalid voxels. */
+              let col = if x >= self.resolution as i32 || y >= self.resolution as i32 || z >= self.resolution as i32
+              { Vec3u8::new(255, 0, 0) }
+              else if x < 0 || y < 0 || z < 0
+              { Vec3u8::new(255, 0, 0) }
+              else
+              { av_color };
+
               /* We have intersection; add a reference to this voxel to the index map. */
               self.voxels.push(Vertex
               {
                 position: Vec3i::new( x - (self.resolution / 2) as i32, 
                                       y - (self.resolution / 2) as i32,
                                       z - (self.resolution / 2) as i32), 
-                color: av_color,
+                color: col,
                 unused: 0,
               });
-
-              let index = (z * ((self.resolution * self.resolution) as i32)) + (y * (self.resolution as i32)) + x;
-              //self.states[index] = Default; TODO
             }
             
             x += 1;
@@ -313,7 +314,7 @@ impl Map
     extra::sort::quick_sort3(self.voxels);
     vec::dedup(&mut self.voxels);
     let new_len = self.voxels.len();
-    debug!("New voxel count is %?, down from %?", new_len, len);
+    debug!("VOXEL: New voxel count is %?, down from %?", new_len, len);
 
     debug!("VOXEL: Enabled %? of %? voxels", self.voxels.len(), self.states.len());
   }
