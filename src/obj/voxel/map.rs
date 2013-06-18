@@ -208,7 +208,6 @@ impl Map
         }
       }
     }
-    assert!(self.states.len() == (f32::pow((self.resolution) as f32, 3.0)) as uint);
 
     for tris.each |tri|
     {
