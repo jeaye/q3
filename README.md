@@ -18,7 +18,7 @@ Q^3 is not a game yet! It's still a side project that I'm working on in my spare
 * Tested on Linux and Mac OS X
 
 ### How do I get Q^3 running on my system?
-I run on the (nearly) latest Rust incoming; I generally pull every few days. Q^3 currently has 
+I run on the (nearly) latest Rust master; I generally pull every few days. Q^3 currently has 
 [glfw3](https://github.com/glfw/glfw), 
 [glfw-rs](https://github.com/Jeaye/glfw-rs), 
 [rust-opengles](https://github.com/Jeaye/rust-opengles), and 
