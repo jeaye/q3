@@ -1,11 +1,8 @@
 Voxelization
-  No need to check all triangles
-    Octree?
-    Threading
-      On different index arrays? Merge at the end?
-    Check every other triangle? ^_^
   Paging
   RLE for networking
+
+Main menu
 
 QuakeLive maps aren't working
 
