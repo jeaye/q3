@@ -91,8 +91,13 @@ impl Sphere
     for uint::range(0, tris.len()) |x|
     { sphere.subdivide(tris[x], new_subdivides); }
 
-    sphere.vao = check!(gl::gen_vertex_arrays(1))[0]; /* TODO: Check these. */
-    sphere.vbo = check!(gl::gen_buffers(1))[0];
+    let name = check!(gl::gen_vertex_arrays(1));
+    assert!(name.len() == 1);
+    sphere.vao = name[0];
+
+    let name = check!(gl::gen_buffers(1));
+    assert!(name.len() == 1);
+    sphere.vbo = name[0];
     check!(gl::bind_vertex_array(sphere.vao));
     check!(gl::bind_buffer(gl::ARRAY_BUFFER, sphere.vbo));
     check!(gl::buffer_data(gl::ARRAY_BUFFER, sphere.tris, gl::STATIC_DRAW));

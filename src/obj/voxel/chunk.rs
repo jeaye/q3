@@ -30,12 +30,16 @@ impl Chunk
 {
   pub fn new(dim: &Vec3i8) -> Chunk
   {
-    let chunk = Chunk
+    let mut chunk = Chunk
     {
-      vbo: check!(gl::gen_buffers(1))[0],
+      vbo: 0,
       dimensions: *dim,
       voxels: ~[],
     };
+
+    let name = check!(gl::gen_buffers(1));
+    assert!(name.len() == 1);
+    chunk.vbo = name[0];
 
     chunk
   }

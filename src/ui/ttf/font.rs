@@ -110,7 +110,9 @@ impl Font
       /* We're using 1 byte alignment buffering. */
       check!(gl::pixel_store_i(gl::UNPACK_ALIGNMENT, 1));
       
-      font.texture_atlas = check!(gl::gen_textures(1))[0];
+      let name = check!(gl::gen_textures(1));
+      assert!(name.len() == 1);
+      font.texture_atlas = name[0];
       check!(gl::bind_texture(gl::TEXTURE_2D, font.texture_atlas));
       check!(gl::tex_image_2d(gl::TEXTURE_2D, 0, gl::RGB as gl::GLint,
                               font.atlas_dimensions.x, font.atlas_dimensions.y,
