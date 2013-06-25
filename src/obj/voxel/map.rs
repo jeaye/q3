@@ -169,9 +169,9 @@ impl Map
     let mut max = Vec3f::new( tris[0].verts[0].position.x,
                               tris[0].verts[0].position.y,
                               tris[0].verts[0].position.z);
-    for tris.each |curr|
+    for tris.iter().advance |curr|
     {
-      for curr.verts.each |vert|
+      for curr.verts.iter().advance |vert|
       {
         min.x = cmp::min(min.x, vert.position.x);
         min.y = cmp::min(min.y, vert.position.y);
@@ -209,12 +209,12 @@ impl Map
       }
     }
 
-    for tris.each |tri|
+    for tris.iter().advance |tri|
     {
       /* Calculate bounding box of the triangle. */
       min = Vec3f::new(tri.verts[0].position.x, tri.verts[0].position.y, tri.verts[0].position.z);
       max = Vec3f::new(tri.verts[0].position.x, tri.verts[0].position.y, tri.verts[0].position.z);
-      for tri.verts.each |vert|
+      for tri.verts.iter().advance |vert|
       {
         /* Adjust by half of a voxel to account for voxel centering. */
         min.x = cmp::min(min.x, vert.position.x - (self.voxel_size / 2.0));

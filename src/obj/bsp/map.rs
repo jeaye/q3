@@ -196,7 +196,7 @@ impl Map
   priv fn triangulate(&mut self)
   {
     let mut verts: ~[lump::Vertex] = ~[];
-    for self.faces.each() |face|
+    for self.faces.iter().advance |face|
     {
       if face.kind != 1 { loop; }
 
