@@ -10,9 +10,9 @@
       into OpenGL-ready cubes.
 */
 
-use std::{ f32, uint, vec, cmp, sys };
+use std::{ i32, f32, uint, vec, cmp, sys };
 use extra;
-use math::{ Vec3f, Vec3i, Vec3u8 };
+use math::{ Vec3f, Vec3i };
 use primitive::Triangle;
 use super::{ Vertex, Behavior, Invisible, Default };
 use ui::Console_Activator;
@@ -132,11 +132,11 @@ impl Map
 
     check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.offset_vbo));
 
-    check!(gl::vertex_attrib_pointer_i32(1, 3, false, (sys::size_of::<Vertex>()) as i32, 0));
+    check!(gl::vertex_attrib_pointer_f32(1, 3, false, (sys::size_of::<Vertex>()) as i32, 0));
     check!(gl::enable_vertex_attrib_array(1));
     check!(gl::vertex_attrib_divisor(1, 1));
 
-    check!(gl::vertex_attrib_pointer_u8(2, 3, true, (sys::size_of::<Vertex>()) as i32, 
+    check!(gl::vertex_attrib_pointer_f32(2, 3, false, (sys::size_of::<Vertex>()) as i32, 
                                         (sys::size_of::<Vec3i>()) as u32));
     check!(gl::enable_vertex_attrib_array(2));
     check!(gl::vertex_attrib_divisor(2, 1));
@@ -244,25 +244,10 @@ impl Map
                                       ((min.z - -mid_offset) / self.voxel_size) as i32);
 
       /* Test intersection with each accepted voxel. */
-      /* TODO: Better loop syntax. */
-      let mut z = start_voxels.z;
-      'collision: loop
-      {
-        if z == start_voxels.z + vox_amount.z
-        { break; }
-
-        let mut y = start_voxels.y;
-        loop
-        {
-          if y == start_voxels.y + vox_amount.y
-          { break; }
-
-          let mut x = start_voxels.x;
-          loop
+      for i32::range(start_voxels.z, start_voxels.z + vox_amount.z) |z|
+      { for i32::range(start_voxels.y, start_voxels.y + vox_amount.y) |y|
+        { for i32::range(start_voxels.x, start_voxels.x + vox_amount.x) |x|
           {
-            if x == start_voxels.x + vox_amount.x
-            { break; }
-
             /* Check for intersection. */
             let c = Vec3f::new( ((x as f32 - (self.resolution as f32 / 2.0)) * self.voxel_size) + (self.voxel_size / 2.0), 
                                 ((y as f32 - (self.resolution as f32 / 2.0)) * self.voxel_size) + (self.voxel_size / 2.0),
@@ -270,11 +255,11 @@ impl Map
             if tri_cube_intersect(c, self.voxel_size, tri)
             {
               /* Calculate the average color from all three verts. */
-              let av_color = Vec3u8::new
+              let av_color = Vec3f::new
               (
-                ((tri.verts[0].color.x + tri.verts[1].color.x + tri.verts[2].color.x) / 3.0) as u8,
-                ((tri.verts[0].color.y + tri.verts[1].color.y + tri.verts[2].color.y) / 3.0) as u8,
-                ((tri.verts[0].color.z + tri.verts[1].color.z + tri.verts[2].color.z) / 3.0) as u8
+                ((tri.verts[0].color.x + tri.verts[1].color.x + tri.verts[2].color.x) / 3.0) as f32 / 255.0,
+                ((tri.verts[0].color.y + tri.verts[1].color.y + tri.verts[2].color.y) / 3.0) as f32 / 255.0,
+                ((tri.verts[0].color.z + tri.verts[1].color.z + tri.verts[2].color.z) / 3.0) as f32 / 255.0
               );
 
               /* Update the state of the voxel. */
@@ -283,28 +268,23 @@ impl Map
 
               /* Enable some debug rendering of invalid voxels. */
               let col = if x >= self.resolution as i32 || y >= self.resolution as i32 || z >= self.resolution as i32
-              { Vec3u8::new(255, 0, 0) }
+              { Vec3f::new(1.0, 0.0, 0.0) }
               else if x < 0 || y < 0 || z < 0
-              { Vec3u8::new(255, 0, 0) }
+              { Vec3f::new(1.0, 0.0, 0.0) }
               else
               { av_color };
 
               /* We have intersection; add a reference to this voxel to the index map. */
               self.voxels.push(Vertex
               {
-                position: Vec3i::new( x - (self.resolution / 2) as i32, 
-                                      y - (self.resolution / 2) as i32,
-                                      z - (self.resolution / 2) as i32), 
-                color: col,
-                unused: 0,
+                position: Vec3f::new( x as f32 - (self.resolution / 2) as f32, 
+                                      y as f32 - (self.resolution / 2) as f32,
+                                      z as f32 - (self.resolution / 2) as f32), 
+                color: col
               });
             }
-            
-            x += 1;
           }
-          y += 1;
         }
-        z += 1;
       }
     }
 

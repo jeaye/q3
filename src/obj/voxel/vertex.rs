@@ -10,27 +10,26 @@
 */
 
 use std::cmp;
-use math::{ Vec3i, Vec3u8 };
+use math::{ Vec3f };
 
 #[packed]
 pub struct Vertex
 {
-  position: Vec3i,
-  color: Vec3u8,
-  unused: u8,
+  position: Vec3f,
+  color: Vec3f,
 }
 
 impl Vertex
 {
   #[inline(always)]
-  pub fn new(pos: Vec3i, col: Vec3u8) -> Vertex
-  { Vertex { position: pos, color: col, unused: 0 } }
+  pub fn new(pos: Vec3f, col: Vec3f) -> Vertex
+  { Vertex { position: pos, color: col } }
   #[inline(always)]
-  pub fn new_with_position(pos: Vec3i) -> Vertex
-  { Vertex { position: pos, color: Vec3u8::new(pos.x as u8, pos.y as u8, pos.z as u8), unused: 0 } }
+  pub fn new_with_position(pos: Vec3f) -> Vertex
+  { Vertex { position: pos, color: Vec3f::new(pos.x, pos.y, pos.z) } }
   #[inline(always)]
   pub fn zero() -> Vertex
-  { Vertex { position: Vec3i::zero(), color: Vec3u8::new(1, 1, 1), unused: 0 } }
+  { Vertex { position: Vec3f::zero(), color: Vec3f::new(1.0, 1.0, 1.0) } }
 }
 
 impl cmp::Ord for Vertex

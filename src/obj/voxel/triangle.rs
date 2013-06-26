@@ -9,7 +9,7 @@
       A voxel-specific triangle.
 */
 
-use math::{ Vec3i };
+use math::{ Vec3f };
 use Vert = super::Vertex;
 
 #[packed]
@@ -23,7 +23,7 @@ impl Triangle
   pub fn new(v1: Vert, v2: Vert, v3: Vert) -> Triangle
   { Triangle { verts: ([ v1, v2, v3 ]) } }
   #[inline(always)]
-  pub fn new_with_position(v1: Vec3i, v2: Vec3i, v3: Vec3i) -> Triangle
+  pub fn new_with_position(v1: Vec3f, v2: Vec3f, v3: Vec3f) -> Triangle
   { Triangle { verts: ([ Vert::new_with_position(v1), Vert::new_with_position(v2), Vert::new_with_position(v3) ]) } }
   #[inline(always)]
   pub fn zero() -> Triangle
