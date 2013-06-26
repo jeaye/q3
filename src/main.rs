@@ -89,7 +89,7 @@ fn main()
     let map = bsp::Map::new("data/maps/q3ctf1.bsp");
 
     let st = extra::time::precise_time_s();
-    let vox_map = voxel::Map::new(map.tris, 300);
+    let vox_map = voxel::Map::new(map.tris, 500);
     let et = extra::time::precise_time_s();
     println(fmt!("Voxel map creation took %? seconds.", (et - st)));
 
@@ -104,8 +104,11 @@ fn main()
     let proj_loc = vox_shader.get_uniform_location("proj");
     let world_loc = vox_shader.get_uniform_location("world");
     let voxel_size_loc = vox_shader.get_uniform_location("voxel_size");
+    let offsets_loc = vox_shader.get_uniform_location("offsets");
     let color_proj_loc = color_shader.get_uniform_location("proj");
     let color_world_loc = color_shader.get_uniform_location("world");
+
+    vox_shader.update_uniform_i32(offsets_loc, 0);
 
     let mut cur_time = (extra::time::precise_time_ns() / 10000) as f32; // Hundredth of a second
     let mut last_time = cur_time;

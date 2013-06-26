@@ -11,7 +11,7 @@
 */
 
 #[cfg(check_gl)]
-pub fn check_gl()
+pub fn check_gl(func: &str)
 {
   use gl::get_err_str;
   use gl = opengles::gl2;
@@ -19,7 +19,7 @@ pub fn check_gl()
   let err = gl::get_error();
   if err != gl::NO_ERROR
   {
-    error!(stringify!($func));
+    error!(func);
     fail!(get_err_str(err)); 
   }
 }
@@ -37,7 +37,7 @@ macro_rules! check
     let ret = $func;
     //io::println(fmt!("%?", ret));
 
-    check::check_gl();
+    check::check_gl(stringify!($func));
 
     ret
   });

@@ -10,7 +10,7 @@
       into OpenGL-ready cubes.
 */
 
-use std::{ i32, f32, uint, vec, cmp, sys };
+use std::{ i32, f32, uint, vec, cmp };
 use extra;
 use math::{ Vec3f, Vec3i };
 use primitive::Triangle;
@@ -32,11 +32,12 @@ struct Map
 
   vao: gl::GLuint,
   vox_vbo: gl::GLuint,
-  offset_vbo: gl::GLuint,
-  ibo: gl::GLuint,
+  offset_tex_vbo: gl::GLuint,
+  offset_tex: gl::GLuint,
 
   states: ~[Behavior],
   voxels: ~[Vertex],
+  visible_voxels: ~[i32],
 
   wireframe: bool,
 }
@@ -51,11 +52,12 @@ impl Map
       voxel_size: 0.0,
       vao: 0,
       vox_vbo: 0,
-      offset_vbo: 0,
-      ibo: 0,
+      offset_tex_vbo: 0,
+      offset_tex: 0,
 
       states: ~[],
       voxels: ~[],
+      visible_voxels: ~[],
 
       wireframe: false,
     };
@@ -92,13 +94,20 @@ impl Map
     let names = check!(gl::gen_buffers(2));
     assert!(names.len() == 2);
     map.vox_vbo = names[0];
-    map.offset_vbo = names[1];
+    map.offset_tex_vbo = names[1];
+
     check!(gl::bind_vertex_array(map.vao));
     check!(gl::bind_buffer(gl::ARRAY_BUFFER, map.vox_vbo));
     check!(gl::buffer_data(gl::ARRAY_BUFFER, voxel, gl::STATIC_DRAW));
 
-    check!(gl::bind_buffer(gl::ARRAY_BUFFER, map.offset_vbo));
-    check!(gl::buffer_data(gl::ARRAY_BUFFER, map.voxels, gl::STATIC_DRAW));
+    check!(gl::bind_buffer(gl::TEXTURE_BUFFER, map.offset_tex_vbo));
+    check!(gl::buffer_data(gl::TEXTURE_BUFFER, map.voxels, gl::STREAM_DRAW));
+
+    let name = check!(gl::gen_textures(1));
+    assert!(name.len() == 1);
+    map.offset_tex = name[0];
+    check!(gl::bind_texture(gl::TEXTURE_BUFFER, map.offset_tex));
+    check!(gl::tex_buffer(gl::TEXTURE_BUFFER, 0x8815 /* RGB32F */, map.offset_tex_vbo));
 
     /* Console functions. */
     Console_Activator::get().add_accessor("map.wireframe", |_|
@@ -130,16 +139,7 @@ impl Map
     check!(gl::vertex_attrib_pointer_f32(0, 3, false, 0, 0));
     check!(gl::enable_vertex_attrib_array(0));
 
-    check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.offset_vbo));
-
-    check!(gl::vertex_attrib_pointer_f32(1, 3, false, (sys::size_of::<Vertex>()) as i32, 0));
-    check!(gl::enable_vertex_attrib_array(1));
-    check!(gl::vertex_attrib_divisor(1, 1));
-
-    check!(gl::vertex_attrib_pointer_f32(2, 3, false, (sys::size_of::<Vertex>()) as i32, 
-                                        (sys::size_of::<Vec3i>()) as u32));
-    check!(gl::enable_vertex_attrib_array(2));
-    check!(gl::vertex_attrib_divisor(2, 1));
+    check!(gl::bind_texture(gl::TEXTURE_BUFFER, self.offset_tex));
 
     if self.wireframe
     { check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::LINE)); }
@@ -150,8 +150,6 @@ impl Map
     { check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::FILL)); }
 
     check!(gl::disable_vertex_attrib_array(0));
-    check!(gl::disable_vertex_attrib_array(1));
-    check!(gl::disable_vertex_attrib_array(2));
     check!(gl::bind_vertex_array(0));
     check!(gl::bind_buffer(gl::ARRAY_BUFFER, 0));
   }

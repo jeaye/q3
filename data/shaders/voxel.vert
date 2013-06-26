@@ -14,21 +14,25 @@
 uniform mat4x4 proj;
 uniform mat4x4 world;
 uniform float voxel_size = 1.0f;
+uniform samplerBuffer offsets;
 
 /* Per vertex. */
 layout (location = 0) in vec4 in_position;
 
 /* Per instance */
-layout (location = 1) in vec4 in_offset;
-layout (location = 2) in vec4 in_color;
+// nothing
 
 out vec4 trans_color;
+
 void main()
 {
-  vec4 position = in_position + (in_offset * voxel_size);
-  position.w = 1.0f;
-  gl_Position = proj * world * position;
+  vec4 tex_offset = texelFetch(offsets, gl_InstanceID * 2);
+  vec4 tex_color = texelFetch(offsets, (gl_InstanceID * 2) + 1);
 
-  trans_color = in_color;
+  vec4 position = in_position + (tex_offset * voxel_size);
+  position.w = 1.0f;
+
+  trans_color = tex_color;
+  gl_Position = proj * world * position;
 }
 
