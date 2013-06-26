@@ -15,8 +15,9 @@ extern mod glfw;
 
 use std::libc;
 
+#[cfg(target_os = "linux")]
 #[nolink]
-#[link_args="-lX11 -lXrandr -lXi -lXxf86vm"]
+#[link_args = "-lX11 -lXrandr -lXi -lXxf86vm"]
 extern { }
 
 #[path = "gl/mod.rs"]
