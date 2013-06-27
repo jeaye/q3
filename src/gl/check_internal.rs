@@ -13,7 +13,7 @@
 */
 
 #[cfg(check_gl)]
-pub fn check_gl()
+pub fn check_gl(func: &str)
 {
   use gl = opengles::gl2;
   use super::util::get_err_str;
@@ -21,13 +21,13 @@ pub fn check_gl()
   let err = gl::get_error();
   if err != gl::NO_ERROR
   {
-    error!(stringify!($func));
+    error!(func);
     fail!(get_err_str(err)); 
   }
 }
 
 #[cfg(not(check_gl))]
-pub fn check_gl()
+pub fn check_gl(_func: &str)
 { }
 
 macro_rules! check
@@ -38,7 +38,7 @@ macro_rules! check
     let ret = $func;
     //io::println(fmt!("%?", ret));
 
-    check_internal::check_gl();
+    check_internal::check_gl(stringify!($func));
 
     ret
   });

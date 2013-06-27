@@ -25,7 +25,7 @@ pub fn check_gl(func: &str)
 }
 
 #[cfg(not(check_gl))]
-pub fn check_gl()
+pub fn check_gl(_func: &str)
 { }
 
 //#[cfg(check_gl)]
