@@ -12,7 +12,7 @@
 use std::{ cast, local_data };
 use std::hashmap::HashMap;
 use std::iterator::IteratorUtil;
-use glfw::{ PRESS, REPEAT, KEY_GRAVE_ACCENT, KEY_ENTER, KEY_BACKSPACE };
+use glfw::{ PRESS, REPEAT, KEY_GRAVE_ACCENT, KEY_WORLD_1, KEY_ENTER, KEY_BACKSPACE };
 use ui::Input_Listener;
 use super::Console;
 
@@ -173,7 +173,8 @@ impl Input_Listener for Console_Activator
   {
     if action == PRESS || action == REPEAT
     {
-      if key == KEY_GRAVE_ACCENT
+      /* Mac grave is world 1 for some reason. */
+      if key == KEY_GRAVE_ACCENT || key == KEY_WORLD_1 
       {
         self.console.velocity *= -1.0;
         return true;
