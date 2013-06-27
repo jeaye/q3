@@ -20,7 +20,7 @@ uniform samplerBuffer offsets;
 layout (location = 0) in vec4 in_position;
 
 /* Per instance */
-// nothing
+layout (location = 1) in int in_index;
 
 out vec4 trans_color;
 

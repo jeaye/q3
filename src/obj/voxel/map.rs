@@ -34,6 +34,7 @@ struct Map
   vox_vbo: gl::GLuint,
   offset_tex_vbo: gl::GLuint,
   offset_tex: gl::GLuint,
+  ibo: gl::GLuint,
 
   states: ~[Behavior],
   voxels: ~[Vertex],
@@ -54,6 +55,7 @@ impl Map
       vox_vbo: 0,
       offset_tex_vbo: 0,
       offset_tex: 0,
+      ibo: 0,
 
       states: ~[],
       voxels: ~[],
@@ -91,17 +93,22 @@ impl Map
     assert!(names.len() == 1);
     map.vao = names[0];
 
-    let names = check!(gl::gen_buffers(2));
-    assert!(names.len() == 2);
+    let names = check!(gl::gen_buffers(3));
+    assert!(names.len() == 3);
     map.vox_vbo = names[0];
     map.offset_tex_vbo = names[1];
+    map.ibo = names[2];
 
     check!(gl::bind_vertex_array(map.vao));
     check!(gl::bind_buffer(gl::ARRAY_BUFFER, map.vox_vbo));
     check!(gl::buffer_data(gl::ARRAY_BUFFER, voxel, gl::STATIC_DRAW));
 
+    check!(gl::bind_buffer(gl::ARRAY_BUFFER, map.ibo));
+    //check!(gl::buffer_data(gl::ARRAY_BUFFER, map.visible_voxels, gl::STREAM_DRAW));
+    map.update_visibility(&Vec3f::zero());
+
     check!(gl::bind_buffer(gl::TEXTURE_BUFFER, map.offset_tex_vbo));
-    check!(gl::buffer_data(gl::TEXTURE_BUFFER, map.voxels, gl::STREAM_DRAW));
+    check!(gl::buffer_data(gl::TEXTURE_BUFFER, map.voxels, gl::STATIC_DRAW));
 
     let name = check!(gl::gen_textures(1));
     assert!(name.len() == 1);
@@ -131,7 +138,7 @@ impl Map
     map
   }
 
-  pub fn draw(&self)
+  pub fn draw(&mut self)
   {
     check!(gl::bind_vertex_array(self.vao));
 
@@ -139,19 +146,42 @@ impl Map
     check!(gl::vertex_attrib_pointer_f32(0, 3, false, 0, 0));
     check!(gl::enable_vertex_attrib_array(0));
 
+    check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.ibo));
+    check!(gl::vertex_attrib_pointer_i32(1, 1, false, 0, 0));
+    check!(gl::enable_vertex_attrib_array(1));
+    check!(gl::vertex_attrib_divisor(1, 1));
+
     check!(gl::bind_texture(gl::TEXTURE_BUFFER, self.offset_tex));
 
     if self.wireframe
     { check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::LINE)); }
 
-    check!(gl::draw_arrays_instanced(gl::TRIANGLE_STRIP, 0, 24, self.voxels.len() as i32));
+    check!(gl::draw_arrays_instanced(gl::TRIANGLE_STRIP, 0, 24, self.visible_voxels.len() as i32));
 
     if self.wireframe
     { check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::FILL)); }
 
     check!(gl::disable_vertex_attrib_array(0));
+    check!(gl::disable_vertex_attrib_array(1));
     check!(gl::bind_vertex_array(0));
     check!(gl::bind_buffer(gl::ARRAY_BUFFER, 0));
+  }
+
+  pub fn update_visibility(&mut self, _cam_pos: &Vec3f)
+  {
+    //self.visible_voxels.clear();
+
+    if self.visible_voxels.len() == 0
+    {
+      for self.voxels.iter().enumerate().advance |(i, _v)|
+      {
+        self.visible_voxels.push(i as i32);
+      }
+      println(fmt!("Updated visible voxels. (%?)", self.visible_voxels.len()));
+    }
+
+    //check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.ibo));
+    check!(gl::buffer_data(gl::ARRAY_BUFFER, self.visible_voxels, gl::STATIC_DRAW)); /* TODO: STREAM */
   }
 
   priv fn voxelize(&mut self, tris: &[Triangle])
