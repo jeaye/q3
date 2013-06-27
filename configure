@@ -23,6 +23,7 @@ function readlink() {
     git submodule update --recursive --init
   popd
 
+rm -r build
 mkdir -p build
 cd build
 
