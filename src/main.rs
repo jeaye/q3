@@ -90,7 +90,7 @@ fn main()
     let map = bsp::Map::new("data/maps/q3ctf1.bsp");
 
     let st = extra::time::precise_time_s();
-    let vox_map = voxel::Map::new(map.tris, 200);
+    let vox_map = voxel::Map::new(map.tris, 300);
     let et = extra::time::precise_time_s();
     println(fmt!("Voxel map creation took %? seconds.", (et - st)));
 

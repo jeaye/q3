@@ -26,8 +26,8 @@ out vec4 trans_color;
 
 void main()
 {
-  vec4 tex_offset = texelFetch(offsets, gl_InstanceID * 2);
-  vec4 tex_color = texelFetch(offsets, (gl_InstanceID * 2) + 1);
+  vec4 tex_offset = texelFetch(offsets, in_index * 2);
+  vec4 tex_color = texelFetch(offsets, (in_index * 2) + 1);
 
   vec4 position = in_position + (tex_offset * voxel_size);
   position.w = 1.0f;

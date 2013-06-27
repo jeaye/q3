@@ -104,7 +104,6 @@ impl Map
     check!(gl::buffer_data(gl::ARRAY_BUFFER, voxel, gl::STATIC_DRAW));
 
     check!(gl::bind_buffer(gl::ARRAY_BUFFER, map.ibo));
-    //check!(gl::buffer_data(gl::ARRAY_BUFFER, map.visible_voxels, gl::STREAM_DRAW));
     map.update_visibility(&Vec3f::zero());
 
     check!(gl::bind_buffer(gl::TEXTURE_BUFFER, map.offset_tex_vbo));
@@ -147,7 +146,7 @@ impl Map
     check!(gl::enable_vertex_attrib_array(0));
 
     check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.ibo));
-    check!(gl::vertex_attrib_pointer_i32(1, 1, false, 0, 0));
+    check!(gl::vertex_attrib_i_pointer_i32(1, 1, 0, 0));
     check!(gl::enable_vertex_attrib_array(1));
     check!(gl::vertex_attrib_divisor(1, 1));
 
@@ -169,19 +168,15 @@ impl Map
 
   pub fn update_visibility(&mut self, _cam_pos: &Vec3f)
   {
-    //self.visible_voxels.clear();
+    self.visible_voxels.clear();
 
     if self.visible_voxels.len() == 0
     {
       for self.voxels.iter().enumerate().advance |(i, _v)|
-      {
-        self.visible_voxels.push(i as i32);
-      }
-      println(fmt!("Updated visible voxels. (%?)", self.visible_voxels.len()));
+      { self.visible_voxels.push(i as i32);}
     }
 
-    //check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.ibo));
-    check!(gl::buffer_data(gl::ARRAY_BUFFER, self.visible_voxels, gl::STATIC_DRAW)); /* TODO: STREAM */
+    check!(gl::buffer_data(gl::ARRAY_BUFFER, self.visible_voxels, gl::STREAM_DRAW));
   }
 
   priv fn voxelize(&mut self, tris: &[Triangle])
