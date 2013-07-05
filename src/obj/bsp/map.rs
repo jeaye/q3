@@ -158,7 +158,7 @@ impl Map
 
     /* Move the mesh by the center to the origin (easier to voxelize). */
     for self.verts.mut_iter().advance |v|
-    { v.position -= center; }
+    { v.position = v.position - center; }
   }
 
   priv fn read_faces(&mut self, fio: @io::Reader)

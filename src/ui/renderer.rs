@@ -143,7 +143,7 @@ impl Renderer
   pub fn render_texture(&mut self, tex: &Texture, pos: &Vec2f)
   {
     self.world = Mat4x4::new_scale(tex.size.x as f32, tex.size.y as f32, 1.0);
-    self.world *= Mat4x4::new_translation(pos.x, pos.y, 0.0);
+    self.world = self.world * Mat4x4::new_translation(pos.x, pos.y, 0.0);
     self.shader.update_uniform_mat(self.world_loc, &self.world);
 
     self.tex_world.identity();
@@ -155,7 +155,7 @@ impl Renderer
   pub fn render_texture_scale_clamp(&mut self, tex: &Texture, pos: &Vec2f, scale: &Vec2f)
   {
     self.world = Mat4x4::new_scale(scale.x, scale.y, 1.0);
-    self.world *= Mat4x4::new_translation(pos.x, pos.y, 0.0);
+    self.world = self.world * Mat4x4::new_translation(pos.x, pos.y, 0.0);
     self.shader.update_uniform_mat(self.world_loc, &self.world);
 
     self.tex_world.identity();

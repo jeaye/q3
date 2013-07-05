@@ -190,17 +190,17 @@ impl Camera
     let forward = self.view.get_forward();
     let right = self.view.get_right();
     if self.move_to & Move_Left > 0
-    { self.position -= right * self.move_speed * dt; }
+    { self.position = self.position - right * self.move_speed * dt; }
     if self.move_to & Move_Right  > 0
-    { self.position += right * self.move_speed * dt; }
+    { self.position = self.position + right * self.move_speed * dt; }
     if self.move_to & Move_Forward > 0
-    { self.position += forward * self.move_speed * dt; }
+    { self.position = self.position + forward * self.move_speed * dt; }
     if self.move_to & Move_Backward > 0
-    { self.position -= forward * self.move_speed * dt; }
+    { self.position = self.position - forward * self.move_speed * dt; }
     if self.move_to & Move_Up > 0
-    { self.position.y += self.move_speed * dt; }
+    { self.position.y = self.position.y + self.move_speed * dt; }
     if self.move_to & Move_Down > 0
-    { self.position.y -= self.move_speed * dt; }
+    { self.position.y = self.position.y - self.move_speed * dt; }
   }
 }
 

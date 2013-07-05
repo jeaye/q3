@@ -15,6 +15,7 @@ extern mod glfw;
 
 use std::libc;
 
+/* TODO: Should be able to remove. */
 #[cfg(target_os = "linux")]
 #[nolink]
 #[link_args = "-lX11 -lXrandr -lXi -lXxf86vm"]
@@ -42,6 +43,15 @@ mod primitive;
 #[path = "obj/voxel/mod.rs"]
 mod voxel;
 
+#[path = "state/mod.rs"]
+mod state;
+
+/* TODO: 
+    Console state
+    Refactor GL code out of voxel map
+    Handle UI rendering (singleton?)
+*/
+
 fn main()
 {
   glfw::set_error_callback(error_callback);
@@ -63,53 +73,34 @@ fn main()
     let console = @mut ui::Console::new();
     let console_activator = ui::Console_Activator::new(console);
 
-    let camera = gl::Camera::new(window);
-    camera.init();
-
-    /* Setup UI elements. */
-    let ui_input = @mut ui::Input_State::new();
-    ui_input.push(camera as @mut ui::Input_Listener);
-    ui_input.push(console_activator as @mut ui::Input_Listener);
+    let states = state::Director::new();
+    let game_state = state::Game::new();
+    let game_renderer_state = state::Game_Renderer::new(game_state, window);
+    states.push(game_state as @mut state::State);
+    states.push(game_renderer_state as @mut state::State);
 
     /* Setup callbacks. */ /* TODO: Crash on close with these callbacks. */
     window.set_cursor_mode(glfw::CURSOR_DISABLED);
-    do window.set_size_callback |_, width, height|
-    { camera.resize(width as i32, height as i32); }
     do window.set_cursor_pos_callback |_, x, y| 
-    { ui_input.mouse_moved(x as f32, y as f32); }
+    { states.mouse_moved(x as f32, y as f32); }
     do window.set_char_callback |_, c|
-    { ui_input.key_char(c); }
+    { states.key_char(c); }
     do window.set_key_callback |window, key, _scancode, action, mods|
     {
-      ui_input.key_action(key, action, mods);
+      states.key_action(key, action, mods);
       key_callback(window, key, action);
     }
 
     let ui_renderer = @mut ui::Renderer::new();
 
-    let map = bsp::Map::new("data/maps/q3ctf1.bsp");
-
-    let st = extra::time::precise_time_s();
-    let vox_map = voxel::Map::new(map.tris, 300);
-    let et = extra::time::precise_time_s();
-    println(fmt!("Voxel map creation took %? seconds.", (et - st)));
-
     /* Temp test for font loading. */
     let font = ui::Font::new("data/fonts/test.ttf", 30);
 
     /* Shader Creation. */
-    let vox_shader = @mut gl::Shader_Builder::new_with_files("data/shaders/voxel.vert", "data/shaders/voxel.frag");
-    let color_shader = @mut gl::Shader_Builder::new_with_files("data/shaders/color.vert", "data/shaders/color.frag");
-    vox_shader.bind();
+    //let color_shader = @mut gl::Shader_Builder::new_with_files("data/shaders/color.vert", "data/shaders/color.frag");
 
-    let proj_loc = vox_shader.get_uniform_location("proj");
-    let world_loc = vox_shader.get_uniform_location("world");
-    let voxel_size_loc = vox_shader.get_uniform_location("voxel_size");
-    let offsets_loc = vox_shader.get_uniform_location("offsets");
-    let color_proj_loc = color_shader.get_uniform_location("proj");
-    let color_world_loc = color_shader.get_uniform_location("world");
-
-    vox_shader.update_uniform_i32(offsets_loc, 0);
+    //let color_proj_loc = color_shader.get_uniform_location("proj");
+    //let color_world_loc = color_shader.get_uniform_location("world");
 
     let mut cur_time = (extra::time::precise_time_ns() / 10000) as f32; // Hundredth of a second
     let mut last_time = cur_time;
@@ -128,38 +119,31 @@ fn main()
       cur_time = (extra::time::precise_time_ns() / 10000) as f32;
 
       console.update(delta);
-      camera.update(delta);
 
-      vox_shader.bind();
-      vox_shader.update_uniform_mat(proj_loc, &camera.projection);
-      vox_shader.update_uniform_mat(world_loc, &camera.view);
-      vox_shader.update_uniform_f32(voxel_size_loc, vox_map.voxel_size);
+      //color_shader.bind();
+      //color_shader.update_uniform_mat(color_proj_loc, &camera.projection);
+      //color_shader.update_uniform_mat(color_world_loc, &camera.view);
 
-      color_shader.bind();
-      color_shader.update_uniform_mat(color_proj_loc, &camera.projection);
-      color_shader.update_uniform_mat(color_world_loc, &camera.view);
+      //let fps = camera.frame_rate;
 
-      let fps = camera.frame_rate;
+      states.update(delta);
 
       check!(gl::clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT));
       {
         //color_shader.bind();
         //map.draw();
 
-        vox_shader.bind();
-        vox_map.draw();
-
-        ui_renderer.begin(camera);
+        //ui_renderer.begin(camera);
         
-        console.render(ui_renderer);
+        //console.render(ui_renderer);
 
-        if camera.show_fps
-        { ui_renderer.render_font(fmt!("%?", fps), math::Vec2f::new(camera.window_size.x as f32 - 40.0, 0.0), &font); }
+        //if camera.show_fps
+        //{ ui_renderer.render_font(fmt!("%?", fps), math::Vec2f::new(camera.window_size.x as f32 - 40.0, 0.0), &font); }
 
-        ui_renderer.end();
+        //ui_renderer.end();
+
+        states.render();
       } window.swap_buffers();
-
-      //extra::timer::sleep(@extra::uv::global_loop::get(), 1000 / (camera.target_frame_rate as uint));
     }
   }
 }

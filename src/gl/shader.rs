@@ -21,6 +21,10 @@ use gl = opengles::gl2;
 use math::{ Mat4x4 };
 pub use Shader = self::Shaderable;
 
+/* TODO: Type for uniform location that is GLint on release,
+   but a lazily-updating custom type on debug that follows the changing
+   of shaders during runtime. */
+
 #[cfg(debug_shader)]
 pub use Shader_Builder = self::Debug_Shader;
 #[cfg(debug_shader)]

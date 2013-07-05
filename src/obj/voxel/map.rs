@@ -314,7 +314,7 @@ impl Map
     /* Remove duplicates. */
     let len = self.voxels.len();
     extra::sort::quick_sort3(self.voxels);
-    vec::dedup(&mut self.voxels);
+    self.voxels.dedup();
     let new_len = self.voxels.len();
     debug!("VOXEL: New voxel count is %?, down from %?", new_len, len);
 

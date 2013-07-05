@@ -168,9 +168,10 @@ impl Font
     font
   }
 }
+
 impl Drop for Font
 {
-  fn finalize(&self)
+  fn drop(&self)
   {
     unsafe
     { ft::FT_Done_FreeType(self.library); }
