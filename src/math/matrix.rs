@@ -11,7 +11,7 @@
 */
 
 use std::{ f32, i32, ptr };
-use math::vec3::Vec3f;
+use math;
 
 type Component = f32; /* TODO: Template. */
 
@@ -131,7 +131,7 @@ impl Mat4x4
   }
 
   #[inline(always)]
-  pub fn new_lookat(position: Vec3f, target: Vec3f, up: Vec3f) -> Mat4x4
+  pub fn new_lookat(position: math::Vec3f, target: math::Vec3f, up: math::Vec3f) -> Mat4x4
   {
     let mut forward = target - position;
     forward.normalize();
@@ -159,27 +159,27 @@ impl Mat4x4
   { return 4; }
 
   #[inline(always)]
-  pub fn get_up(&self) -> Vec3f
-  { Vec3f::new(self.data[0][1], self.data[1][1], self.data[2][1]) }
+  pub fn get_up(&self) -> math::Vec3f
+  { math::Vec3f::new(self.data[0][1], self.data[1][1], self.data[2][1]) }
   #[inline(always)]
-  pub fn get_down(&self) -> Vec3f
-  { Vec3f::new(-self.data[0][1], -self.data[1][1], -self.data[2][1]) }
+  pub fn get_down(&self) -> math::Vec3f
+  { math::Vec3f::new(-self.data[0][1], -self.data[1][1], -self.data[2][1]) }
   #[inline(always)]
-  pub fn get_left(&self) -> Vec3f
-  { Vec3f::new(-self.data[0][0], -self.data[1][0], -self.data[2][0]) }
+  pub fn get_left(&self) -> math::Vec3f
+  { math::Vec3f::new(-self.data[0][0], -self.data[1][0], -self.data[2][0]) }
   #[inline(always)]
-  pub fn get_right(&self) -> Vec3f
-  { Vec3f::new(self.data[0][0], self.data[1][0], self.data[2][0]) }
+  pub fn get_right(&self) -> math::Vec3f
+  { math::Vec3f::new(self.data[0][0], self.data[1][0], self.data[2][0]) }
   #[inline(always)]
-  pub fn get_forward(&self) -> Vec3f
-  { Vec3f::new(-self.data[0][2], -self.data[1][2], -self.data[2][2]) }
+  pub fn get_forward(&self) -> math::Vec3f
+  { math::Vec3f::new(-self.data[0][2], -self.data[1][2], -self.data[2][2]) }
   #[inline(always)]
-  pub fn get_backward(&self) -> Vec3f
-  { Vec3f::new(self.data[0][2], self.data[1][2], self.data[2][2]) }
+  pub fn get_backward(&self) -> math::Vec3f
+  { math::Vec3f::new(self.data[0][2], self.data[1][2], self.data[2][2]) }
 
   #[inline(always)]
-  pub fn get_position(&self) -> Vec3f
-  { Vec3f::new(self.data[3][0], self.data[3][1], self.data[3][2]) }
+  pub fn get_position(&self) -> math::Vec3f
+  { math::Vec3f::new(self.data[3][0], self.data[3][1], self.data[3][2]) }
 
   #[inline(always)]
   pub fn identity(&mut self)
@@ -192,7 +192,7 @@ impl Mat4x4
 
   /* TODO: Figure out how to do this. >.< */
   //#[inline(always)]
-  //pub fn translate(&mut self, pos: &Vec3f)
+  //pub fn translate(&mut self, pos: &math::Vec3f)
   //{
   //  let mat = Mat4x4::new_translation(pos.x, pos.y, pos.z);
   //  let res = self.clone();
@@ -200,7 +200,7 @@ impl Mat4x4
   //}
 
   //#[inline(always)]
-  //pub fn scale(&mut self, scaler: &Vec3f)
+  //pub fn scale(&mut self, scaler: &math::Vec3f)
   //{
   //  let mat = Mat4x4::new_scale(scaler.x, scaler.y, scaler.z);
   //  let res = self.clone();

@@ -9,15 +9,15 @@
       A single character stored in a font's texture atlas.
 */
 
-use math::Vec2f;
+use math;
 
 #[packed]
 pub struct Glyph
 {
-  tex: Vec2f,
-  advance: Vec2f,
-  dimensions: Vec2f,
-  offset: Vec2f,
+  tex: math::Vec2f,
+  advance: math::Vec2f,
+  dimensions: math::Vec2f,
+  offset: math::Vec2f,
   buffer: ~[u8]
 }
 
@@ -28,10 +28,10 @@ impl Glyph
   {
     Glyph
     {
-      tex: Vec2f::zero(),
-      advance: Vec2f::zero(),
-      dimensions: Vec2f::zero(),
-      offset: Vec2f::zero(),
+      tex: math::Vec2f::zero(),
+      advance: math::Vec2f::zero(),
+      dimensions: math::Vec2f::zero(),
+      offset: math::Vec2f::zero(),
       buffer: ~[]
     }
   }

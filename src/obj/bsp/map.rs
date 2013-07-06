@@ -10,13 +10,12 @@
 */
 
 use std::{ i32, cmp, path, io, sys, cast };
-use math::{ Vec3f, Vec4u8, BB3 };
+use math;
 use primitive::{ Triangle, Vertex_PC };
+use gl2 = opengles::gl2;
 
 #[path = "lump.rs"]
 mod lump;
-#[path = "../../gl/mod.rs"]
-mod gl;
 
 #[path = "../../gl/check.rs"]
 mod check;
@@ -29,10 +28,10 @@ pub struct Map
   verts: ~[lump::Vertex],
   faces: ~[lump::Face],
   mesh_verts: ~[lump::Mesh_Vert], 
-  vao: gl::GLuint,
-  vbo: gl::GLuint, 
-  position: Vec3f, /* TODO: Trait for positional objects. */
-  bb: BB3
+  vao: gl2::GLuint,
+  vbo: gl2::GLuint, 
+  position: math::Vec3f, /* TODO: Trait for positional objects. */
+  bb: math::BB3
 }
 
 impl Map
@@ -49,8 +48,8 @@ impl Map
       mesh_verts: ~[],
       vao: 0,
       vbo: 0,
-      position: Vec3f::zero(),
-      bb: BB3::zero(),
+      position: math::Vec3f::zero(),
+      bb: math::BB3::zero(),
     };
 
     let fio = io::file_reader(@path::PosixPath(file)).unwrap();
@@ -136,10 +135,10 @@ impl Map
     }
 
     /* Calculate the mesh's bounding box. */
-    let mut min = Vec3f::new( self.verts[0].position.x,
+    let mut min = math::Vec3f::new( self.verts[0].position.x,
                               self.verts[0].position.y, 
                               self.verts[0].position.z);
-    let mut max = Vec3f::new( self.verts[0].position.x,
+    let mut max = math::Vec3f::new( self.verts[0].position.x,
                               self.verts[0].position.y,
                               self.verts[0].position.z);
     for self.verts.iter().advance |v|
@@ -152,7 +151,7 @@ impl Map
       max.y = cmp::max(max.y, v.position.y);
       max.z = cmp::max(max.z, v.position.z);
     }
-    let center = Vec3f::new(max.x - ((max.x - min.x) / 2.0),
+    let center = math::Vec3f::new(max.x - ((max.x - min.x) / 2.0),
                             max.y - ((max.y - min.y) / 2.0),
                             max.z - ((max.z - min.z) / 2.0));
 
@@ -213,17 +212,17 @@ impl Map
             self.tris.push(Triangle::new( 
                         Vertex_PC::new(
                             self.verts[face.start_vertex].position,
-                            Vec3f::new( self.verts[face.start_vertex].color.x as f32,
+                            math::Vec3f::new( self.verts[face.start_vertex].color.x as f32,
                                         self.verts[face.start_vertex].color.y as f32,
                                         self.verts[face.start_vertex].color.z as f32)),
                         Vertex_PC::new(
                             self.verts[face.start_vertex + i + 2].position,
-                            Vec3f::new( self.verts[face.start_vertex + i + 2].color.x as f32,
+                            math::Vec3f::new( self.verts[face.start_vertex + i + 2].color.x as f32,
                                         self.verts[face.start_vertex + i + 2].color.y as f32,
                                         self.verts[face.start_vertex + i + 2].color.z as f32)),
                         Vertex_PC::new(
                             self.verts[face.start_vertex + i + 1].position,
-                            Vec3f::new( self.verts[face.start_vertex + i + 1].color.x as f32,
+                            math::Vec3f::new( self.verts[face.start_vertex + i + 1].color.x as f32,
                                         self.verts[face.start_vertex + i + 1].color.y as f32,
                                         self.verts[face.start_vertex + i + 1].color.z as f32))));
           }
@@ -239,43 +238,43 @@ impl Map
 
   priv fn upload(&mut self)
   {
-    let name = check!(gl::gen_vertex_arrays(1));
+    let name = check!(gl2::gen_vertex_arrays(1));
     assert!(name.len() == 1);
     self.vao = name[0];
 
-    let name = check!(gl::gen_buffers(1));
+    let name = check!(gl2::gen_buffers(1));
     assert!(name.len() == 1);
     self.vbo = name[0];
 
-    check!(gl::bind_vertex_array(self.vao));
-    check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.vbo));
-    check!(gl::buffer_data(gl::ARRAY_BUFFER, self.verts, gl::STATIC_DRAW));
+    check!(gl2::bind_vertex_array(self.vao));
+    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.vbo));
+    check!(gl2::buffer_data(gl2::ARRAY_BUFFER, self.verts, gl2::STATIC_DRAW));
   }
 
   pub fn draw(&self)
   {
-    check!(gl::bind_vertex_array(self.vao));
-    check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.vbo));
-    check!(gl::enable_vertex_attrib_array(0));
-    check!(gl::enable_vertex_attrib_array(1));
+    check!(gl2::bind_vertex_array(self.vao));
+    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.vbo));
+    check!(gl2::enable_vertex_attrib_array(0));
+    check!(gl2::enable_vertex_attrib_array(1));
 
-    check!(gl::vertex_attrib_pointer_f32(0, 3, false, 
+    check!(gl2::vertex_attrib_pointer_f32(0, 3, false, 
                 sys::size_of::<lump::Vertex>() as i32, 
                 0));
-    check!(gl::vertex_attrib_pointer_u8(1, 4, true, 
+    check!(gl2::vertex_attrib_pointer_u8(1, 4, true, 
                 sys::size_of::<lump::Vertex>() as i32, 
                 sys::size_of::<lump::Vertex>() as u32 -
-                sys::size_of::<Vec4u8>() as u32));
-    check!(gl::draw_arrays(gl::TRIANGLES, 0, self.verts.len() as i32));
+                sys::size_of::<math::Vec4u8>() as u32));
+    check!(gl2::draw_arrays(gl2::TRIANGLES, 0, self.verts.len() as i32));
 
-    check!(gl::disable_vertex_attrib_array(0));
-    check!(gl::disable_vertex_attrib_array(1));
-    check!(gl::bind_vertex_array(0));
-    check!(gl::bind_buffer(gl::ARRAY_BUFFER, 0));
+    check!(gl2::disable_vertex_attrib_array(0));
+    check!(gl2::disable_vertex_attrib_array(1));
+    check!(gl2::bind_vertex_array(0));
+    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, 0));
   }
 
   #[inline(always)]
-  pub fn center(&self) -> Vec3f
+  pub fn center(&self) -> math::Vec3f
   { self.bb.center_with_offset(self.position) }
 }
 

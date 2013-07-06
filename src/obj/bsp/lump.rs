@@ -9,7 +9,7 @@
       Lump definitions for Q3 BSP maps.
 */
 
-use math::{ Vec2i, Vec2f, Vec3f, Vec4u8 };
+use math;
 
 pub enum Lump_Type
 {
@@ -90,7 +90,7 @@ pub struct Texture
 #[packed]
 pub struct Plane
 {
-  normal: Vec3f,
+  normal: math::Vec3f,
   /* Distance the plane is from the origin, along the normal. */
   distance: f32
 }
@@ -101,10 +101,10 @@ pub struct Node
   /* Index of the corresponding plane. */
   plane: i32,
   /* Child indices; negative means lead: -(leaf + 1) */
-  children: [i32, ..2],
+  children: math::Vec2i,
   /* Bounding box. */
-  mins: [i32, ..3], /* TODO: Templated Vec3? */
-  maxs: [i32, ..3]
+  mins: math::Vec3i,
+  maxs: math::Vec3i,
 }
 
 #[packed]
@@ -115,8 +115,8 @@ pub struct Leaf
   /* Areaportal area. */
   area: i32,
   /* Bounding box. */ /* TODO: Struct? */
-  mins: [i32, ..2],
-  maxs: [i32, ..2],
+  mins: math::Vec2i,
+  maxs: math::Vec2i,
   /* First leaf face. */
   face: i32,
   num_faces: i32,
@@ -143,8 +143,8 @@ pub struct Leaf_Brush
 pub struct Model
 {
   /* Bounding box. */
-  mins: [f32, ..2],
-  maxs: [f32, ..2],
+  mins: math::Vec2f,
+  maxs: math::Vec2f,
   /* First face. */
   face: i32,
   num_faces: i32,
@@ -175,19 +175,19 @@ pub struct Brush_Side
 #[packed]
 pub struct Vertex
 {
-  position: Vec3f,
-  tex_coords: [Vec2f, ..2], /* 0 = Surface; 1 = Lightmap */
-  normal: Vec3f,
-  color: Vec4u8 
+  position: math::Vec3f,
+  tex_coords: [math::Vec2f, ..2], /* 0 = Surface; 1 = Lightmap */
+  normal: math::Vec3f,
+  color: math::Vec4u8 
 }
 impl Vertex
 {
   #[inline(always)]
   pub fn new() -> Vertex
-  { Vertex {  position: Vec3f::zero(),
-              tex_coords: [Vec2f::zero(), ..2],
-              normal: Vec3f::zero(),
-              color: Vec4u8::new(1, 1, 1, 1) } }
+  { Vertex {  position: math::Vec3f::zero(),
+              tex_coords: [math::Vec2f::zero(), ..2],
+              normal: math::Vec3f::zero(),
+              color: math::Vec4u8::new(1, 1, 1, 1) } }
 }
 
 #[packed]
@@ -229,14 +229,14 @@ pub struct Face
   num_mesh_vertices: i32,
   /* Light map index. */
   lightmap: i32,
-  lightmap_corner: Vec2i,
-  lightmap_size: Vec2i,
-  lightmap_origin: Vec3f,
+  lightmap_corner: math::Vec2i,
+  lightmap_size: math::Vec2i,
+  lightmap_origin: math::Vec3f,
   /* World-space s and t unit vectors. */
-  lightmap_vecs: [Vec3f, ..2],
-  normal: Vec3f,
+  lightmap_vecs: [math::Vec3f, ..2],
+  normal: math::Vec3f,
   /* Patch dimensions. */
-  patch_size: Vec2i,
+  patch_size: math::Vec2i,
 }
 impl Face
 {
@@ -251,12 +251,12 @@ impl Face
             start_mesh_vertex: 0, 
             num_mesh_vertices: 0,
             lightmap: 0,
-            lightmap_corner: Vec2i::zero(),
-            lightmap_size: Vec2i::zero(),
-            lightmap_origin: Vec3f::zero(),
-            lightmap_vecs: [Vec3f::zero(), ..2],
-            normal: Vec3f::zero(),
-            patch_size: Vec2i::zero() } 
+            lightmap_corner: math::Vec2i::zero(),
+            lightmap_size: math::Vec2i::zero(),
+            lightmap_origin: math::Vec3f::zero(),
+            lightmap_vecs: [math::Vec3f::zero(), ..2],
+            normal: math::Vec3f::zero(),
+            patch_size: math::Vec2i::zero() } 
   }
 }
 
@@ -270,11 +270,11 @@ pub struct Light_Map
 pub struct Light_Vol
 {
   /* Ambient color compontn RGB. */
-  ambient: [u8, ..3],
+  ambient: math::Vec3u8,
   /* Directional color component RGB. */
-  directional: [u8, ..3],
+  directional: math::Vec3u8,
   /* Direction to the light. */
-  direction: [u8, ..2] /* 0 = phi; 1 = theta */
+  direction: math::Vec2u8, /* 0 = phi; 1 = theta */
 }
 
 #[packed]

@@ -10,23 +10,18 @@
 */
 
 use std::{ uint, sys };
-use math::{ Vec3f };
-use primitive::Vertex_PC;
-use primitive::Triangle;
+use math;
+use primitive::{ Triangle, Vertex_PC };
+use gl2 = opengles::gl2;
 
-#[path = "../../gl/mod.rs"]
-mod gl;
-#[path = "../../gl/util.rs"]
-mod util;
-#[macro_escape]
 #[path = "../../gl/check.rs"]
 mod check;
 
 pub struct Sphere
 {
   radius: f32,
-  vao: gl::GLuint,
-  vbo: gl::GLuint,
+  vao: gl2::GLuint,
+  vbo: gl2::GLuint,
   tris: ~[Triangle],
 }
 
@@ -46,22 +41,22 @@ impl Sphere
       tris: ~[],
     };
 
-    let root_verts: [Vec3f, ..12] =
+    let root_verts: [math::Vec3f, ..12] =
     [
-      Vec3f::new(-magic_x, 0.0, magic_z),
-      Vec3f::new(magic_x, 0.0, magic_z),
-      Vec3f::new(-magic_x, 0.0, -magic_z),
-      Vec3f::new(magic_x, 0.0, -magic_z),
+      math::Vec3f::new(-magic_x, 0.0, magic_z),
+      math::Vec3f::new(magic_x, 0.0, magic_z),
+      math::Vec3f::new(-magic_x, 0.0, -magic_z),
+      math::Vec3f::new(magic_x, 0.0, -magic_z),
 
-      Vec3f::new(0.0, magic_z, magic_x),
-      Vec3f::new(0.0, magic_z, -magic_x),
-      Vec3f::new(0.0, -magic_z, magic_x),
-      Vec3f::new(0.0, -magic_z, -magic_x),
+      math::Vec3f::new(0.0, magic_z, magic_x),
+      math::Vec3f::new(0.0, magic_z, -magic_x),
+      math::Vec3f::new(0.0, -magic_z, magic_x),
+      math::Vec3f::new(0.0, -magic_z, -magic_x),
 
-      Vec3f::new(magic_z, magic_x, 0.0),
-      Vec3f::new(-magic_z, magic_x, 0.0),
-      Vec3f::new(magic_z, -magic_x, 0.0),
-      Vec3f::new(-magic_z, -magic_x, 0.0), 
+      math::Vec3f::new(magic_z, magic_x, 0.0),
+      math::Vec3f::new(-magic_z, magic_x, 0.0),
+      math::Vec3f::new(magic_z, -magic_x, 0.0),
+      math::Vec3f::new(-magic_z, -magic_x, 0.0), 
     ];
 
     let tris: &[Triangle] = 
@@ -91,16 +86,16 @@ impl Sphere
     for uint::range(0, tris.len()) |x|
     { sphere.subdivide(tris[x], new_subdivides); }
 
-    let name = check!(gl::gen_vertex_arrays(1));
+    let name = check!(gl2::gen_vertex_arrays(1));
     assert!(name.len() == 1);
     sphere.vao = name[0];
 
-    let name = check!(gl::gen_buffers(1));
+    let name = check!(gl2::gen_buffers(1));
     assert!(name.len() == 1);
     sphere.vbo = name[0];
-    check!(gl::bind_vertex_array(sphere.vao));
-    check!(gl::bind_buffer(gl::ARRAY_BUFFER, sphere.vbo));
-    check!(gl::buffer_data(gl::ARRAY_BUFFER, sphere.tris, gl::STATIC_DRAW));
+    check!(gl2::bind_vertex_array(sphere.vao));
+    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, sphere.vbo));
+    check!(gl2::buffer_data(gl2::ARRAY_BUFFER, sphere.tris, gl2::STATIC_DRAW));
 
     sphere
   }
@@ -144,22 +139,22 @@ impl Sphere
 
   pub fn draw(&self)
   {
-    check!(gl::bind_vertex_array(self.vao));
-    check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.vbo));
+    check!(gl2::bind_vertex_array(self.vao));
+    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.vbo));
 
-    check!(gl::vertex_attrib_pointer_f32(0, 3, false, (sys::size_of::<Vertex_PC>()) as i32, 0));
-    check!(gl::vertex_attrib_pointer_f32(1, 3, false, (sys::size_of::<Vertex_PC>()) as i32, sys::size_of::<Vec3f>() as u32));
-    check!(gl::enable_vertex_attrib_array(0));
-    check!(gl::enable_vertex_attrib_array(1));
+    check!(gl2::vertex_attrib_pointer_f32(0, 3, false, (sys::size_of::<Vertex_PC>()) as i32, 0));
+    check!(gl2::vertex_attrib_pointer_f32(1, 3, false, (sys::size_of::<Vertex_PC>()) as i32, sys::size_of::<math::Vec3f>() as u32));
+    check!(gl2::enable_vertex_attrib_array(0));
+    check!(gl2::enable_vertex_attrib_array(1));
 
-    check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::LINE));
-    check!(gl::draw_arrays(gl::TRIANGLES, 0, (self.tris.len() as i32 * 3)));
-    check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::FILL));
+    check!(gl2::polygon_mode(gl2::FRONT_AND_BACK, gl2::LINE));
+    check!(gl2::draw_arrays(gl2::TRIANGLES, 0, (self.tris.len() as i32 * 3)));
+    check!(gl2::polygon_mode(gl2::FRONT_AND_BACK, gl2::FILL));
 
-    check!(gl::disable_vertex_attrib_array(0));
-    check!(gl::disable_vertex_attrib_array(1));
-    check!(gl::bind_vertex_array(0));
-    check!(gl::bind_buffer(gl::ARRAY_BUFFER, 0));
+    check!(gl2::disable_vertex_attrib_array(0));
+    check!(gl2::disable_vertex_attrib_array(1));
+    check!(gl2::bind_vertex_array(0));
+    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, 0));
   }
 }
 

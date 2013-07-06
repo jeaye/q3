@@ -11,15 +11,12 @@
       camera and uses it to render the map data.
 */
 
-use glfw::Window;
-use ui::Input_Listener;
+use glfw;
+use ui;
 use super::{ State, Game };
+use gl2 = opengles::gl2;
+use gl;
 
-#[path = "../../gl/mod.rs"]
-mod gl;
-#[path = "../../gl/util.rs"]
-mod util;
-#[macro_escape]
 #[path = "../../gl/check.rs"]
 mod check;
 
@@ -28,15 +25,15 @@ pub struct Game_Renderer
   game: @mut Game,
   camera: @mut gl::Camera,
   shader: @gl::Shader,
-  proj_loc: gl::GLint,
-  world_loc: gl::GLint,
-  voxel_size_loc: gl::GLint,
-  offsets_loc: gl::GLint,
+  proj_loc: gl2::GLint,
+  world_loc: gl2::GLint,
+  voxel_size_loc: gl2::GLint,
+  offsets_loc: gl2::GLint,
 }
 
 impl Game_Renderer
 {
-  pub fn new(game: @mut Game, window: @Window) -> @mut Game_Renderer
+  pub fn new(game: @mut Game, window: @glfw::Window) -> @mut Game_Renderer
   {
     let gr = @mut Game_Renderer
     {
@@ -99,8 +96,8 @@ impl State for Game_Renderer
 
   /* TODO: Are these casts needed? */
   pub fn key_action(&mut self, key: i32, action: i32, _mods: i32) -> bool
-  { (self.camera as @mut Input_Listener).key_action(key, action, _mods) }
+  { (self.camera as @mut ui::Input_Listener).key_action(key, action, _mods) }
   pub fn mouse_moved(&mut self, x: f32, y: f32) -> bool
-  { (self.camera as @mut Input_Listener).mouse_moved(x, y) }
+  { (self.camera as @mut ui::Input_Listener).mouse_moved(x, y) }
 }
 

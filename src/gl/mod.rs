@@ -9,9 +9,6 @@
       An aggregator of OpenGL items.
 */
 
-extern mod opengles;
-
-pub use opengles::gl2::*;
 pub use self::camera::Camera;
 pub use self::shader::{ Shader, Shader_Builder };
 pub use self::texture::Texture;

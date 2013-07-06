@@ -12,16 +12,12 @@
 
 use std::{ i32, f32, uint, vec, cmp };
 use extra;
-use math::{ Vec3f, Vec3i };
+use math;
 use primitive::Triangle;
 use super::{ Vertex, Behavior, Invisible, Default };
-use ui::Console_Activator;
+use ui;
+use gl2 = opengles::gl2;
 
-#[path = "../../gl/mod.rs"]
-mod gl;
-#[path = "../../gl/util.rs"]
-mod util;
-#[macro_escape]
 #[path = "../../gl/check.rs"]
 mod check;
 
@@ -30,11 +26,11 @@ struct Map
   resolution: u32,
   voxel_size: f32,
 
-  vao: gl::GLuint,
-  vox_vbo: gl::GLuint,
-  offset_tex_vbo: gl::GLuint,
-  offset_tex: gl::GLuint,
-  ibo: gl::GLuint,
+  vao: gl2::GLuint,
+  vox_vbo: gl2::GLuint,
+  offset_tex_vbo: gl2::GLuint,
+  offset_tex: gl2::GLuint,
+  ibo: gl2::GLuint,
 
   states: ~[Behavior],
   voxels: ~[Vertex],
@@ -89,36 +85,36 @@ impl Map
       -h,h,-h,  h,h,-h,   
     ];
 
-    let names = check!(gl::gen_vertex_arrays(1));
+    let names = check!(gl2::gen_vertex_arrays(1));
     assert!(names.len() == 1);
     map.vao = names[0];
 
-    let names = check!(gl::gen_buffers(3));
+    let names = check!(gl2::gen_buffers(3));
     assert!(names.len() == 3);
     map.vox_vbo = names[0];
     map.offset_tex_vbo = names[1];
     map.ibo = names[2];
 
-    check!(gl::bind_vertex_array(map.vao));
-    check!(gl::bind_buffer(gl::ARRAY_BUFFER, map.vox_vbo));
-    check!(gl::buffer_data(gl::ARRAY_BUFFER, voxel, gl::STATIC_DRAW));
+    check!(gl2::bind_vertex_array(map.vao));
+    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, map.vox_vbo));
+    check!(gl2::buffer_data(gl2::ARRAY_BUFFER, voxel, gl2::STATIC_DRAW));
 
-    check!(gl::bind_buffer(gl::ARRAY_BUFFER, map.ibo));
-    map.update_visibility(&Vec3f::zero());
+    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, map.ibo));
+    map.update_visibility(&math::Vec3f::zero());
 
-    check!(gl::bind_buffer(gl::TEXTURE_BUFFER, map.offset_tex_vbo));
-    check!(gl::buffer_data(gl::TEXTURE_BUFFER, map.voxels, gl::STATIC_DRAW));
+    check!(gl2::bind_buffer(gl2::TEXTURE_BUFFER, map.offset_tex_vbo));
+    check!(gl2::buffer_data(gl2::TEXTURE_BUFFER, map.voxels, gl2::STATIC_DRAW));
 
-    let name = check!(gl::gen_textures(1));
+    let name = check!(gl2::gen_textures(1));
     assert!(name.len() == 1);
     map.offset_tex = name[0];
-    check!(gl::bind_texture(gl::TEXTURE_BUFFER, map.offset_tex));
-    check!(gl::tex_buffer(gl::TEXTURE_BUFFER, 0x8815 /* RGB32F */, map.offset_tex_vbo));
+    check!(gl2::bind_texture(gl2::TEXTURE_BUFFER, map.offset_tex));
+    check!(gl2::tex_buffer(gl2::TEXTURE_BUFFER, 0x8815 /* RGB32F */, map.offset_tex_vbo));
 
     /* Console functions. */
-    Console_Activator::get().add_accessor("map.wireframe", |_|
+    ui::Console_Activator::get().add_accessor("map.wireframe", |_|
     { map.wireframe.to_str() });
-    Console_Activator::get().add_mutator("map.wireframe", |p, x|
+    ui::Console_Activator::get().add_mutator("map.wireframe", |p, x|
     {
       let mut error = ~"";
       if x == "true"
@@ -139,34 +135,34 @@ impl Map
 
   pub fn draw(&mut self)
   {
-    check!(gl::bind_vertex_array(self.vao));
+    check!(gl2::bind_vertex_array(self.vao));
 
-    check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.vox_vbo));
-    check!(gl::vertex_attrib_pointer_f32(0, 3, false, 0, 0));
-    check!(gl::enable_vertex_attrib_array(0));
+    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.vox_vbo));
+    check!(gl2::vertex_attrib_pointer_f32(0, 3, false, 0, 0));
+    check!(gl2::enable_vertex_attrib_array(0));
 
-    check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.ibo));
-    check!(gl::vertex_attrib_i_pointer_i32(1, 1, 0, 0));
-    check!(gl::enable_vertex_attrib_array(1));
-    check!(gl::vertex_attrib_divisor(1, 1));
+    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.ibo));
+    check!(gl2::vertex_attrib_i_pointer_i32(1, 1, 0, 0));
+    check!(gl2::enable_vertex_attrib_array(1));
+    check!(gl2::vertex_attrib_divisor(1, 1));
 
-    check!(gl::bind_texture(gl::TEXTURE_BUFFER, self.offset_tex));
-
-    if self.wireframe
-    { check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::LINE)); }
-
-    check!(gl::draw_arrays_instanced(gl::TRIANGLE_STRIP, 0, 24, self.visible_voxels.len() as i32));
+    check!(gl2::bind_texture(gl2::TEXTURE_BUFFER, self.offset_tex));
 
     if self.wireframe
-    { check!(gl::polygon_mode(gl::FRONT_AND_BACK, gl::FILL)); }
+    { check!(gl2::polygon_mode(gl2::FRONT_AND_BACK, gl2::LINE)); }
 
-    check!(gl::disable_vertex_attrib_array(0));
-    check!(gl::disable_vertex_attrib_array(1));
-    check!(gl::bind_vertex_array(0));
-    check!(gl::bind_buffer(gl::ARRAY_BUFFER, 0));
+    check!(gl2::draw_arrays_instanced(gl2::TRIANGLE_STRIP, 0, 24, self.visible_voxels.len() as i32));
+
+    if self.wireframe
+    { check!(gl2::polygon_mode(gl2::FRONT_AND_BACK, gl2::FILL)); }
+
+    check!(gl2::disable_vertex_attrib_array(0));
+    check!(gl2::disable_vertex_attrib_array(1));
+    check!(gl2::bind_vertex_array(0));
+    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, 0));
   }
 
-  pub fn update_visibility(&mut self, _cam_pos: &Vec3f)
+  pub fn update_visibility(&mut self, _cam_pos: &math::Vec3f)
   {
     self.visible_voxels.clear();
 
@@ -176,7 +172,7 @@ impl Map
       { self.visible_voxels.push(i as i32);}
     }
 
-    check!(gl::buffer_data(gl::ARRAY_BUFFER, self.visible_voxels, gl::STREAM_DRAW));
+    check!(gl2::buffer_data(gl2::ARRAY_BUFFER, self.visible_voxels, gl2::STREAM_DRAW));
   }
 
   priv fn voxelize(&mut self, tris: &[Triangle])
@@ -186,10 +182,10 @@ impl Map
     debug!("VOXEL: Incoming triangles: %?", tris.len());
 
     /* Bounding box of vert dimensions. */
-    let mut min = Vec3f::new( tris[0].verts[0].position.x,
+    let mut min = math::Vec3f::new( tris[0].verts[0].position.x,
                               tris[0].verts[0].position.y, 
                               tris[0].verts[0].position.z);
-    let mut max = Vec3f::new( tris[0].verts[0].position.x,
+    let mut max = math::Vec3f::new( tris[0].verts[0].position.x,
                               tris[0].verts[0].position.y,
                               tris[0].verts[0].position.z);
     for tris.iter().advance |curr|
@@ -206,7 +202,7 @@ impl Map
       }
     }
     debug!("VOXEL: Min: %s Max: %s", min.to_str(), max.to_str());
-    let center = Vec3f::new(max.x - ((max.x - min.x) / 2.0),
+    let center = math::Vec3f::new(max.x - ((max.x - min.x) / 2.0),
                             max.y - ((max.y - min.y) / 2.0),
                             max.z - ((max.z - min.z) / 2.0));
     debug!("VOXEL: Center of mesh is %s", center.to_str());
@@ -235,8 +231,8 @@ impl Map
     for tris.iter().advance |tri|
     {
       /* Calculate bounding box of the triangle. */
-      min = Vec3f::new(tri.verts[0].position.x, tri.verts[0].position.y, tri.verts[0].position.z);
-      max = Vec3f::new(tri.verts[0].position.x, tri.verts[0].position.y, tri.verts[0].position.z);
+      min = math::Vec3f::new(tri.verts[0].position.x, tri.verts[0].position.y, tri.verts[0].position.z);
+      max = math::Vec3f::new(tri.verts[0].position.x, tri.verts[0].position.y, tri.verts[0].position.z);
       for tri.verts.iter().advance |vert|
       {
         /* Adjust by half of a voxel to account for voxel centering. */
@@ -250,7 +246,7 @@ impl Map
       }
 
       /* The dimensions (in voxels) of the triangle's bounding box. */
-      let mut vox_amount = Vec3i::new(f32::ceil(((max.x - min.x) / self.voxel_size)) as i32,
+      let mut vox_amount = math::Vec3i::new(f32::ceil(((max.x - min.x) / self.voxel_size)) as i32,
                                       f32::ceil(((max.y - min.y) / self.voxel_size)) as i32,
                                       f32::ceil(((max.z - min.z) / self.voxel_size)) as i32);
       if vox_amount.x < 1
@@ -262,7 +258,7 @@ impl Map
       //debug!("VOXEL: [Per voxel] Checking %s surrounding states with SAT", vox_amount.to_str());
 
       /* Get the starting indices of the triangle's bounding box. */
-      let start_voxels = Vec3i::new( ((min.x - -mid_offset) / self.voxel_size) as i32, 
+      let start_voxels = math::Vec3i::new( ((min.x - -mid_offset) / self.voxel_size) as i32, 
                                       ((min.y - -mid_offset) / self.voxel_size) as i32,
                                       ((min.z - -mid_offset) / self.voxel_size) as i32);
 
@@ -272,13 +268,13 @@ impl Map
         { for i32::range(start_voxels.x, start_voxels.x + vox_amount.x) |x|
           {
             /* Check for intersection. */
-            let c = Vec3f::new( ((x as f32 - (self.resolution as f32 / 2.0)) * self.voxel_size) + (self.voxel_size / 2.0), 
+            let c = math::Vec3f::new( ((x as f32 - (self.resolution as f32 / 2.0)) * self.voxel_size) + (self.voxel_size / 2.0), 
                                 ((y as f32 - (self.resolution as f32 / 2.0)) * self.voxel_size) + (self.voxel_size / 2.0),
                                 ((z as f32 - (self.resolution as f32 / 2.0)) * self.voxel_size) + (self.voxel_size / 2.0));
             if tri_cube_intersect(c, self.voxel_size, tri)
             {
               /* Calculate the average color from all three verts. */
-              let av_color = Vec3f::new
+              let av_color = math::Vec3f::new
               (
                 ((tri.verts[0].color.x + tri.verts[1].color.x + tri.verts[2].color.x) / 3.0) as f32 / 255.0,
                 ((tri.verts[0].color.y + tri.verts[1].color.y + tri.verts[2].color.y) / 3.0) as f32 / 255.0,
@@ -291,16 +287,16 @@ impl Map
 
               /* Enable some debug rendering of invalid voxels. */
               let col = if x >= self.resolution as i32 || y >= self.resolution as i32 || z >= self.resolution as i32
-              { Vec3f::new(1.0, 0.0, 0.0) }
+              { math::Vec3f::new(1.0, 0.0, 0.0) }
               else if x < 0 || y < 0 || z < 0
-              { Vec3f::new(1.0, 0.0, 0.0) }
+              { math::Vec3f::new(1.0, 0.0, 0.0) }
               else
               { av_color };
 
               /* We have intersection; add a reference to this voxel to the index map. */
               self.voxels.push(Vertex
               {
-                position: Vec3f::new( x as f32 - (self.resolution / 2) as f32, 
+                position: math::Vec3f::new( x as f32 - (self.resolution / 2) as f32, 
                                       y as f32 - (self.resolution / 2) as f32,
                                       z as f32 - (self.resolution / 2) as f32), 
                 color: col
@@ -429,7 +425,7 @@ macro_rules! axis_test_z0
 )
 
 #[inline(always)]
-priv fn tri_cube_intersect(box_center: Vec3f, box_size: f32, tri: &Triangle) -> bool
+priv fn tri_cube_intersect(box_center: math::Vec3f, box_size: f32, tri: &Triangle) -> bool
 {
   let _v0;
   let _v1;
@@ -504,7 +500,7 @@ priv fn tri_cube_intersect(box_center: Vec3f, box_size: f32, tri: &Triangle) -> 
 }
 
 #[inline(always)]
-priv fn plane_cube_intersect(normal: &Vec3f, vert: &Vec3f, box_size: f32) -> bool
+priv fn plane_cube_intersect(normal: &math::Vec3f, vert: &math::Vec3f, box_size: f32) -> bool
 {
   let mut vmin: [f32, ..3] = [0.0, 0.0, 0.0];
   let mut vmax: [f32, ..3] = [0.0, 0.0, 0.0];

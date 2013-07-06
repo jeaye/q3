@@ -9,7 +9,7 @@
       A generic triangle of three vertices.
 */
 
-use math::Vec3f;
+use math;
 use Vert = primitive::Vertex_PC;
 
 #[packed]
@@ -23,16 +23,16 @@ impl Triangle
   pub fn new(v1: Vert, v2: Vert, v3: Vert) -> Triangle
   { Triangle { verts: ([ v1, v2, v3 ]) } }
   #[inline(always)]
-  pub fn new_with_position(v1: Vec3f, v2: Vec3f, v3: Vec3f) -> Triangle
+  pub fn new_with_position(v1: math::Vec3f, v2: math::Vec3f, v3: math::Vec3f) -> Triangle
   { Triangle { verts: ([ Vert::new_with_position(v1), Vert::new_with_position(v2), Vert::new_with_position(v3) ]) } }
   #[inline(always)]
   pub fn zero() -> Triangle
   { Triangle { verts: ([ Vert::zero(), ..3 ]) } }
 
-  pub fn get_normal(&self) -> Vec3f
+  pub fn get_normal(&self) -> math::Vec3f
   {
-    let mut a = Vec3f::zero();
-    let mut b = Vec3f::zero();
+    let mut a = math::Vec3f::zero();
+    let mut b = math::Vec3f::zero();
     let mut res;
 
     /* First edge. */
@@ -62,16 +62,16 @@ impl Voxel_Triangle
   pub fn new(v1: Vert, v2: Vert, v3: Vert) -> Voxel_Triangle
   { Voxel_Triangle { verts: ([ v1, v2, v3 ]) } }
   #[inline(always)]
-  pub fn new_with_position(v1: Vec3f, v2: Vec3f, v3: Vec3f) -> Voxel_Triangle
+  pub fn new_with_position(v1: math::Vec3f, v2: math::Vec3f, v3: math::Vec3f) -> Voxel_Triangle
   { Voxel_Triangle { verts: ([ Vert::new_with_position(v1), Vert::new_with_position(v2), Vert::new_with_position(v3) ]) } }
   #[inline(always)]
   pub fn zero() -> Voxel_Triangle
   { Voxel_Triangle { verts: ([ Vert::zero(), ..3 ]) } }
 
-  pub fn get_normal(&self) -> Vec3f
+  pub fn get_normal(&self) -> math::Vec3f
   {
-    let mut a = Vec3f::zero();
-    let mut b = Vec3f::zero();
+    let mut a = math::Vec3f::zero();
+    let mut b = math::Vec3f::zero();
     let mut res;
 
     /* First edge. */

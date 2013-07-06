@@ -9,49 +9,45 @@
       A wrapper of arbitrary OpenGL textures.
 */
 
-extern mod std;
-extern mod opengles;
-extern mod stb_image;
 use std::{ vec, cast };
-use gl = opengles::gl2;
-use math::Vec2i;
-
-mod util;
+use gl2 = opengles::gl2;
+use stb_image;
+use math;
 
 #[macro_escape]
-mod check_internal;
+mod check;
 
 struct Texture
 {
-  target: gl::GLenum,
-  obj: gl::GLuint,
+  target: gl2::GLenum,
+  obj: gl2::GLuint,
   filename: @str,
-  size: Vec2i,
+  size: math::Vec2i,
 }
 
 impl Texture
 {
   #[inline(always)]
-  pub fn new(targ: gl::GLenum, file: &str) -> Texture
+  pub fn new(targ: gl2::GLenum, file: &str) -> Texture
   {
     let mut tex = Texture
     {
       target: targ,
       obj: 0,
       filename: file.to_managed(),
-      size: Vec2i::zero(),
+      size: math::Vec2i::zero(),
     };
 
-    let name = check!(gl::gen_textures(1));
+    let name = check!(gl2::gen_textures(1));
     assert!(name.len() == 1);
     tex.obj = name[0];
     tex.bind(0);
 
-    check!(gl::pixel_store_i(gl::UNPACK_ALIGNMENT, 4));
-    check!(gl::tex_parameter_i(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR as gl::GLint));
-    check!(gl::tex_parameter_i(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as gl::GLint));
-    check!(gl::tex_parameter_i(gl::TEXTURE_2D, gl::TEXTURE_WRAP_S, gl::CLAMP_TO_EDGE as gl::GLint));
-    check!(gl::tex_parameter_i(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, gl::CLAMP_TO_EDGE as gl::GLint));
+    check!(gl2::pixel_store_i(gl2::UNPACK_ALIGNMENT, 4));
+    check!(gl2::tex_parameter_i(gl2::TEXTURE_2D, gl2::TEXTURE_MIN_FILTER, gl2::LINEAR as gl2::GLint));
+    check!(gl2::tex_parameter_i(gl2::TEXTURE_2D, gl2::TEXTURE_MAG_FILTER, gl2::LINEAR as gl2::GLint));
+    check!(gl2::tex_parameter_i(gl2::TEXTURE_2D, gl2::TEXTURE_WRAP_S, gl2::CLAMP_TO_EDGE as gl2::GLint));
+    check!(gl2::tex_parameter_i(gl2::TEXTURE_2D, gl2::TEXTURE_WRAP_T, gl2::CLAMP_TO_EDGE as gl2::GLint));
 
     match stb_image::image::load(file.to_owned())
     {
@@ -60,25 +56,25 @@ impl Texture
         debug!(fmt!("Loaded image %s with %?x%?:%?", 
                     tex.filename, image.width, image.height, image.depth));
 
-        tex.size = Vec2i::new(image.width as i32, image.height as i32);
+        tex.size = math::Vec2i::new(image.width as i32, image.height as i32);
         let format = match image.depth
         {
-          3 => { gl::RGB },
-          4 => { gl::RGBA },
-          x => { error!(fmt!("Invalid texture depth %?", x)); gl::RGBA }
+          3 => { gl2::RGB },
+          4 => { gl2::RGBA },
+          x => { error!(fmt!("Invalid texture depth %?", x)); gl2::RGBA }
         };
 
         let data = copy image.data;
         unsafe {
-          check!(gl::glTexImage2D
+          check!(gl2::glTexImage2D
           (
-            /* target */ gl::TEXTURE_2D, 
+            /* target */ gl2::TEXTURE_2D, 
             /* mipmap */ 0, 
-            /* internal */ gl::RGBA8 as gl::GLint, 
-            /* size */ tex.size.x as gl::GLsizei, tex.size.y as gl::GLsizei, 
+            /* internal */ gl2::RGBA8 as gl2::GLint, 
+            /* size */ tex.size.x as gl2::GLsizei, tex.size.y as gl2::GLsizei, 
             /* border */ 0, 
             /* external */ format, 
-            /* size type */ gl::UNSIGNED_BYTE, 
+            /* size type */ gl2::UNSIGNED_BYTE, 
             /* data */ cast::transmute(vec::raw::to_ptr(data))
           ));
         }
@@ -90,15 +86,15 @@ impl Texture
   }
 
   #[inline(always)]
-  pub fn bind(&self, _unit: gl::GLenum)
+  pub fn bind(&self, _unit: gl2::GLenum)
   {
-    //check!(gl::active_texture(gl::TEXTURE0 + unit));
-    check!(gl::bind_texture(gl::TEXTURE_2D, self.obj));
+    //check!(gl2::active_texture(gl2::TEXTURE0 + unit));
+    check!(gl2::bind_texture(gl2::TEXTURE_2D, self.obj));
   }
 
   #[inline(always)]
   pub fn unbind(&self)
-  { check!(gl::bind_texture(gl::TEXTURE_2D, 0)); }
+  { check!(gl2::bind_texture(gl2::TEXTURE_2D, 0)); }
 }
  
 

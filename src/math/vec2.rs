@@ -11,6 +11,7 @@
 
 pub use self::vecf::Vec2f;
 pub use self::veci::Vec2i;
+pub use self::vecu8::Vec2u8;
 
 macro_rules! declare
 (
@@ -104,4 +105,5 @@ macro_rules! declare
 
 declare!(Vec2f, vecf, f32)
 declare!(Vec2i, veci, i32)
+declare!(Vec2u8, vecu8, u8)
 

@@ -9,20 +9,19 @@
       A collection of helpful OpenGL items.
 */
 
-extern mod opengles;
-use gl = opengles::gl2;
+use gl2 = opengles::gl2;
 
 pub fn get_err_str(err: u32) -> ~str
 {
    match err
    {
-     gl::INVALID_ENUM => { ~"Invalid enum" },
-     gl::INVALID_VALUE => { ~"Invalid value" },
-     gl::INVALID_OPERATION => { ~"Invalid operation" },
-     gl::INVALID_FRAMEBUFFER_OPERATION => { ~"Invalid frame buffer operation" },
-     gl::OUT_OF_MEMORY => { ~"Out of memory" },
-     gl::STACK_UNDERFLOW => { ~"Stack underflow" },
-     gl::STACK_OVERFLOW => { ~"Stack overflow" },
+     gl2::INVALID_ENUM => { ~"Invalid enum" },
+     gl2::INVALID_VALUE => { ~"Invalid value" },
+     gl2::INVALID_OPERATION => { ~"Invalid operation" },
+     gl2::INVALID_FRAMEBUFFER_OPERATION => { ~"Invalid frame buffer operation" },
+     gl2::OUT_OF_MEMORY => { ~"Out of memory" },
+     gl2::STACK_UNDERFLOW => { ~"Stack underflow" },
+     gl2::STACK_OVERFLOW => { ~"Stack overflow" },
      _ => { ~"Unknown error" }
    }
 }

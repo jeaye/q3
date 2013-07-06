@@ -11,24 +11,20 @@
 
 use std::vec;
 use std::iterator::IteratorUtil;
-use gl::shader::{ Shader, Shader_Builder };
-use gl::camera::Camera;
+use gl;
 use super::Font;
-use math::{ Vec2f, Mat4x4 };
+use math;
+use gl2 = opengles::gl2;
 
-#[path = "../../gl/mod.rs"]
-mod gl;
-#[path = "../../gl/util.rs"]
-mod util;
 #[path = "../../gl/check.rs"]
 mod check;
 
 struct Renderer
 {
-  vao: gl::GLuint,
-  vbo: gl::GLuint,
-  shader: @Shader,
-  proj_loc: gl::GLint,
+  vao: gl2::GLuint,
+  vbo: gl2::GLuint,
+  shader: @gl::Shader,
+  proj_loc: gl2::GLint,
 }
 
 impl Renderer
@@ -39,7 +35,7 @@ impl Renderer
     {
         vao: 0,
         vbo: 0,
-        shader: Shader_Builder::new_with_files("data/shaders/text.vert", "data/shaders/text.frag"),
+        shader: gl::Shader_Builder::new_with_files("data/shaders/text.vert", "data/shaders/text.frag"),
         proj_loc: 0,
     };
     renderer.proj_loc = renderer.shader.get_uniform_location("proj");
@@ -47,56 +43,56 @@ impl Renderer
     renderer.shader.bind();
     renderer.shader.update_uniform_i32(tex_loc, 0);
 
-    let name = check!(gl::gen_vertex_arrays(1));
+    let name = check!(gl2::gen_vertex_arrays(1));
     assert!(name.len() == 1);
     renderer.vao = name[0];
-    check!(gl::bind_vertex_array(renderer.vao));
+    check!(gl2::bind_vertex_array(renderer.vao));
 
-    let name = check!(gl::gen_buffers(1));
+    let name = check!(gl2::gen_buffers(1));
     assert!(name.len() == 1);
     renderer.vbo = name[0];
-    check!(gl::bind_buffer(gl::ARRAY_BUFFER, renderer.vbo));
+    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, renderer.vbo));
 
     let data: ~[u8] = ~[];
-    check!(gl::buffer_data(gl::ARRAY_BUFFER, data, gl::STREAM_DRAW));
-    check!(gl::enable_vertex_attrib_array(0));
+    check!(gl2::buffer_data(gl2::ARRAY_BUFFER, data, gl2::STREAM_DRAW));
+    check!(gl2::enable_vertex_attrib_array(0));
 
     renderer
   }
 
   #[inline(always)]
-  pub fn begin(&mut self, camera: &Camera)
+  pub fn begin(&mut self, camera: &gl::Camera)
   {
-    check!(gl::disable(gl::DEPTH_TEST));
+    check!(gl2::disable(gl2::DEPTH_TEST));
 
-    check!(gl::tex_parameter_i(gl::TEXTURE_2D, gl::TEXTURE_WRAP_S, gl::CLAMP_TO_EDGE as i32));
-    check!(gl::tex_parameter_i(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, gl::CLAMP_TO_EDGE as i32));
+    check!(gl2::tex_parameter_i(gl2::TEXTURE_2D, gl2::TEXTURE_WRAP_S, gl2::CLAMP_TO_EDGE as i32));
+    check!(gl2::tex_parameter_i(gl2::TEXTURE_2D, gl2::TEXTURE_WRAP_T, gl2::CLAMP_TO_EDGE as i32));
 
     /* Enable transparency. */
-    check!(gl::enable(gl::BLEND));
-    check!(gl::blend_func(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA));
+    check!(gl2::enable(gl2::BLEND));
+    check!(gl2::blend_func(gl2::SRC_ALPHA, gl2::ONE_MINUS_SRC_ALPHA));
 
     self.shader.bind();
-    let proj =  Mat4x4::new_orthographic(0.0, camera.window_size.x as f32, camera.window_size.y as f32, 0.0,  1.0, 100.0);
+    let proj =  math::Mat4x4::new_orthographic(0.0, camera.window_size.x as f32, camera.window_size.y as f32, 0.0,  1.0, 100.0);
     self.shader.update_uniform_mat(self.proj_loc, &proj);
   }
 
   #[inline(always)]
   pub fn end(&mut self)
   {
-    check!(gl::enable(gl::DEPTH_TEST));
-    check!(gl::disable(gl::BLEND));
+    check!(gl2::enable(gl2::DEPTH_TEST));
+    check!(gl2::disable(gl2::BLEND));
   }
 
-  pub fn render(&mut self, text: &str, pos: Vec2f, font: &Font)
+  pub fn render(&mut self, text: &str, pos: math::Vec2f, font: &Font)
   {
-    //check!(gl::active_texture(gl::TEXTURE0));
-    check!(gl::bind_texture(gl::TEXTURE_2D, font.texture_atlas));
+    //check!(gl2::active_texture(gl2::TEXTURE0));
+    check!(gl2::bind_texture(gl2::TEXTURE_2D, font.texture_atlas));
 
-    check!(gl::bind_vertex_array(self.vao));
-    check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.vbo));
-    check!(gl::enable_vertex_attrib_array(0));
-    check!(gl::vertex_attrib_pointer_f32(0, 4, false, 0, 0));
+    check!(gl2::bind_vertex_array(self.vao));
+    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.vbo));
+    check!(gl2::enable_vertex_attrib_array(0));
+    check!(gl2::vertex_attrib_pointer_f32(0, 4, false, 0, 0));
 
     struct Point
     {
@@ -149,13 +145,13 @@ impl Renderer
         count += 6;
       }
 
-      check!(gl::buffer_data(gl::ARRAY_BUFFER, coords, gl::STREAM_DRAW)); 
-      check!(gl::draw_arrays(gl::TRIANGLES, 0, count));
+      check!(gl2::buffer_data(gl2::ARRAY_BUFFER, coords, gl2::STREAM_DRAW)); 
+      check!(gl2::draw_arrays(gl2::TRIANGLES, 0, count));
     }
 
-    check!(gl::disable_vertex_attrib_array(0));
-    check!(gl::bind_buffer(gl::ARRAY_BUFFER, 0));
-    check!(gl::bind_vertex_array(0));
+    check!(gl2::disable_vertex_attrib_array(0));
+    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, 0));
+    check!(gl2::bind_vertex_array(0));
   }
 }
 

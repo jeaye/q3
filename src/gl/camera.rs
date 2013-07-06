@@ -11,17 +11,13 @@
 */
 
 use glfw;
-use gl = opengles::gl2;
+use gl2 = opengles::gl2;
 use std::f32;
-use math::vec2::{ Vec2f, Vec2i };
-use math::vec3::Vec3f;
-use math::matrix::Mat4x4;
-use ui::{ Input_Listener, Console_Activator };
-
-mod util;
+use math;
+use ui;
 
 #[macro_escape]
-mod check_internal;
+mod check;
 
 static Move_Left: u8 = 1;
 static Move_Right: u8 = 2;
@@ -32,14 +28,14 @@ static Move_Down: u8 = 32;
 
 pub struct Camera
 {
-  position: Vec3f,
-  angles: Vec2f,
+  position: math::Vec3f,
+  angles: math::Vec2f,
   
   /* Projection. */
-  projection: Mat4x4,
-  near_far: Vec2f,
+  projection: math::Mat4x4,
+  near_far: math::Vec2f,
   fov: f32,
-  view: Mat4x4,
+  view: math::Mat4x4,
 
   /* Mouse. */
   look_speed: f32,
@@ -56,7 +52,7 @@ pub struct Camera
 
   /* Window. */
   window: @glfw::Window,
-  window_size: Vec2i,
+  window_size: math::Vec2i,
   show_fps: bool,
 }
 impl Camera
@@ -66,12 +62,12 @@ impl Camera
   {
     let c = @mut Camera
     {
-      position: Vec3f::zero(),
-      angles: Vec2f::zero(),
-      projection: Mat4x4::new(),
-      near_far: Vec2f::new(0.1, 50.0),
+      position: math::Vec3f::zero(),
+      angles: math::Vec2f::zero(),
+      projection: math::Mat4x4::new(),
+      near_far: math::Vec2f::new(0.1, 50.0),
       fov: 100.0,
-      view: Mat4x4::new(),
+      view: math::Mat4x4::new(),
       look_speed: 0.001,
       move_to: 0,
       move_speed: 10.0,
@@ -81,13 +77,13 @@ impl Camera
       this_sec: 0.0,
 
       window: win,
-      window_size: Vec2i::zero(),
+      window_size: math::Vec2i::zero(),
       show_fps: true,
     };
 
-    Console_Activator::get().add_accessor("camera.fov", |_|
+    ui::Console_Activator::get().add_accessor("camera.fov", |_|
     { c.fov.to_str() });
-    Console_Activator::get().add_mutator("camera.fov", |p, fov|
+    ui::Console_Activator::get().add_mutator("camera.fov", |p, fov|
     {
       let mut error = ~"";
 
@@ -105,9 +101,9 @@ impl Camera
       else
       { Some(error) }
     });
-    Console_Activator::get().add_accessor("ui.show_fps", |_|
+    ui::Console_Activator::get().add_accessor("ui.show_fps", |_|
     { c.show_fps.to_str() });
-    Console_Activator::get().add_mutator("ui.show_fps", |p, x|
+    ui::Console_Activator::get().add_mutator("ui.show_fps", |p, x|
     {
       let mut error = ~"";
       if x == "true"
@@ -129,11 +125,11 @@ impl Camera
   #[inline(always)]
   pub fn init(&mut self)
   {
-    check!(gl::enable(gl::CULL_FACE)); 
-    check!(gl::enable(gl::DEPTH_TEST));
-    check!(gl::depth_func(gl::LEQUAL));
-    check!(gl::blend_func(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA));
-    check!(gl::clear_color(0.0, 0.0, 0.0, 1.0));
+    check!(gl2::enable(gl2::CULL_FACE)); 
+    check!(gl2::enable(gl2::DEPTH_TEST));
+    check!(gl2::depth_func(gl2::LEQUAL));
+    check!(gl2::blend_func(gl2::SRC_ALPHA, gl2::ONE_MINUS_SRC_ALPHA));
+    check!(gl2::clear_color(0.0, 0.0, 0.0, 1.0));
 
     match self.window.get_size()
     { (width, height) => self.resize(width as i32, height as i32) }
@@ -149,9 +145,9 @@ impl Camera
     self.window_size.x = new_width;
     self.window_size.y = new_height;
 
-    check!(gl::viewport(0, 0, self.window_size.x, self.window_size.y));
+    check!(gl2::viewport(0, 0, self.window_size.x, self.window_size.y));
 
-    self.projection = Mat4x4::new_perspective(
+    self.projection = math::Mat4x4::new_perspective(
                                       self.fov,
                                       (self.window_size.x / self.window_size.y) as f32,
                                       self.near_far.x,
@@ -176,15 +172,15 @@ impl Camera
 
 
     /* Update where the camera is looking. */
-    let lookat = Vec3f::new
+    let lookat = math::Vec3f::new
     (
       f32::sin(self.angles.x) * f32::cos(self.angles.y),
       f32::sin(self.angles.y),
       f32::cos(self.angles.x) * f32::cos(self.angles.y)
     );
-    self.view = Mat4x4::new_lookat(self.position, 
+    self.view = math::Mat4x4::new_lookat(self.position, 
                                     self.position + lookat, /* TODO: * focus for zoom */
-                                    Vec3f::new(0.0, 1.0, 0.0));
+                                    math::Vec3f::new(0.0, 1.0, 0.0));
 
     /* Move based on the keyboard input. */
     let forward = self.view.get_forward();
@@ -204,7 +200,7 @@ impl Camera
   }
 }
 
-impl Input_Listener for Camera
+impl ui::Input_Listener for Camera
 {
   pub fn key_action(&mut self, key: i32, action: i32, _mods: i32) -> bool
   {

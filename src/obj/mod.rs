@@ -11,6 +11,5 @@
 
 //pub use traits::{ Movable, Rotatable, Scalable };
 
-#[path = "./traits.rs"]
 pub mod traits;
 

@@ -9,26 +9,19 @@
       A pageable 3D chunk of voxel data.
 */
 
-use math::{ Vec3i8 };
-
-#[path = "../../gl/mod.rs"]
-mod gl;
-#[path = "../../gl/util.rs"]
-mod util;
-#[macro_escape]
-#[path = "../../gl/check.rs"]
-mod check;
+use math;
+use gl2 = opengles::gl2;
 
 pub struct Chunk
 {
-  vbo: gl::GLuint,
-  dimensions: Vec3i8,
-  voxels: ~[Vec3i8],
+  vbo: gl2::GLuint,
+  dimensions: math::Vec3i8,
+  voxels: ~[math::Vec3i8],
 }
 
 impl Chunk
 {
-  pub fn new(dim: &Vec3i8) -> Chunk
+  pub fn new(dim: &math::Vec3i8) -> Chunk
   {
     let mut chunk = Chunk
     {
@@ -36,10 +29,6 @@ impl Chunk
       dimensions: *dim,
       voxels: ~[],
     };
-
-    let name = check!(gl::gen_buffers(1));
-    assert!(name.len() == 1);
-    chunk.vbo = name[0];
 
     chunk
   }

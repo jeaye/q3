@@ -18,14 +18,6 @@ use BSP_Map = bsp::Map;
 use Voxel_Map = voxel::Map;
 use super::State;
 
-#[path = "../../gl/mod.rs"]
-mod gl;
-#[path = "../../gl/util.rs"]
-mod util;
-#[macro_escape]
-#[path = "../../gl/check.rs"]
-mod check;
-
 pub struct Game
 {
   bsp_map: BSP_Map,

@@ -12,8 +12,10 @@
 extern mod extra;
 extern mod opengles;
 extern mod glfw;
+extern mod stb_image;
 
 use std::libc;
+use gl2 = opengles::gl2;
 
 /* TODO: Should be able to remove. */
 #[cfg(target_os = "linux")]
@@ -22,29 +24,29 @@ use std::libc;
 extern { }
 
 #[path = "gl/mod.rs"]
-mod gl;
+pub mod gl;
 
 #[path = "math/mod.rs"]
-mod math;
+pub mod math;
 
 #[macro_escape]
 #[path = "gl/check.rs"]
 mod check;
 
 #[path = "obj/bsp/mod.rs"]
-mod bsp; 
+pub mod bsp; 
 
 #[path = "ui/mod.rs"]
-mod ui;
+pub mod ui;
 
 #[path = "obj/primitive/mod.rs"]
-mod primitive;
+pub mod primitive;
 
 #[path = "obj/voxel/mod.rs"]
-mod voxel;
+pub mod voxel;
 
 #[path = "state/mod.rs"]
-mod state;
+pub mod state;
 
 /* TODO: 
     Console state
@@ -128,7 +130,7 @@ fn main()
 
       states.update(delta);
 
-      check!(gl::clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT));
+      check!(gl2::clear(gl2::COLOR_BUFFER_BIT | gl2::DEPTH_BUFFER_BIT));
       {
         //color_shader.bind();
         //map.draw();

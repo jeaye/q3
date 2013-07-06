@@ -14,10 +14,10 @@
 pub fn check_gl(func: &str)
 {
   use gl::get_err_str;
-  use gl = opengles::gl2;
+  use gl2 = opengles::gl2;
 
-  let err = gl::get_error();
-  if err != gl::NO_ERROR
+  let err = gl2::get_error();
+  if err != gl2::NO_ERROR
   {
     error!(func);
     fail!(get_err_str(err)); 

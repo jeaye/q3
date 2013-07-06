@@ -12,8 +12,8 @@
 use std::{ cast, local_data };
 use std::hashmap::HashMap;
 use std::iterator::IteratorUtil;
-use glfw::{ PRESS, REPEAT, KEY_GRAVE_ACCENT, KEY_WORLD_1, KEY_ENTER, KEY_BACKSPACE };
-use ui::Input_Listener;
+use glfw;
+use ui;
 use super::Console;
 
 priv type Property_Accessor = @fn(&str) -> ~str;
@@ -167,14 +167,14 @@ impl Console_Activator
   { self.console.body = self.console.body + "\n" + text; }
 }
 
-impl Input_Listener for Console_Activator
+impl ui::Input_Listener for Console_Activator
 {
   pub fn key_action(&mut self, key: i32, action: i32, _mods: i32) -> bool
   {
-    if action == PRESS || action == REPEAT
+    if action == glfw::PRESS || action == glfw::REPEAT
     {
       /* Mac grave is world 1 for some reason. */
-      if key == KEY_GRAVE_ACCENT || key == KEY_WORLD_1 
+      if key == glfw::KEY_GRAVE_ACCENT || key == glfw::KEY_WORLD_1 
       {
         self.console.velocity *= -1.0;
         return true;
@@ -183,7 +183,7 @@ impl Input_Listener for Console_Activator
       /* The following only apply if the console is enabled. */
       if self.console.velocity > 0.0
       {
-        if key == KEY_ENTER
+        if key == glfw::KEY_ENTER
         {
           if self.console.input.len() == 0
           { return true; }
@@ -216,7 +216,7 @@ impl Input_Listener for Console_Activator
           self.console.input = ~"";
           return true;
         }
-        else if key == KEY_BACKSPACE
+        else if key == glfw::KEY_BACKSPACE
         {
           if self.console.input.len() > 0
           { self.console.input.pop_char(); }

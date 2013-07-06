@@ -9,40 +9,37 @@
       A UI component renderer.
 */
 
-use gl::{ Shader, Shader_Builder, Texture, Camera };
-use math::{ Vec2f, Vec2i, Mat4x4 };
+use gl;
+use math;
 use TTF_Renderer = super::ttf::Renderer;
 use TTF_Font = super::ttf::Font;
+use gl2 = opengles::gl2;
 
-#[path = "../gl/mod.rs"]
-mod gl;
-#[path = "../gl/util.rs"]
-mod util;
 #[path = "../gl/check.rs"]
 mod check;
 
 struct Renderer
 {
-  vao: gl::GLuint,
-  vbo: gl::GLuint,
+  vao: gl2::GLuint,
+  vbo: gl2::GLuint,
 
   /* Shader uniforms. */
-  shader: @Shader,
-  world: Mat4x4,
-  tex_world: Mat4x4,
+  shader: @gl::Shader,
+  world: math::Mat4x4,
+  tex_world: math::Mat4x4,
 
   /* Shader uniform locations. */
-  proj_loc: gl::GLint,
-  world_loc: gl::GLint,
-  alpha_loc: gl::GLint,
-  tex_world_loc: gl::GLint,
-  texture0_loc: gl::GLint,
+  proj_loc: gl2::GLint,
+  world_loc: gl2::GLint,
+  alpha_loc: gl2::GLint,
+  tex_world_loc: gl2::GLint,
+  texture0_loc: gl2::GLint,
 
   /* Font support. */
   font_renderer: TTF_Renderer,
 
   /* Window. */
-  window_size: Vec2i,
+  window_size: math::Vec2i,
 }
 
 impl Renderer
@@ -54,9 +51,9 @@ impl Renderer
       vao: 0,
       vbo: 0,
 
-      shader: Shader_Builder::new_with_files("data/shaders/ui.vert", "data/shaders/ui.frag"),
-      world: Mat4x4::new(),
-      tex_world: Mat4x4::new(),
+      shader: gl::Shader_Builder::new_with_files("data/shaders/ui.vert", "data/shaders/ui.frag"),
+      world: math::Mat4x4::new(),
+      tex_world: math::Mat4x4::new(),
 
       proj_loc: 0,
       world_loc: 0,
@@ -66,7 +63,7 @@ impl Renderer
 
       font_renderer: TTF_Renderer::new(),
 
-      window_size: Vec2i::zero(),
+      window_size: math::Vec2i::zero(),
     };
 
     renderer.proj_loc = renderer.shader.get_uniform_location("proj");
@@ -78,16 +75,16 @@ impl Renderer
     renderer.shader.update_uniform_i32(renderer.texture0_loc, 0);
 
     /* VAO */
-    let name = check!(gl::gen_vertex_arrays(1));
+    let name = check!(gl2::gen_vertex_arrays(1));
     assert!(name.len() == 1);
     renderer.vao = name[0];
-    check!(gl::bind_vertex_array(renderer.vao));
+    check!(gl2::bind_vertex_array(renderer.vao));
 
     /* VBO */
-    let name = check!(gl::gen_buffers(1));
+    let name = check!(gl2::gen_buffers(1));
     assert!(name.len() == 1);
     renderer.vbo = name[0];
-    check!(gl::bind_buffer(gl::ARRAY_BUFFER, renderer.vbo));
+    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, renderer.vbo));
 
     struct Point
     {
@@ -108,23 +105,23 @@ impl Renderer
       Point::new(1.0, 1.0, 1.0, 1.0),
       Point::new(1.0, 0.0, 1.0, 0.0),
     ];
-    check!(gl::buffer_data(gl::ARRAY_BUFFER, data, gl::STATIC_DRAW));
-    check!(gl::enable_vertex_attrib_array(0));
+    check!(gl2::buffer_data(gl2::ARRAY_BUFFER, data, gl2::STATIC_DRAW));
+    check!(gl2::enable_vertex_attrib_array(0));
 
     renderer
   }
 
   #[inline(always)]
-  pub fn begin(&mut self, camera: &Camera)
+  pub fn begin(&mut self, camera: &gl::Camera)
   {
-    check!(gl::disable(gl::DEPTH_TEST));
+    check!(gl2::disable(gl2::DEPTH_TEST));
 
     /* Enable transparency. */
-    check!(gl::enable(gl::BLEND));
+    check!(gl2::enable(gl2::BLEND));
 
     /* Update the projection information. */
     self.window_size = camera.window_size;
-    let proj = Mat4x4::new_orthographic(0.0, self.window_size.x as f32, self.window_size.y as f32, 0.0,  1.0, 100.0);
+    let proj = math::Mat4x4::new_orthographic(0.0, self.window_size.x as f32, self.window_size.y as f32, 0.0,  1.0, 100.0);
 
     self.font_renderer.shader.bind();
     self.font_renderer.shader.update_uniform_mat(self.font_renderer.proj_loc, &proj);
@@ -136,14 +133,14 @@ impl Renderer
   #[inline(always)]
   pub fn end(&mut self)
   {
-    check!(gl::enable(gl::DEPTH_TEST));
-    check!(gl::disable(gl::BLEND));
+    check!(gl2::enable(gl2::DEPTH_TEST));
+    check!(gl2::disable(gl2::BLEND));
   }
 
-  pub fn render_texture(&mut self, tex: &Texture, pos: &Vec2f)
+  pub fn render_texture(&mut self, tex: &gl::Texture, pos: &math::Vec2f)
   {
-    self.world = Mat4x4::new_scale(tex.size.x as f32, tex.size.y as f32, 1.0);
-    self.world = self.world * Mat4x4::new_translation(pos.x, pos.y, 0.0);
+    self.world = math::Mat4x4::new_scale(tex.size.x as f32, tex.size.y as f32, 1.0);
+    self.world = self.world * math::Mat4x4::new_translation(pos.x, pos.y, 0.0);
     self.shader.update_uniform_mat(self.world_loc, &self.world);
 
     self.tex_world.identity();
@@ -152,10 +149,10 @@ impl Renderer
     self.render(tex);
   }
 
-  pub fn render_texture_scale_clamp(&mut self, tex: &Texture, pos: &Vec2f, scale: &Vec2f)
+  pub fn render_texture_scale_clamp(&mut self, tex: &gl::Texture, pos: &math::Vec2f, scale: &math::Vec2f)
   {
-    self.world = Mat4x4::new_scale(scale.x, scale.y, 1.0);
-    self.world = self.world * Mat4x4::new_translation(pos.x, pos.y, 0.0);
+    self.world = math::Mat4x4::new_scale(scale.x, scale.y, 1.0);
+    self.world = self.world * math::Mat4x4::new_translation(pos.x, pos.y, 0.0);
     self.shader.update_uniform_mat(self.world_loc, &self.world);
 
     self.tex_world.identity();
@@ -164,29 +161,29 @@ impl Renderer
     self.render(tex);
   }
 
-  pub fn render_font(&mut self, text: &str, pos: Vec2f, font: &TTF_Font)
+  pub fn render_font(&mut self, text: &str, pos: math::Vec2f, font: &TTF_Font)
   {
     self.font_renderer.shader.bind();
     self.font_renderer.render(text, pos, font);
     self.shader.bind();
   }
 
-  priv fn render(&mut self, tex: &Texture)
+  priv fn render(&mut self, tex: &gl::Texture)
   {
     tex.bind(0);
 
-    check!(gl::bind_vertex_array(self.vao));
-    check!(gl::bind_buffer(gl::ARRAY_BUFFER, self.vbo));
-    check!(gl::enable_vertex_attrib_array(0));
-    check!(gl::vertex_attrib_pointer_f32(0, 4, false, 0, 0));
+    check!(gl2::bind_vertex_array(self.vao));
+    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.vbo));
+    check!(gl2::enable_vertex_attrib_array(0));
+    check!(gl2::vertex_attrib_pointer_f32(0, 4, false, 0, 0));
 
-    check!(gl::draw_arrays(gl::TRIANGLE_FAN, 0, 4));
+    check!(gl2::draw_arrays(gl2::TRIANGLE_FAN, 0, 4));
 
     tex.unbind();
 
-    check!(gl::disable_vertex_attrib_array(0));
-    check!(gl::bind_buffer(gl::ARRAY_BUFFER, 0));
-    check!(gl::bind_vertex_array(0));
+    check!(gl2::disable_vertex_attrib_array(0));
+    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, 0));
+    check!(gl2::bind_vertex_array(0));
   }
 }
 

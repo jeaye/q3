@@ -9,7 +9,7 @@
       An aggregator of primitive geometric items.
 */
 
-use math::Vec3f;
+use math;
 use primitive::{ Triangle, Triangle_Index };
 
 #[packed]
@@ -19,49 +19,49 @@ struct Cube
 }
 impl Cube
 {
-  pub fn new(size: f32, center: Vec3f) -> Cube
+  pub fn new(size: f32, center: math::Vec3f) -> Cube
   {
     let half = size / 2.0;
     Cube
     {
       tris:
       ([
-          Triangle::new_with_position(Vec3f::new(-half,-half,-half) + center, 
-                                      Vec3f::new(-half,-half, half) + center,
-                                      Vec3f::new(-half, half, half) + center),
-          Triangle::new_with_position(Vec3f::new(half, half,-half) + center,
-                                      Vec3f::new(-half,-half,-half) + center,
-                                      Vec3f::new(-half, half,-half) + center),
-          Triangle::new_with_position(Vec3f::new(half,-half, half) + center,
-                                      Vec3f::new(-half,-half,-half) + center,
-                                      Vec3f::new(half,-half,-half) + center),
-          Triangle::new_with_position(Vec3f::new(half, half,-half) + center,
-                                      Vec3f::new(half,-half,-half) + center,
-                                      Vec3f::new(-half,-half,-half) + center),
-          Triangle::new_with_position(Vec3f::new(-half,-half,-half) + center,
-                                      Vec3f::new(-half, half, half) + center,
-                                      Vec3f::new(-half, half,-half) + center),
-          Triangle::new_with_position(Vec3f::new(half,-half, half) + center,
-                                      Vec3f::new(-half,-half, half) + center,
-                                      Vec3f::new(-half,-half,-half) + center),
-          Triangle::new_with_position(Vec3f::new(-half, half, half) + center,
-                                      Vec3f::new(-half,-half, half) + center,
-                                      Vec3f::new(half,-half, half) + center),
-          Triangle::new_with_position(Vec3f::new(half, half, half) + center,
-                                      Vec3f::new(half,-half,-half) + center,
-                                      Vec3f::new(half, half,-half) + center),
-          Triangle::new_with_position(Vec3f::new(half,-half,-half) + center,
-                                      Vec3f::new(half, half, half) + center,
-                                      Vec3f::new(half,-half, half) + center),
-          Triangle::new_with_position(Vec3f::new(half, half, half) + center,
-                                      Vec3f::new(half, half,-half) + center,
-                                      Vec3f::new(-half, half,-half) + center),
-          Triangle::new_with_position(Vec3f::new(half, half, half) + center,
-                                      Vec3f::new(-half, half,-half) + center,
-                                      Vec3f::new(-half, half, half) + center),
-          Triangle::new_with_position(Vec3f::new(half, half, half) + center,
-                                      Vec3f::new(-half, half, half) + center,
-                                      Vec3f::new(half,-half, half) + center),
+          Triangle::new_with_position(math::Vec3f::new(-half,-half,-half) + center, 
+                                      math::Vec3f::new(-half,-half, half) + center,
+                                      math::Vec3f::new(-half, half, half) + center),
+          Triangle::new_with_position(math::Vec3f::new(half, half,-half) + center,
+                                      math::Vec3f::new(-half,-half,-half) + center,
+                                      math::Vec3f::new(-half, half,-half) + center),
+          Triangle::new_with_position(math::Vec3f::new(half,-half, half) + center,
+                                      math::Vec3f::new(-half,-half,-half) + center,
+                                      math::Vec3f::new(half,-half,-half) + center),
+          Triangle::new_with_position(math::Vec3f::new(half, half,-half) + center,
+                                      math::Vec3f::new(half,-half,-half) + center,
+                                      math::Vec3f::new(-half,-half,-half) + center),
+          Triangle::new_with_position(math::Vec3f::new(-half,-half,-half) + center,
+                                      math::Vec3f::new(-half, half, half) + center,
+                                      math::Vec3f::new(-half, half,-half) + center),
+          Triangle::new_with_position(math::Vec3f::new(half,-half, half) + center,
+                                      math::Vec3f::new(-half,-half, half) + center,
+                                      math::Vec3f::new(-half,-half,-half) + center),
+          Triangle::new_with_position(math::Vec3f::new(-half, half, half) + center,
+                                      math::Vec3f::new(-half,-half, half) + center,
+                                      math::Vec3f::new(half,-half, half) + center),
+          Triangle::new_with_position(math::Vec3f::new(half, half, half) + center,
+                                      math::Vec3f::new(half,-half,-half) + center,
+                                      math::Vec3f::new(half, half,-half) + center),
+          Triangle::new_with_position(math::Vec3f::new(half,-half,-half) + center,
+                                      math::Vec3f::new(half, half, half) + center,
+                                      math::Vec3f::new(half,-half, half) + center),
+          Triangle::new_with_position(math::Vec3f::new(half, half, half) + center,
+                                      math::Vec3f::new(half, half,-half) + center,
+                                      math::Vec3f::new(-half, half,-half) + center),
+          Triangle::new_with_position(math::Vec3f::new(half, half, half) + center,
+                                      math::Vec3f::new(-half, half,-half) + center,
+                                      math::Vec3f::new(-half, half, half) + center),
+          Triangle::new_with_position(math::Vec3f::new(half, half, half) + center,
+                                      math::Vec3f::new(-half, half, half) + center,
+                                      math::Vec3f::new(half,-half, half) + center),
     ])
     }
   }
