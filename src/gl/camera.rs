@@ -74,7 +74,7 @@ impl Camera
       view: Mat4x4::new(),
       look_speed: 0.001,
       move_to: 0,
-      move_speed: 0.0001,
+      move_speed: 10.0,
       target_frame_rate: 60.0,
       frame_rate: 0.0,
       frames_this_sec: 0.0,
@@ -166,13 +166,13 @@ impl Camera
 
     /* Frame rate. */
     self.this_sec += dt;
-    if self.this_sec >= 100000f32
+    if self.this_sec >= 1.0
     {
       self.frame_rate = self.frames_this_sec;
-      self.frames_this_sec = 0f32;
-      self.this_sec -= 100000f32;
+      self.frames_this_sec = 0.0;
+      self.this_sec -= 1.0;
     } else
-    { self.frames_this_sec += 1f32; }
+    { self.frames_this_sec += 1.0; }
 
 
     /* Update where the camera is looking. */

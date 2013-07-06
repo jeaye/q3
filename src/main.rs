@@ -102,7 +102,7 @@ fn main()
     //let color_proj_loc = color_shader.get_uniform_location("proj");
     //let color_world_loc = color_shader.get_uniform_location("world");
 
-    let mut cur_time = (extra::time::precise_time_ns() / 10000) as f32; // Hundredth of a second
+    let mut cur_time = extra::time::precise_time_s() as f32;
     let mut last_time = cur_time;
 
     /* Console functions. */
@@ -116,7 +116,7 @@ fn main()
       /* Delta time. */
       let delta = cur_time - last_time;
       last_time = cur_time;
-      cur_time = (extra::time::precise_time_ns() / 10000) as f32;
+      cur_time = extra::time::precise_time_s() as f32;
 
       console.update(delta);
 

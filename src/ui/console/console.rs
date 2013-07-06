@@ -40,7 +40,7 @@ impl Console
       tex_middle: Texture::new(gl::TEXTURE_2D, "data/img/console/middle.png"),
 
       position: Vec2f::zero(),
-      velocity: 0.01,
+      velocity: 1.0,
 
       /* Text. */
       font: Font::new("data/fonts/test.ttf", 16),
