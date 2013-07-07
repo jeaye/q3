@@ -3,7 +3,7 @@ Q^3
 ![Screenshot](pics/012_1_no_wire.png)
 
 ### What is Q^3?
-Q^3 is a very new project using Mozilla's Rust language and OpenGL to create a Quake 3 like game.
+Q^3 is a project using Mozilla's Rust language and OpenGL to create a Quake 3 like game.
 The goal of this project is not to be Quake 3, but to be its own game. My aim is to take Quake 3 and QuakeLive maps, voxelize them, allow groups of players to join, and blow the shit out of everything in a fast-paced Quake-esque first person shooter with 100% destructible maps.
 
 ### What's the current state of Q^3?
