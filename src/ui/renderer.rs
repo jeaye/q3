@@ -9,6 +9,8 @@
       A UI component renderer.
 */
 
+use std::{ cast, local_data };
+use glfw;
 use gl;
 use math;
 use TTF_Renderer = super::ttf::Renderer;
@@ -39,14 +41,18 @@ struct Renderer
   font_renderer: TTF_Renderer,
 
   /* Window. */
-  window_size: math::Vec2i,
+  window: @glfw::Window,
 }
 
 impl Renderer
 {
-  pub fn new() -> Renderer
+  /*  Key function used to index our singleton in
+      task-local storage. */
+  priv fn tls_key(_: @@Renderer) { }
+
+  pub fn new(window: @glfw::Window) -> @mut Renderer
   {
-    let mut renderer = Renderer
+    let renderer = @mut Renderer
     {
       vao: 0,
       vbo: 0,
@@ -63,8 +69,18 @@ impl Renderer
 
       font_renderer: TTF_Renderer::new(),
 
-      window_size: math::Vec2i::zero(),
+      window: window,
     };
+
+    /* Store in task-local storage. (singleton) */
+    unsafe
+    {
+      local_data::local_data_set
+      (
+        Renderer::tls_key,
+        @cast::transmute::<@mut Renderer, @Renderer>(renderer)
+      );
+    }
 
     renderer.proj_loc = renderer.shader.get_uniform_location("proj");
     renderer.world_loc = renderer.shader.get_uniform_location("world");
@@ -111,8 +127,18 @@ impl Renderer
     renderer
   }
 
+  /* Accesses the singleton from task-local storage. */
+  pub fn get() -> @mut Renderer
+  {
+    unsafe 
+    {
+      cast::transmute::<@Renderer, @mut Renderer>
+      (*local_data::local_data_get(Renderer::tls_key).get())
+    }
+  }
+
   #[inline(always)]
-  pub fn begin(&mut self, camera: &gl::Camera)
+  pub fn begin(&mut self)
   {
     check!(gl2::disable(gl2::DEPTH_TEST));
 
@@ -120,8 +146,9 @@ impl Renderer
     check!(gl2::enable(gl2::BLEND));
 
     /* Update the projection information. */
-    self.window_size = camera.window_size;
-    let proj = math::Mat4x4::new_orthographic(0.0, self.window_size.x as f32, self.window_size.y as f32, 0.0,  1.0, 100.0);
+    let proj =
+      match self.window.get_size()
+      { (width, height) => math::Mat4x4::new_orthographic(0.0, width as f32, height as f32, 0.0,  1.0, 100.0) };
 
     self.font_renderer.shader.bind();
     self.font_renderer.shader.update_uniform_mat(self.font_renderer.proj_loc, &proj);

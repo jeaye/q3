@@ -83,12 +83,12 @@ impl Director
   pub fn push(&mut self, mut state: @mut State)
   {
     state.load();
-    self.states.unshift(state);
+    self.states.push(state);
   }
 
   pub fn pop(&mut self)
   {
-    let mut state = self.states.shift();
+    let mut state = self.states.pop();
     state.unload();
   }
 
@@ -120,7 +120,7 @@ impl Director
   {
     assert!(self.states.len() > 0);
 
-    for self.states.mut_iter().advance |x|
+    for self.states.mut_rev_iter().advance |x|
     {
       if x.key_action(key, action, mods)
       { break; }
@@ -131,7 +131,7 @@ impl Director
   {
     assert!(self.states.len() > 0);
 
-    for self.states.mut_iter().advance |x|
+    for self.states.mut_rev_iter().advance |x|
     {
       if x.key_char(ch)
       { break; }
@@ -142,7 +142,7 @@ impl Director
   {
     assert!(self.states.len() > 0);
 
-    for self.states.mut_iter().advance |x|
+    for self.states.mut_rev_iter().advance |x|
     {
       if x.mouse_action(button, action, mods)
       { break; }
@@ -153,7 +153,7 @@ impl Director
   {
     assert!(self.states.len() > 0);
 
-    for self.states.mut_iter().advance |state|
+    for self.states.mut_rev_iter().advance |state|
     {
       if state.mouse_moved(x, y)
       { break; }

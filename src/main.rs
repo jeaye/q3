@@ -48,12 +48,6 @@ pub mod voxel;
 #[path = "state/mod.rs"]
 pub mod state;
 
-/* TODO: 
-    Console state
-    Refactor GL code out of voxel map
-    Handle UI rendering (singleton?)
-*/
-
 fn main()
 {
   glfw::set_error_callback(error_callback);
@@ -72,14 +66,15 @@ fn main()
     };
     window.make_context_current();
 
-    let console = @mut ui::Console::new();
-    let console_activator = ui::Console_Activator::new(console);
+    let ui_renderer = ui::Renderer::new(window);
 
     let states = state::Director::new();
+    let console_state = state::Console::new();
     let game_state = state::Game::new();
     let game_renderer_state = state::Game_Renderer::new(game_state, window);
     states.push(game_state as @mut state::State);
     states.push(game_renderer_state as @mut state::State);
+    states.push(console_state as @mut state::State);
 
     /* Setup callbacks. */ /* TODO: Crash on close with these callbacks. */
     window.set_cursor_mode(glfw::CURSOR_DISABLED);
@@ -93,11 +88,6 @@ fn main()
       key_callback(window, key, action);
     }
 
-    let ui_renderer = @mut ui::Renderer::new();
-
-    /* Temp test for font loading. */
-    let font = ui::Font::new("data/fonts/test.ttf", 30);
-
     /* Shader Creation. */
     //let color_shader = @mut gl::Shader_Builder::new_with_files("data/shaders/color.vert", "data/shaders/color.frag");
 
@@ -107,26 +97,17 @@ fn main()
     let mut cur_time = extra::time::precise_time_s() as f32;
     let mut last_time = cur_time;
 
-    /* Console functions. */
-    console_activator.add_accessor("q3.version", |_|
-    { fmt!("%s.%s", env!("VERSION"), env!("COMMIT")) });
-
     while !window.should_close()
     {
       glfw::poll_events();
 
-      /* Delta time. */
       let delta = cur_time - last_time;
       last_time = cur_time;
       cur_time = extra::time::precise_time_s() as f32;
 
-      console.update(delta);
-
       //color_shader.bind();
       //color_shader.update_uniform_mat(color_proj_loc, &camera.projection);
       //color_shader.update_uniform_mat(color_world_loc, &camera.view);
-
-      //let fps = camera.frame_rate;
 
       states.update(delta);
 
@@ -134,15 +115,6 @@ fn main()
       {
         //color_shader.bind();
         //map.draw();
-
-        //ui_renderer.begin(camera);
-        
-        //console.render(ui_renderer);
-
-        //if camera.show_fps
-        //{ ui_renderer.render_font(fmt!("%?", fps), math::Vec2f::new(camera.window_size.x as f32 - 40.0, 0.0), &font); }
-
-        //ui_renderer.end();
 
         states.render();
       } window.swap_buffers();

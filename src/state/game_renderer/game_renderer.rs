@@ -12,10 +12,11 @@
 */
 
 use glfw;
-use ui;
 use super::{ State, Game };
 use gl2 = opengles::gl2;
 use gl;
+use ui;
+use math;
 
 #[path = "../../gl/check.rs"]
 mod check;
@@ -24,11 +25,14 @@ pub struct Game_Renderer
 {
   game: @mut Game,
   camera: @mut gl::Camera,
+
   shader: @gl::Shader,
   proj_loc: gl2::GLint,
   world_loc: gl2::GLint,
   voxel_size_loc: gl2::GLint,
   offsets_loc: gl2::GLint,
+
+  fps_font: ui::Font,
 }
 
 impl Game_Renderer
@@ -39,11 +43,14 @@ impl Game_Renderer
     {
       game: game,
       camera: gl::Camera::new(window),
+
       shader: gl::Shader_Builder::new_with_files("data/shaders/voxel.vert", "data/shaders/voxel.frag"),
       proj_loc: 0,
       world_loc: 0,
       voxel_size_loc: 0,
       offsets_loc: 0,
+
+      fps_font: ui::Font::new("data/fonts/test.ttf", 30),
     };
 
     do window.set_size_callback |_, width, height|
@@ -68,12 +75,15 @@ impl State for Game_Renderer
     self.offsets_loc = self.shader.get_uniform_location("offsets");
 
     self.shader.update_uniform_i32(self.offsets_loc, 0);
+
+    /* Console functions. */
+    ui::Console_Activator::get().add_accessor("q3.version", |_|
+    { fmt!("%s.%s", env!("VERSION"), env!("COMMIT")) });
+
   }
 
   pub fn unload(&mut self)
-  {
-    debug!("Unloading game renderer state.");
-  }
+  { debug!("Unloading game renderer state."); }
 
   pub fn update(&mut self, delta: f32) -> bool /* dt is in terms of seconds. */
   {
@@ -91,10 +101,17 @@ impl State for Game_Renderer
 
     self.game.voxel_map.draw();
 
+    let fps = self.camera.frame_rate;
+
+    let ui_renderer = ui::Renderer::get();
+    ui_renderer.begin();
+    if self.camera.show_fps
+    { ui_renderer.render_font(fmt!("%?", fps), math::Vec2f::new(self.camera.window_size.x as f32 - 40.0, 0.0), &self.fps_font); }
+    ui_renderer.end();
+
     false
   }
 
-  /* TODO: Are these casts needed? */
   pub fn key_action(&mut self, key: i32, action: i32, _mods: i32) -> bool
   { (self.camera as @mut ui::Input_Listener).key_action(key, action, _mods) }
   pub fn mouse_moved(&mut self, x: f32, y: f32) -> bool

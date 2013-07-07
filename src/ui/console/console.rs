@@ -21,7 +21,7 @@ pub struct Console
   tex_right: gl::Texture,
 
   position: math::Vec2f,
-  velocity: f32, /* On the Y axis. */
+  velocity: f32, /* On the Y axis only. */
   
   font: ui::Font,
   body: ~str,
@@ -40,7 +40,7 @@ impl Console
       tex_middle: gl::Texture::new(gl2::TEXTURE_2D, "data/img/console/middle.png"),
 
       position: math::Vec2f::zero(),
-      velocity: 1.0,
+      velocity: 300.0,
 
       /* Text. */
       font: ui::Font::new("data/fonts/test.ttf", 16),
@@ -63,7 +63,10 @@ impl Console
     if self.position.y < -self.tex_left.size.y as f32
     { return; }
 
-    let right_pos = math::Vec2f::new((renderer.window_size.x - self.tex_right.size.x) as f32, self.position.y);
+    let right_pos =
+      match renderer.window.get_size()
+      { (width, _height) => math::Vec2f::new((width as i32 - self.tex_right.size.x) as f32, self.position.y) };
+
     let middle_pos = math::Vec2f::new(self.tex_left.size.x as f32, self.position.y);
     let middle_size = math::Vec2f::new(right_pos.x - self.tex_left.size.x as f32, self.tex_middle.size.y as f32);
 
