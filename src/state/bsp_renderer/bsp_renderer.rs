@@ -3,12 +3,14 @@
     See licensing in LICENSE file, or at:
         http://www.opensource.org/licenses/BSD-3-Clause
 
-    File: state/game_renderer/game_renderer.rs
+    File: state/bsp_renderer/bsp_renderer.rs
     Author: Jesse 'Jeaye' Wilkerson
     Description:
       A client-only state that depends on
-      the shared game state. This state owns the
-      camera and uses it to render the map data.
+      the shared game state. This state is
+      used only in development to testing
+      the loading and rendering of Quake's
+      BSP maps.
 */
 
 use glfw;
@@ -21,34 +23,30 @@ use math;
 #[path = "../../gl/check.rs"]
 mod check;
 
-pub struct Game_Renderer
+pub struct BSP_Renderer
 {
   game: @mut Game,
-  camera: @mut gl::Camera,
+  game_renderer: @mut Game_Renderer,
 
   shader: @gl::Shader,
   proj_loc: gl2::GLint,
   world_loc: gl2::GLint,
-  voxel_size_loc: gl2::GLint,
-  offsets_loc: gl2::GLint,
 
   fps_font: ui::Font,
 }
 
-impl Game_Renderer
+impl BSP_Renderer
 {
-  pub fn new(game: @mut Game, window: @glfw::Window) -> @mut Game_Renderer
+  pub fn new(game: @mut Game, window: @glfw::Window) -> @mut BSP_Renderer
   {
-    let gr = @mut Game_Renderer
+    let gr = @mut BSP_Renderer
     {
       game: game,
       camera: gl::Camera::new(window),
 
-      shader: gl::Shader_Builder::new_with_files("data/shaders/voxel.vert", "data/shaders/voxel.frag"),
+      shader: gl::Shader_Builder::new_with_files("data/shaders/color.vert", "data/shaders/color.frag"),
       proj_loc: 0,
       world_loc: 0,
-      voxel_size_loc: 0,
-      offsets_loc: 0,
 
       fps_font: ui::Font::new("data/fonts/test.ttf", 30),
     };
@@ -62,23 +60,21 @@ impl Game_Renderer
   }
 }
 
-impl State for Game_Renderer
+impl State for BSP_Renderer
 {
   pub fn load(&mut self)
   {
-    debug!("Loading game renderer state.");
+    debug!("Loading bsp renderer state.");
+
+    self.camera.show_fps = true;
 
     self.shader.bind();
     self.proj_loc = self.shader.get_uniform_location("proj");
     self.world_loc = self.shader.get_uniform_location("world");
-    self.voxel_size_loc = self.shader.get_uniform_location("voxel_size");
-    self.offsets_loc = self.shader.get_uniform_location("offsets");
-
-    self.shader.update_uniform_i32(self.offsets_loc, 0);
   }
 
   pub fn unload(&mut self)
-  { debug!("Unloading game renderer state."); }
+  { debug!("Unloading bsp renderer state."); }
 
   pub fn update(&mut self, delta: f32) -> bool /* dt is in terms of seconds. */
   {
@@ -92,9 +88,8 @@ impl State for Game_Renderer
     self.shader.bind();
     self.shader.update_uniform_mat(self.proj_loc, &self.camera.projection);
     self.shader.update_uniform_mat(self.world_loc, &self.camera.view);
-    self.shader.update_uniform_f32(self.voxel_size_loc, self.game.voxel_map.voxel_size);
 
-    self.game.voxel_map.draw();
+    self.game.bsp_map.draw();
 
     let fps = self.camera.frame_rate;
 

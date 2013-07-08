@@ -15,6 +15,7 @@ pub use self::director::State;
 
 pub use self::game::Game;
 pub use self::game_renderer::Game_Renderer;
+pub use self::bsp_renderer::BSP_Renderer;
 pub use self::console::Console;
 
 mod director;
@@ -23,6 +24,8 @@ mod director;
 mod game;
 #[path = "game_renderer/game_renderer.rs"]
 mod game_renderer;
+#[path = "bsp_renderer/bsp_renderer.rs"]
+mod bsp_renderer;
 #[path = "console/console.rs"]
 mod console;
 

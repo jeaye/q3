@@ -72,6 +72,7 @@ fn main()
     let console_state = state::Console::new();
     let game_state = state::Game::new();
     let game_renderer_state = state::Game_Renderer::new(game_state, window);
+    let bsp_renderer_state = state::BSP_Renderer::new(game_state, window);
     states.push(game_state as @mut state::State);
     states.push(game_renderer_state as @mut state::State);
     states.push(console_state as @mut state::State);
@@ -84,16 +85,31 @@ fn main()
     { states.key_char(c); }
     do window.set_key_callback |window, key, _scancode, action, mods|
     {
+      /* TODO: Ability to pop specific states. */
+      if key == glfw::KEY_LEFT_BRACKET && action == glfw::PRESS
+      {
+        states.pop(); /* console */
+        states.pop(); /* renderer */
+        states.push(game_renderer_state as @mut state::State);
+        states.push(console_state as @mut state::State);
+      }
+      else if key == glfw::KEY_RIGHT_BRACKET && action == glfw::PRESS
+      {
+        states.pop(); /* console */
+        states.pop(); /* renderer */
+        states.push(bsp_renderer_state as @mut state::State);
+        states.push(console_state as @mut state::State);
+      }
+
       states.key_action(key, action, mods);
       key_callback(window, key, action);
     }
 
-    /* Shader Creation. */
-    //let color_shader = @mut gl::Shader_Builder::new_with_files("data/shaders/color.vert", "data/shaders/color.frag");
+    /* Console functions. */
+    ui::Console_Activator::get().add_accessor("q3.version", |_|
+    { fmt!("%s.%s", env!("VERSION"), env!("COMMIT")) });
 
-    //let color_proj_loc = color_shader.get_uniform_location("proj");
-    //let color_world_loc = color_shader.get_uniform_location("world");
-
+    /* Delta time. */
     let mut cur_time = extra::time::precise_time_s() as f32;
     let mut last_time = cur_time;
 
@@ -105,17 +121,10 @@ fn main()
       last_time = cur_time;
       cur_time = extra::time::precise_time_s() as f32;
 
-      //color_shader.bind();
-      //color_shader.update_uniform_mat(color_proj_loc, &camera.projection);
-      //color_shader.update_uniform_mat(color_world_loc, &camera.view);
-
       states.update(delta);
 
       check!(gl2::clear(gl2::COLOR_BUFFER_BIT | gl2::DEPTH_BUFFER_BIT));
       {
-        //color_shader.bind();
-        //map.draw();
-
         states.render();
       } window.swap_buffers();
     }
