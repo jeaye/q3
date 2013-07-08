@@ -72,7 +72,7 @@ fn main()
     let console_state = state::Console::new();
     let game_state = state::Game::new();
     let game_renderer_state = state::Game_Renderer::new(game_state, window);
-    let bsp_renderer_state = state::BSP_Renderer::new(game_state, window);
+    let bsp_renderer_state = state::BSP_Renderer::new(game_renderer_state);
     states.push(game_state as @mut state::State);
     states.push(game_renderer_state as @mut state::State);
     states.push(console_state as @mut state::State);
