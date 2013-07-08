@@ -66,7 +66,7 @@ fn main()
     };
     window.make_context_current();
 
-    let ui_renderer = ui::Renderer::new(window);
+    let _ui_renderer = ui::Renderer::new(window);
 
     let states = state::Director::new();
     let console_state = state::Console::new();

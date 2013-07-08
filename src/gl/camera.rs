@@ -19,12 +19,12 @@ use ui;
 #[macro_escape]
 mod check;
 
-static Move_Left: u8 = 1;
-static Move_Right: u8 = 2;
-static Move_Forward: u8 = 4;
-static Move_Backward: u8 = 8;
-static Move_Up: u8 = 16;
-static Move_Down: u8 = 32;
+static MOVE_LEFT: u8 = 1;
+static MOVE_RIGHT: u8 = 2;
+static MOVE_FORWARD: u8 = 4;
+static MOVE_BACKWARD: u8 = 8;
+static MOVE_UP: u8 = 16;
+static MOVE_DOWN: u8 = 32;
 
 pub struct Camera
 {
@@ -185,17 +185,17 @@ impl Camera
     /* Move based on the keyboard input. */
     let forward = self.view.get_forward();
     let right = self.view.get_right();
-    if self.move_to & Move_Left > 0
+    if self.move_to & MOVE_LEFT > 0
     { self.position = self.position - right * self.move_speed * dt; }
-    if self.move_to & Move_Right  > 0
+    if self.move_to & MOVE_RIGHT  > 0
     { self.position = self.position + right * self.move_speed * dt; }
-    if self.move_to & Move_Forward > 0
+    if self.move_to & MOVE_FORWARD > 0
     { self.position = self.position + forward * self.move_speed * dt; }
-    if self.move_to & Move_Backward > 0
+    if self.move_to & MOVE_BACKWARD > 0
     { self.position = self.position - forward * self.move_speed * dt; }
-    if self.move_to & Move_Up > 0
+    if self.move_to & MOVE_UP > 0
     { self.position.y = self.position.y + self.move_speed * dt; }
-    if self.move_to & Move_Down > 0
+    if self.move_to & MOVE_DOWN > 0
     { self.position.y = self.position.y - self.move_speed * dt; }
   }
 }
@@ -210,12 +210,12 @@ impl ui::Input_Listener for Camera
     {
       match key
       {
-        glfw::KEY_W => { self.move_to |= Move_Forward; }
-        glfw::KEY_A => { self.move_to |= Move_Left; }
-        glfw::KEY_S => { self.move_to |= Move_Backward; }
-        glfw::KEY_D => { self.move_to |= Move_Right; }
-        glfw::KEY_LEFT_CONTROL => { self.move_to |= Move_Down; }
-        glfw::KEY_SPACE => { self.move_to |= Move_Up; }
+        glfw::KEY_W => { self.move_to |= MOVE_FORWARD; }
+        glfw::KEY_A => { self.move_to |= MOVE_LEFT; }
+        glfw::KEY_S => { self.move_to |= MOVE_BACKWARD; }
+        glfw::KEY_D => { self.move_to |= MOVE_RIGHT; }
+        glfw::KEY_LEFT_CONTROL => { self.move_to |= MOVE_DOWN; }
+        glfw::KEY_SPACE => { self.move_to |= MOVE_UP; }
         _ => { captured = false; }
       }
     }
@@ -223,12 +223,12 @@ impl ui::Input_Listener for Camera
     {
       match key
       {
-        glfw::KEY_W => { self.move_to &= !Move_Forward; }
-        glfw::KEY_A => { self.move_to &= !Move_Left; }
-        glfw::KEY_S => { self.move_to &= !Move_Backward; }
-        glfw::KEY_D => { self.move_to &= !Move_Right; }
-        glfw::KEY_LEFT_CONTROL => { self.move_to &= !Move_Down; }
-        glfw::KEY_SPACE => { self.move_to &= !Move_Up; }
+        glfw::KEY_W => { self.move_to &= !MOVE_FORWARD; }
+        glfw::KEY_A => { self.move_to &= !MOVE_LEFT; }
+        glfw::KEY_S => { self.move_to &= !MOVE_BACKWARD; }
+        glfw::KEY_D => { self.move_to &= !MOVE_RIGHT; }
+        glfw::KEY_LEFT_CONTROL => { self.move_to &= !MOVE_DOWN; }
+        glfw::KEY_SPACE => { self.move_to &= !MOVE_UP; }
         _ => { captured = false; }
       }
     }

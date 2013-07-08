@@ -23,19 +23,19 @@ pub trait State
       captured, it's set to the next lower state. (A state can capture
       renders, for example, as an optimization -- or updates as a sanity or
       security measure). Rinse and repeat. */
-  pub fn update(&mut self, delta: f32) -> bool /* dt is in terms of seconds. */
+  pub fn update(&mut self, _delta: f32) -> bool /* dt is in terms of seconds. */
   { false }
   pub fn render(&mut self) -> bool
   { false }
 
   /* TODO: Trait inheritance with Input_Listener. */
-  pub fn key_action(&mut self, key: i32, action: i32, mods: i32) -> bool
+  pub fn key_action(&mut self, _key: i32, _action: i32, _mods: i32) -> bool
   { false }
-  pub fn key_char(&mut self, ch: char) -> bool
+  pub fn key_char(&mut self, _ch: char) -> bool
   { false }
-  pub fn mouse_action(&mut self, button: i32, action: i32, mods: i32) -> bool
+  pub fn mouse_action(&mut self, _button: i32, _action: i32, _mods: i32) -> bool
   { false }
-  pub fn mouse_moved(&mut self, x: f32, y: f32) -> bool
+  pub fn mouse_moved(&mut self, _x: f32, _y: f32) -> bool
   { false }
 }
 

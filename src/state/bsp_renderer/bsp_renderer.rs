@@ -13,7 +13,6 @@
       BSP maps.
 */
 
-use glfw;
 use super::{ State, Game_Renderer };
 use gl2 = opengles::gl2;
 use gl;

@@ -32,7 +32,7 @@ pub enum Lump_Type
   Vis_Data_Type = 0x10
 }
 
-static version: i32 = 0x2E;
+static VERSION: i32 = 0x2E;
 
 #[packed]
 pub struct Lump

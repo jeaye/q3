@@ -23,7 +23,7 @@ impl Chunk
 {
   pub fn new(dim: &math::Vec3i8) -> Chunk
   {
-    let mut chunk = Chunk
+    let chunk = Chunk
     {
       vbo: 0,
       dimensions: *dim,

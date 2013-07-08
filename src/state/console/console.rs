@@ -12,8 +12,7 @@
 
 use UI_Console = ui::Console;
 use ui;
-use gl2 = opengles::gl2;
-use super::{ State, Game_Renderer };
+use super::{ State };
 
 struct Console
 {

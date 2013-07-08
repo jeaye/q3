@@ -44,15 +44,11 @@ impl Game
 impl State for Game
 {
   pub fn load(&mut self)
-  {
-    debug!("Loading game state.");
-  }
+  { debug!("Loading game state."); }
   pub fn unload(&mut self)
-  {
-    debug!("Unloading game state.");
-  }
+  { debug!("Unloading game state."); }
 
-  pub fn update(&mut self, delta: f32) -> bool /* dt is in terms of seconds. */
+  pub fn update(&mut self, _delta: f32) -> bool /* dt is in terms of seconds. */
   { false }
   pub fn render(&mut self) -> bool
   { false }
