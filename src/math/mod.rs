@@ -9,13 +9,12 @@
       An aggregator of math items.
 */
 
-/* TODO: Wildcard include? */
-pub use self::matrix::Mat4x4;
-pub use self::vec2::{ Vec2u8, Vec2i, Vec2f };
-pub use self::vec3::{ Vec3i, Vec3i8, Vec3u8, Vec3f };
-pub use self::vec4::{ Vec4u8, Vec4f };
-pub use self::bb3::BB3;
-pub use self::util::{ next_power_of_2 };
+pub use self::matrix::*;
+pub use self::vec2::*;
+pub use self::vec3::*;
+pub use self::vec4::*;
+pub use self::bb3::*;
+pub use self::util::*;
 
 mod matrix;
 mod vec2;

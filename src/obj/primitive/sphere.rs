@@ -116,7 +116,7 @@ impl Sphere
     v23.color = tri.verts[0].color;
     v31.color = tri.verts[0].color;
 
-    v12.position.x = tri.verts[0].position.x + tri.verts[1].position.x; /* TODO: Lack of clean mutable indexing. */
+    v12.position.x = tri.verts[0].position.x + tri.verts[1].position.x; /* XXX: Lack of clean mutable indexing. */
     v23.position.x = tri.verts[1].position.x + tri.verts[2].position.x;
     v31.position.x = tri.verts[2].position.x + tri.verts[0].position.x;
 

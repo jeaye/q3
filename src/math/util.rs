@@ -9,7 +9,6 @@
       Misc math utils.
 */
 
-/* TODO: i64 version. */
 pub fn next_power_of_2(num: i32) -> i32
 {
   /* Magic. */

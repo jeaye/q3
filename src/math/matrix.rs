@@ -13,9 +13,8 @@
 use std::{ f32, i32, ptr };
 use math;
 
-type Component = f32; /* TODO: Template. */
+type Component = f32;
 
-//#[deriving(Clone)]
 struct Mat4x4
 {
   data: [[f32, ..4], ..4]
@@ -172,21 +171,6 @@ impl Mat4x4
                   [0.0, 0.0, 1.0, 0.0],
                   [0.0, 0.0, 0.0, 1.0]];
   }
-
-  /* TODO: Figure out how to do this. >.< */
-  //pub fn translate(&mut self, pos: &math::Vec3f)
-  //{
-  //  let mat = Mat4x4::new_translation(pos.x, pos.y, pos.z);
-  //  let res = self.clone();
-  //  *self = (*res * mat);
-  //}
-
-  //pub fn scale(&mut self, scaler: &math::Vec3f)
-  //{
-  //  let mat = Mat4x4::new_scale(scaler.x, scaler.y, scaler.z);
-  //  let res = self.clone();
-  //  *self = (*res * mat);
-  //}
 
   pub unsafe fn to_ptr(&self) -> *Mat4x4
   { ptr::to_unsafe_ptr(self) }

@@ -13,7 +13,7 @@ use math;
 use Vert = primitive::Vertex_PC;
 
 #[packed]
-struct Triangle /* TODO: Template this? */
+struct Triangle
 {
   verts: ([Vert, ..3]),
 }
@@ -42,14 +42,14 @@ impl Triangle
     b.y = self.verts[1].position.y - self.verts[2].position.y;
     b.z = self.verts[1].position.z - self.verts[2].position.z;
 
-    res = a.cross(&b); /* TODO: Other way? */
+    res = a.cross(&b);
     res.normalize();
     res
   }
 }
 
 #[packed]
-struct Voxel_Triangle /* TODO: Template this? */
+struct Voxel_Triangle
 {
   verts: ([Vert, ..3]),
 }
@@ -78,7 +78,7 @@ impl Voxel_Triangle
     b.y = self.verts[1].position.y - self.verts[2].position.y;
     b.z = self.verts[1].position.z - self.verts[2].position.z;
 
-    res = a.cross(&b); /* TODO: Other way? */
+    res = a.cross(&b);
     res.normalize();
     res
   }

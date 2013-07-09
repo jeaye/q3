@@ -111,7 +111,7 @@ pub struct Leaf
   cluster: i32,
   /* Areaportal area. */
   area: i32,
-  /* Bounding box. */ /* TODO: Struct? */
+  /* Bounding box. */
   mins: math::Vec2i,
   maxs: math::Vec2i,
   /* First leaf face. */

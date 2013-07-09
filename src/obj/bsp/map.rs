@@ -72,7 +72,6 @@ impl Map
   }
 
 
-  /* TODO: Make this generic. */
   priv fn read_verts(&mut self, fio: @io::Reader)
   {
     fio.seek(self.header.lumps[lump::Vertex_Type as int].offset as int, io::SeekSet);
@@ -91,7 +90,7 @@ impl Map
       vert.position.y = vert.position.z;
       vert.position.z = -temp;
 
-      /* TODO: Color hack. */
+      /* XXX: Color hack -- avoid pure black and pure white. */
       if vert.color.x == 0 { vert.color.x += 100; }
       if vert.color.y == 0 { vert.color.y += 100; }
       if vert.color.z == 0 { vert.color.z += 100; }

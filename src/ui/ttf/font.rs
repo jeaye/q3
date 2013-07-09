@@ -82,7 +82,7 @@ impl Font
           row_width = 0; row_height = 0;
         }
 
-        let mut glyph = Glyph::new(); /* TODO: Need to be f32 here? Messy. */
+        let mut glyph = Glyph::new();
         glyph.advance.x = ((*ft_glyph).advance.x >> 6) as f32;
         glyph.advance.y = ((*ft_glyph).advance.y >> 6) as f32;
         glyph.dimensions.x = (*ft_glyph).bitmap.width as f32;

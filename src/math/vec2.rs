@@ -37,10 +37,10 @@ macro_rules! declare
 
         pub fn normalize(&mut self)
         {
-          let mut len = self.length();
+          let len = self.length();
 
-          if (len == 0 as $Component) || (len < 0.0001 as $Component && len > -0.0001 as $Component) /* TODO: Egh, hack. */
-          { len = 1 as $Component; } /* TODO: Return? */
+          if (len as f32).approx_eq(&0.0)
+          { return; }
 
           self.x /= len;
           self.y /= len;

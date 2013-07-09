@@ -123,7 +123,7 @@ impl Renderer
 
         let end_x = temp_pos.x + glyph.offset.x;
         let end_y = -temp_pos.y - (glyph.dimensions.y - glyph.offset.y);
-        let end_w = glyph.dimensions.x; /* TODO: Use this everywhere. */
+        let end_w = glyph.dimensions.x;
         let end_h = glyph.dimensions.y;
 
         temp_pos.x += glyph.advance.x; 
@@ -134,11 +134,11 @@ impl Renderer
         { loop; }
 
         coords.push(Point::new(end_x, -end_y - end_h, glyph.tex.x, glyph.tex.y));
-        coords.push(Point::new(end_x, -end_y, glyph.tex.x, glyph.tex.y + (glyph.dimensions.y / (font.atlas_dimensions.y as f32))));
-        coords.push(Point::new(end_x + end_w, -end_y, glyph.tex.x + (glyph.dimensions.x / (font.atlas_dimensions.x as f32)), glyph.tex.y + (glyph.dimensions.y / (font.atlas_dimensions.y as f32))));
+        coords.push(Point::new(end_x, -end_y, glyph.tex.x, glyph.tex.y + (end_h / (font.atlas_dimensions.y as f32))));
+        coords.push(Point::new(end_x + end_w, -end_y, glyph.tex.x + (end_w / (font.atlas_dimensions.x as f32)), glyph.tex.y + (end_h / (font.atlas_dimensions.y as f32))));
         coords.push(Point::new(end_x, -end_y - end_h, glyph.tex.x, glyph.tex.y));
-        coords.push(Point::new(end_x + end_w, -end_y, glyph.tex.x + (glyph.dimensions.x / (font.atlas_dimensions.x as f32)), glyph.tex.y + (glyph.dimensions.y / (font.atlas_dimensions.y as f32))));
-        coords.push(Point::new(end_x + end_w, -end_y - end_h, glyph.tex.x + (glyph.dimensions.x / (font.atlas_dimensions.x as f32)), glyph.tex.y));
+        coords.push(Point::new(end_x + end_w, -end_y, glyph.tex.x + (end_w / (font.atlas_dimensions.x as f32)), glyph.tex.y + (end_h / (font.atlas_dimensions.y as f32))));
+        coords.push(Point::new(end_x + end_w, -end_y - end_h, glyph.tex.x + (end_w / (font.atlas_dimensions.x as f32)), glyph.tex.y));
         count += 6;
       }
 
