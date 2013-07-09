@@ -253,7 +253,7 @@ mod shared
       if result == 0 as gl2::GLint
       {
         let err = check!(gl2::get_shader_info_log(obj));
-        println(err);
+        error!(err);
       }
       result != 0
     };

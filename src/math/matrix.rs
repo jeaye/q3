@@ -211,22 +211,6 @@ impl Mat4x4
   pub unsafe fn to_ptr(&self) -> *Mat4x4
   { ptr::to_unsafe_ptr(self) }
 
-  pub fn show(&self)
-  {
-    println("----------");
-    for i32::range(0, 4) |y|
-    {
-      print("|");
-      for i32::range(0, 4) |x|
-      {
-        print(f32::to_str(self.data[x][y]) + " ");
-      }
-      println("|");
-    }
-    println("----------");
-  }
-}
-
 /***** Operator Overloads *****/
 impl Mul<Mat4x4, Mat4x4> for Mat4x4
 {

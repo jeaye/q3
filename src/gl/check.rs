@@ -28,7 +28,6 @@ pub fn check_gl(func: &str)
 pub fn check_gl(_func: &str)
 { }
 
-//#[cfg(check_gl)]
 macro_rules! check
 (
   ($func:expr) => 
@@ -42,13 +41,4 @@ macro_rules! check
     ret
   });
 )
-
-//#[cfg(no_check_gl)]
-//macro_rules! check
-//(
-//  ($func:expr) => 
-//  (
-//    $func
-//  );
-//)
 
