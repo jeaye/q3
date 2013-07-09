@@ -19,26 +19,22 @@ pub struct BB3 /* TODO: Check math on this shit. */
 
 impl BB3
 {
-  #[inline(always)]
   pub fn new(t_left: math::Vec3f, b_right: math::Vec3f) -> BB3
   {
     BB3{ top_left: t_left, bottom_right: b_right }
   }
 
-  #[inline(always)]
   pub fn zero() -> BB3
   {
     BB3{  top_left: math::Vec3f::zero(), bottom_right: math::Vec3f::zero() } 
   }
 
-  #[inline(always)]
   pub fn center(&self) -> math::Vec3f
   { math::Vec3f::new( (self.bottom_right.x - self.top_left.x) / 2.0,
                       (self.top_left.y - self.bottom_right.y) / 2.0,
                       (self.top_left.z - self.bottom_right.z) / 2.0 )
   }
 
-  #[inline(always)]
   pub fn center_with_offset(&self, offset: math::Vec3f) -> math::Vec3f
   { math::Vec3f::new( ((self.bottom_right.x - self.top_left.x) / 2.0) + offset.x,
                       ((self.top_left.y - self.bottom_right.y) / 2.0) + offset.y,

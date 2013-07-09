@@ -19,13 +19,10 @@ struct Triangle /* TODO: Template this? */
 }
 impl Triangle
 {
-  #[inline(always)]
   pub fn new(v1: Vert, v2: Vert, v3: Vert) -> Triangle
   { Triangle { verts: ([ v1, v2, v3 ]) } }
-  #[inline(always)]
   pub fn new_with_position(v1: math::Vec3f, v2: math::Vec3f, v3: math::Vec3f) -> Triangle
   { Triangle { verts: ([ Vert::new_with_position(v1), Vert::new_with_position(v2), Vert::new_with_position(v3) ]) } }
-  #[inline(always)]
   pub fn zero() -> Triangle
   { Triangle { verts: ([ Vert::zero(), ..3 ]) } }
 
@@ -58,13 +55,10 @@ struct Voxel_Triangle /* TODO: Template this? */
 }
 impl Voxel_Triangle
 {
-  #[inline(always)]
   pub fn new(v1: Vert, v2: Vert, v3: Vert) -> Voxel_Triangle
   { Voxel_Triangle { verts: ([ v1, v2, v3 ]) } }
-  #[inline(always)]
   pub fn new_with_position(v1: math::Vec3f, v2: math::Vec3f, v3: math::Vec3f) -> Voxel_Triangle
   { Voxel_Triangle { verts: ([ Vert::new_with_position(v1), Vert::new_with_position(v2), Vert::new_with_position(v3) ]) } }
-  #[inline(always)]
   pub fn zero() -> Voxel_Triangle
   { Voxel_Triangle { verts: ([ Vert::zero(), ..3 ]) } }
 
@@ -97,7 +91,6 @@ struct Triangle_Index
 }
 impl Triangle_Index
 {
-  #[inline(always)]
   pub fn new(start: u32) -> Triangle_Index
   {
     Triangle_Index

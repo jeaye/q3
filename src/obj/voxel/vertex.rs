@@ -21,13 +21,10 @@ pub struct Vertex
 
 impl Vertex
 {
-  #[inline(always)]
   pub fn new(pos: math::Vec3f, col: math::Vec3f) -> Vertex
   { Vertex { position: pos, color: col } }
-  #[inline(always)]
   pub fn new_with_position(pos: math::Vec3f) -> Vertex
   { Vertex { position: pos, color: math::Vec3f::new(pos.x, pos.y, pos.z) } }
-  #[inline(always)]
   pub fn zero() -> Vertex
   { Vertex { position: math::Vec3f::zero(), color: math::Vec3f::new(1.0, 1.0, 1.0) } }
 }

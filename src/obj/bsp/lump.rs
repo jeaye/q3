@@ -44,7 +44,6 @@ pub struct Lump
 } 
 impl Lump
 {
-  #[inline(always)]
   pub fn new() -> Lump
   { Lump{ offset: 0, length: 0 } }
 }
@@ -61,7 +60,6 @@ pub struct Header
 }
 impl Header
 {
-  #[inline(always)]
   pub fn new() -> Header
   { Header{ magic: [0, ..4], version: 0, lumps: [Lump::new(), ..17] } }
 }
@@ -75,7 +73,6 @@ pub struct Entity
 }
 impl Entity
 {
-  #[inline(always)]
   pub fn new() -> Entity
   { Entity{ size: 0, buffer: ~[] } }
 }
@@ -182,7 +179,6 @@ pub struct Vertex
 }
 impl Vertex
 {
-  #[inline(always)]
   pub fn new() -> Vertex
   { Vertex {  position: math::Vec3f::zero(),
               tex_coords: [math::Vec2f::zero(), ..2],
@@ -198,7 +194,6 @@ pub struct Mesh_Vert
 }
 impl Mesh_Vert
 {
-  #[inline(always)]
   pub fn new() -> Mesh_Vert
   { Mesh_Vert { offset: 0 } }
 }
@@ -240,7 +235,6 @@ pub struct Face
 }
 impl Face
 {
-  #[inline(always)]
   pub fn new() -> Face
   { 
     Face {  texture: 0,

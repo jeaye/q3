@@ -29,15 +29,12 @@ macro_rules! declare
 
       impl $Type
       {
-        #[inline(always)]
         pub fn new(nx: $Component, ny: $Component) -> $Type
         { $Type{ x: nx, y: ny } }
 
-        #[inline(always)]
         pub fn zero() -> $Type
         { $Type{ x: 0 as $Component, y: 0 as $Component } }
 
-        #[inline(always)]
         pub fn normalize(&mut self)
         {
           let mut len = self.length();
@@ -49,16 +46,13 @@ macro_rules! declare
           self.y /= len;
         }
 
-        #[inline(always)]
         pub fn length(&self) -> $Component
         { float::sqrt(( (self.x * self.x) + 
                         (self.y * self.y)) as float) as $Component }
 
-        #[inline(always)]
         pub unsafe fn to_ptr(&self) -> *$Type
         { ptr::to_unsafe_ptr(self) } 
 
-        #[inline(always)]
         pub fn to_str(&self) -> ~str
         { fmt!("(%?, %?)", self.x, self.y) }
       }

@@ -27,7 +27,6 @@ struct Texture
 
 impl Texture
 {
-  #[inline(always)]
   pub fn new(targ: gl2::GLenum, file: &str) -> Texture
   {
     let mut tex = Texture
@@ -85,14 +84,12 @@ impl Texture
     tex
   }
 
-  #[inline(always)]
   pub fn bind(&self, _unit: gl2::GLenum)
   {
     //check!(gl2::active_texture(gl2::TEXTURE0 + unit));
     check!(gl2::bind_texture(gl2::TEXTURE_2D, self.obj));
   }
 
-  #[inline(always)]
   pub fn unbind(&self)
   { check!(gl2::bind_texture(gl2::TEXTURE_2D, 0)); }
 }

@@ -273,7 +273,6 @@ impl Map
     check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, 0));
   }
 
-  #[inline(always)]
   pub fn center(&self) -> math::Vec3f
   { self.bb.center_with_offset(self.position) }
 }

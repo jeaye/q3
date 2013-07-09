@@ -57,7 +57,6 @@ pub struct Camera
 }
 impl Camera
 {
-  #[inline(always)]
   pub fn new(win: @glfw::Window) -> @mut Camera
   {
     let c = @mut Camera
@@ -122,7 +121,6 @@ impl Camera
     c
   }
 
-  #[inline(always)]
   pub fn init(&mut self)
   {
     check!(gl2::enable(gl2::CULL_FACE)); 
@@ -135,7 +133,6 @@ impl Camera
     { (width, height) => self.resize(width as i32, height as i32) }
   }
 
-  #[inline(always)]
   pub fn resize(&mut self, new_width: i32, new_height: i32)
   {
     /* Avoid division by zero if the window is being fondled. */

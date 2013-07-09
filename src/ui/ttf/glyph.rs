@@ -23,7 +23,6 @@ pub struct Glyph
 
 impl Glyph
 {
-  #[inline(always)]
   pub fn new() -> Glyph
   {
     Glyph

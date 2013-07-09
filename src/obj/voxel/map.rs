@@ -423,7 +423,6 @@ macro_rules! axis_test_z0
   )
 )
 
-#[inline(always)]
 priv fn tri_cube_intersect(box_center: math::Vec3f, box_size: f32, tri: &Triangle) -> bool
 {
   let _v0;
@@ -498,7 +497,6 @@ priv fn tri_cube_intersect(box_center: math::Vec3f, box_size: f32, tri: &Triangl
   plane_cube_intersect(&_normal, &_v0, box_size)
 }
 
-#[inline(always)]
 priv fn plane_cube_intersect(normal: &math::Vec3f, vert: &math::Vec3f, box_size: f32) -> bool
 {
   let mut vmin: [f32, ..3] = [0.0, 0.0, 0.0];

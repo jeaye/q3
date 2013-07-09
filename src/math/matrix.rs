@@ -24,7 +24,6 @@ struct Mat4x4
 impl Mat4x4
 {
 
-  #[inline(always)]
   pub fn new() -> Mat4x4
   {
     Mat4x4{data:[ [1.0, 0.0, 0.0, 0.0],
@@ -33,7 +32,6 @@ impl Mat4x4
                   [0.0, 0.0, 0.0, 1.0]]}
   }
 
-  #[inline(always)]
   pub fn new_perspective(fov: Component, aspect_ratio: Component, near: Component, far: Component) -> Mat4x4
   {
     let mut mat = Mat4x4::new();
@@ -53,7 +51,6 @@ impl Mat4x4
     mat
   }
 
-  #[inline(always)]
   pub fn new_orthographic(left: Component, right: Component, bottom: Component, top: Component,
                           near: Component, far: Component) -> Mat4x4
   {
@@ -88,7 +85,6 @@ impl Mat4x4
     mat
   }
   
-  #[inline(always)]
   pub fn new_rotation_x(deg: Component) -> Mat4x4
   {
     let mut mat = Mat4x4::new();
@@ -102,7 +98,6 @@ impl Mat4x4
     mat
   }
 
-  #[inline(always)]
   pub fn new_rotation_y(deg: Component) -> Mat4x4
   {
     let mut mat = Mat4x4::new();
@@ -116,7 +111,6 @@ impl Mat4x4
     mat
   }
 
-  #[inline(always)]
   pub fn new_rotation_z(deg: Component) -> Mat4x4
   {
     let mut mat = Mat4x4::new();
@@ -130,7 +124,6 @@ impl Mat4x4
     mat
   }
 
-  #[inline(always)]
   pub fn new_lookat(position: math::Vec3f, target: math::Vec3f, up: math::Vec3f) -> Mat4x4
   {
     let mut forward = target - position;
@@ -151,37 +144,27 @@ impl Mat4x4
     mat
   }
 
-  #[inline(always)]
   pub fn get_width(&self) -> uint
   { return 4; }
-  #[inline(always)]
   pub fn get_height(&self) -> uint
   { return 4; }
 
-  #[inline(always)]
   pub fn get_up(&self) -> math::Vec3f
   { math::Vec3f::new(self.data[0][1], self.data[1][1], self.data[2][1]) }
-  #[inline(always)]
   pub fn get_down(&self) -> math::Vec3f
   { math::Vec3f::new(-self.data[0][1], -self.data[1][1], -self.data[2][1]) }
-  #[inline(always)]
   pub fn get_left(&self) -> math::Vec3f
   { math::Vec3f::new(-self.data[0][0], -self.data[1][0], -self.data[2][0]) }
-  #[inline(always)]
   pub fn get_right(&self) -> math::Vec3f
   { math::Vec3f::new(self.data[0][0], self.data[1][0], self.data[2][0]) }
-  #[inline(always)]
   pub fn get_forward(&self) -> math::Vec3f
   { math::Vec3f::new(-self.data[0][2], -self.data[1][2], -self.data[2][2]) }
-  #[inline(always)]
   pub fn get_backward(&self) -> math::Vec3f
   { math::Vec3f::new(self.data[0][2], self.data[1][2], self.data[2][2]) }
 
-  #[inline(always)]
   pub fn get_position(&self) -> math::Vec3f
   { math::Vec3f::new(self.data[3][0], self.data[3][1], self.data[3][2]) }
 
-  #[inline(always)]
   pub fn identity(&mut self)
   {
     self.data = [ [1.0, 0.0, 0.0, 0.0],
@@ -191,7 +174,6 @@ impl Mat4x4
   }
 
   /* TODO: Figure out how to do this. >.< */
-  //#[inline(always)]
   //pub fn translate(&mut self, pos: &math::Vec3f)
   //{
   //  let mat = Mat4x4::new_translation(pos.x, pos.y, pos.z);
@@ -199,7 +181,6 @@ impl Mat4x4
   //  *self = (*res * mat);
   //}
 
-  //#[inline(always)]
   //pub fn scale(&mut self, scaler: &math::Vec3f)
   //{
   //  let mat = Mat4x4::new_scale(scaler.x, scaler.y, scaler.z);
@@ -207,9 +188,9 @@ impl Mat4x4
   //  *self = (*res * mat);
   //}
 
-  #[inline(always)]
   pub unsafe fn to_ptr(&self) -> *Mat4x4
   { ptr::to_unsafe_ptr(self) }
+}
 
 /***** Operator Overloads *****/
 impl Mul<Mat4x4, Mat4x4> for Mat4x4
