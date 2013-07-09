@@ -20,7 +20,7 @@ macro_rules! declare
   (
     mod $Mod
     {
-      use std::{ float, ptr };
+      use std::{ float, cmp, ptr };
 
       pub struct $Type
       {
@@ -132,6 +132,65 @@ macro_rules! declare
             _ => { fail!(~"Invalid index to Vec3"); }
           }
         }
+      }
+
+      impl cmp::Ord for $Type
+      {
+        fn lt(&self, other: &$Type) -> bool
+        {
+          if self.x < other.x
+          { return true; }
+          else if self.x > other.x
+          { return false; }
+          else if self.y < other.y
+          { return true; }
+          else if self.y > other.y
+          { return false; }
+          else if self.z < other.z
+          { return true; }
+          else if self.z > other.z
+          { return false; }
+
+          /* equal */
+          false
+        }
+        fn le(&self, other: &$Type) -> bool
+        { (self == other) || (self < other) }
+        fn ge(&self, other: &$Type) -> bool
+        { (self == other) || (self > other) }
+        fn gt(&self, other: &$Type) -> bool
+        { !(self == other) && !(self < other) }
+      }
+
+      impl cmp::TotalOrd for $Type
+      {
+        fn cmp(&self, other: &$Type) -> cmp::Ordering
+        {
+          if self < other
+          { cmp::Less }
+          else if self > other
+          { cmp::Greater }
+          else
+          { cmp::Equal }
+        }
+      }
+
+      impl cmp::Eq for $Type
+      {
+        fn eq(&self, other: &$Type) -> bool
+        {
+          (self.x as f32).approx_eq(&(other.x as f32)) && 
+          (self.y as f32).approx_eq(&(other.y as f32)) && 
+          (self.z as f32).approx_eq(&(other.z as f32))
+        }
+        fn ne(&self, other: &$Type) -> bool
+        { !(self == other) }
+      }
+
+      impl cmp::TotalEq for $Type
+      {
+        fn equals(&self, other: &$Type) -> bool
+        { self == other }
       }
     }
   );

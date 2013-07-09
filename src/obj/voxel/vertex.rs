@@ -35,32 +35,26 @@ impl Vertex
 impl cmp::Ord for Vertex
 {
   fn lt(&self, other: &Vertex) -> bool
+  { self.position < other.position }
+  fn le(&self, other: &Vertex) -> bool
+  { (self == other) || (self < other) }
+  fn ge(&self, other: &Vertex) -> bool
+  { (self == other) || (self > other) }
+  fn gt(&self, other: &Vertex) -> bool
+  { !(self == other) && !(self < other) }
+}
+
+impl cmp::TotalOrd for Vertex
+{
+  fn cmp(&self, other: &Vertex) -> cmp::Ordering
   {
-    if self.position.x < other.position.x
-    { return true; }
-    else if self.position.x > other.position.x
-    { return false; }
-
-    if self.position.y < other.position.y
-    { return true; }
-    else if self.position.y > other.position.y
-    { return false; }
-
-    if self.position.z < other.position.z
-    { return true; }
-    else if self.position.z > other.position.z
-    { return false; }
+    if self.position < other.position
+    { cmp::Less }
+    else if self.position > other.position
+    { cmp::Greater }
     else
-    { false }
+    { cmp::Equal }
   }
-
-  /* I don't care about these. */
-  fn le(&self, _other: &Vertex) -> bool
-  { fail!("Unsupported") }
-  fn ge(&self, _other: &Vertex) -> bool
-  { fail!("Unsupported") }
-  fn gt(&self, _other: &Vertex) -> bool
-  { fail!("Unsupported") }
 }
 
 impl cmp::Eq for Vertex
@@ -73,5 +67,11 @@ impl cmp::Eq for Vertex
   }
   fn ne(&self, other: &Vertex) -> bool
   { !(self == other) }
+}
+
+impl cmp::TotalEq for Vertex
+{
+  fn equals(&self, other: &Vertex) -> bool
+  { self.position == other.position }
 }
 

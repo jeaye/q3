@@ -14,6 +14,7 @@
       is included.
 */
 
+use extra;
 use BSP_Map = bsp::Map;
 use Voxel_Map = voxel::Map;
 use super::State;
@@ -29,11 +30,17 @@ impl Game
 {
   pub fn new() -> @mut Game
   {
-    let map = BSP_Map::new("data/maps/q3ctf1.bsp");
+    let bmap = BSP_Map::new("data/maps/q3ctf1.bsp");
+
+    let start_time = extra::time::precise_time_s();
+    let vmap = Voxel_Map::new(bmap.tris, 300);
+    let time = extra::time::precise_time_s() - start_time;
+    error!("Voxelization took %? seconds", time);
+
     let game = @mut Game
     {
-      voxel_map: Voxel_Map::new(map.tris, 300),
-      bsp_map: map,
+      voxel_map: vmap,
+      bsp_map: bmap,
       name: ~"Default",
     };
 

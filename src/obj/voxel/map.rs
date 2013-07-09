@@ -218,7 +218,7 @@ impl Map
 
     /* Create 3D array of states. */
     self.states = vec::with_capacity((f32::pow((self.resolution + 1) as f32, 3.0)) as uint);
-    self.voxels = vec::with_capacity(self.states.len() / 2); 
+    self.voxels = vec::with_capacity(self.states.len() / 2); /* Half is just a (generous) guess. */
     for uint::range(0, self.resolution as uint) |_z| 
     { for uint::range(0, self.resolution as uint) |_y|
       { for uint::range(0, self.resolution as uint) |_x|
@@ -228,6 +228,7 @@ impl Map
       }
     }
 
+    let mut voxels = extra::treemap::TreeSet::new();
     for tris.iter().advance |tri|
     {
       /* Calculate bounding box of the triangle. */
@@ -294,7 +295,8 @@ impl Map
               { av_color };
 
               /* We have intersection; add a reference to this voxel to the index map. */
-              self.voxels.push(Vertex
+              voxels.insert(
+              Vertex
               {
                 position: math::Vec3f::new( x as f32 - (self.resolution / 2) as f32, 
                                       y as f32 - (self.resolution / 2) as f32,
@@ -307,12 +309,9 @@ impl Map
       }
     }
 
-    /* Remove duplicates. */
-    let len = self.voxels.len();
-    extra::sort::quick_sort3(self.voxels);
-    self.voxels.dedup();
-    let new_len = self.voxels.len();
-    debug!("VOXEL: New voxel count is %?, down from %?", new_len, len);
+    /* Move to array form. */
+    for voxels.iter().advance |x|
+    { self.voxels.push(*x); }
 
     debug!("VOXEL: Enabled %? of %? voxels", self.voxels.len(), self.states.len());
   }
