@@ -4,6 +4,7 @@ tags
 update.sh
 Makefile
 
+*.DS_Store
 *.dylib
 *.so*
 
