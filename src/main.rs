@@ -78,7 +78,8 @@ fn main()
     states.push(console_state as @mut state::State);
 
     /* Setup callbacks. */ /* TODO: Crash on close with these callbacks. */
-    window.set_cursor_mode(glfw::CURSOR_DISABLED);
+    do window.set_focus_callback |_, focused|
+    { if focused {window.set_cursor_mode(glfw::CURSOR_DISABLED); } }
     do window.set_cursor_pos_callback |_, x, y| 
     { states.mouse_moved(x as f32, y as f32); }
     do window.set_char_callback |_, c|
