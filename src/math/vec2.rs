@@ -19,7 +19,7 @@ macro_rules! declare
   (
     mod $Mod
     {
-      use std::{ float, ptr };
+      use std::{ ptr };
 
       pub struct $Type
       {
@@ -47,8 +47,8 @@ macro_rules! declare
         }
 
         pub fn length(&self) -> $Component
-        { float::sqrt(( (self.x * self.x) + 
-                        (self.y * self.y)) as float) as $Component }
+        { (((self.x * self.x) + 
+            (self.y * self.y)) as float).sqrt() as $Component }
 
         pub unsafe fn to_ptr(&self) -> *$Type
         { ptr::to_unsafe_ptr(self) } 

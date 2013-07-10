@@ -20,7 +20,7 @@ macro_rules! declare
   (
     mod $Mod
     {
-      use std::{ float, cmp, ptr };
+      use std::{ cmp, ptr };
 
       pub struct $Type
       {
@@ -50,9 +50,9 @@ macro_rules! declare
         }
 
         pub fn length(&self) -> $Component
-        { float::sqrt(( (self.x * self.x) + 
-                        (self.y * self.y) + 
-                        (self.z * self.z)) as float) as $Component }
+        { (((self.x * self.x) + 
+            (self.y * self.y) + 
+            (self.z * self.z)) as float).sqrt() as $Component }
 
         pub fn cross(&self, rhs: &$Type) -> $Type
         {

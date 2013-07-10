@@ -10,7 +10,7 @@
       into OpenGL-ready cubes.
 */
 
-use std::{ i32, f32, uint, vec, cmp };
+use std::{ i32, uint, vec, cmp };
 use extra;
 use math;
 use primitive::Triangle;
@@ -217,7 +217,7 @@ impl Map
     debug!("VOXEL: Midpoint offset is %?", mid_offset);
 
     /* Create 3D array of states. */
-    self.states = vec::with_capacity((f32::pow((self.resolution + 1) as f32, 3.0)) as uint);
+    self.states = vec::with_capacity(((self.resolution + 1) as f32).pow(&3.0) as uint);
     self.voxels = vec::with_capacity(self.states.len() / 2); /* Half is just a (generous) guess. */
     for uint::range(0, self.resolution as uint) |_z| 
     { for uint::range(0, self.resolution as uint) |_y|
@@ -247,9 +247,9 @@ impl Map
       }
 
       /* The dimensions (in voxels) of the triangle's bounding box. */
-      let mut vox_amount = math::Vec3i::new(f32::ceil(((max.x - min.x) / self.voxel_size)) as i32,
-                                      f32::ceil(((max.y - min.y) / self.voxel_size)) as i32,
-                                      f32::ceil(((max.z - min.z) / self.voxel_size)) as i32);
+      let mut vox_amount = math::Vec3i::new((((max.x - min.x) / self.voxel_size)).ceil() as i32,
+                                            (((max.y - min.y) / self.voxel_size)).ceil() as i32,
+                                            (((max.z - min.z) / self.voxel_size)).ceil() as i32);
       if vox_amount.x < 1
       { vox_amount.x = 1; }
       if vox_amount.y < 1
@@ -454,25 +454,25 @@ priv fn tri_cube_intersect(box_center: math::Vec3f, box_size: f32, tri: &Triangl
 
   //debug!("VOXEL: [Per voxel SAT] Testing bullet 3 edge 0");
   /* Bullet 3. */
-  _fex = f32::abs(_e0.x);
-  _fey = f32::abs(_e0.y);
-  _fez = f32::abs(_e0.z);
+  _fex = _e0.x.abs();
+  _fey = _e0.y.abs();
+  _fez = _e0.z.abs();
   axis_test_x01!(_e0.z, _e0.y, _fez, _fey);
   axis_test_y02!(_e0.z, _e0.x, _fez, _fex);
   axis_test_z12!(_e0.y, _e0.x, _fey, _fex);
 
   //debug!("VOXEL: [Per voxel SAT] Testing bullet 3 edge 1");
-  _fex = f32::abs(_e1.x);
-  _fey = f32::abs(_e1.y);
-  _fez = f32::abs(_e1.z);
+  _fex = _e1.x.abs();
+  _fey = _e1.y.abs();
+  _fez = _e1.z.abs();
   axis_test_x01!(_e1.z, _e1.y, _fez, _fey);
   axis_test_y02!(_e1.z, _e1.x, _fez, _fex);
   axis_test_z0!(_e1.y, _e1.x, _fey, _fex);
 
   //debug!("VOXEL: [Per voxel SAT] Testing bullet 3 edge 2");
-  _fex = f32::abs(_e2.x);
-  _fey = f32::abs(_e2.y);
-  _fez = f32::abs(_e2.z);
+  _fex = _e2.x.abs();
+  _fey = _e2.y.abs();
+  _fez = _e2.z.abs();
   axis_test_x2!(_e2.z, _e2.y, _fez, _fey);
   axis_test_y1!(_e2.z, _e2.x, _fez, _fex);
   axis_test_z12!(_e2.y, _e2.x, _fey, _fex);

@@ -171,9 +171,9 @@ impl Camera
     /* Update where the camera is looking. */
     let lookat = math::Vec3f::new
     (
-      f32::sin(self.angles.x) * f32::cos(self.angles.y),
-      f32::sin(self.angles.y),
-      f32::cos(self.angles.x) * f32::cos(self.angles.y)
+      self.angles.x.sin() * self.angles.y.cos(),
+      self.angles.y.sin(),
+      self.angles.x.cos() * self.angles.y.cos()
     );
     self.view = math::Mat4x4::new_lookat(self.position, 
                                     self.position + lookat, /* TODO: * focus for zoom */

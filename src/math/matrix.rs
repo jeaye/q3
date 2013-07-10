@@ -10,7 +10,7 @@
       for representing orientational data.
 */
 
-use std::{ f32, i32, ptr };
+use std::{ i32, ptr };
 use math;
 
 type Component = f32;
@@ -36,7 +36,7 @@ impl Mat4x4
     let mut mat = Mat4x4::new();
 
     let rad = (3.1415 * fov) / 180.0;
-    let range = f32::tan(rad / 2.0) * near;
+    let range = (rad / 2.0).tan() * near;
     let left = -range * aspect_ratio;
     let right = range * aspect_ratio;
     let bottom = -range;
@@ -90,8 +90,8 @@ impl Mat4x4
     let rad: Component = (3.14159 * deg) / 180.0;
 
     mat.data[0][0] = 1.0; mat.data[1][0] = 0.0;            mat.data[2][0] = 0.0;           mat.data[3][0] = 0.0;
-    mat.data[0][1] = 0.0; mat.data[1][1] = f32::cos(rad);  mat.data[2][1] = f32::sin(rad); mat.data[3][1] = 0.0;
-    mat.data[0][2] = 0.0; mat.data[1][2] = -f32::sin(rad); mat.data[2][2] = f32::cos(rad); mat.data[3][2] = 0.0;
+    mat.data[0][1] = 0.0; mat.data[1][1] = rad.cos();  mat.data[2][1] = rad.sin(); mat.data[3][1] = 0.0;
+    mat.data[0][2] = 0.0; mat.data[1][2] = -rad.sin(); mat.data[2][2] = rad.cos(); mat.data[3][2] = 0.0;
     mat.data[0][3] = 0.0; mat.data[1][3] = 0.0;            mat.data[2][3] = 0.0;           mat.data[3][3] = 1.0;
   
     mat
@@ -102,9 +102,9 @@ impl Mat4x4
     let mut mat = Mat4x4::new();
     let rad: Component = (3.14159 * deg) / 180.0;
 
-    mat.data[0][0] = f32::cos(rad);  mat.data[1][0] = 0.0; mat.data[2][0] = f32::sin(rad); mat.data[3][0] = 0.0;  
+    mat.data[0][0] = rad.cos();  mat.data[1][0] = 0.0; mat.data[2][0] = rad.sin(); mat.data[3][0] = 0.0;  
     mat.data[0][1] = 0.0;            mat.data[1][1] = 1.0; mat.data[2][1] = 0.0;           mat.data[3][1] = 0.0;
-    mat.data[0][2] = -f32::sin(rad); mat.data[1][2] = 0.0; mat.data[2][2] = f32::cos(rad); mat.data[3][2] = 0.0;
+    mat.data[0][2] = -rad.sin(); mat.data[1][2] = 0.0; mat.data[2][2] = rad.cos(); mat.data[3][2] = 0.0;
     mat.data[0][3] = 0.0;            mat.data[1][3] = 0.0; mat.data[2][3] = 0.0;           mat.data[3][3] = 1.0;
     
     mat
@@ -115,8 +115,8 @@ impl Mat4x4
     let mut mat = Mat4x4::new();
     let rad: Component = (3.14159 * deg) / 180.0;
 
-    mat.data[0][0] = f32::cos(rad);  mat.data[1][0] = f32::sin(rad); mat.data[2][0] = 0.0; mat.data[3][0] = 0.0;
-    mat.data[0][1] = -f32::sin(rad); mat.data[1][1] = f32::cos(rad); mat.data[2][1] = 0.0; mat.data[3][1] = 0.0;
+    mat.data[0][0] = rad.cos();  mat.data[1][0] = rad.sin(); mat.data[2][0] = 0.0; mat.data[3][0] = 0.0;
+    mat.data[0][1] = -rad.sin(); mat.data[1][1] = rad.cos(); mat.data[2][1] = 0.0; mat.data[3][1] = 0.0;
     mat.data[0][2] = 0.0;            mat.data[1][2] = 0.0;           mat.data[2][2] = 1.0; mat.data[3][2] = 0.0;
     mat.data[0][3] = 0.0;            mat.data[1][3] = 0.0;           mat.data[2][3] = 0.0; mat.data[3][3] = 1.0;
   
