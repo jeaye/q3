@@ -17,6 +17,7 @@ pub use self::game::Game;
 pub use self::game_renderer::Game_Renderer;
 pub use self::bsp_renderer::BSP_Renderer;
 pub use self::console::Console;
+pub use self::console_renderer::Console_Renderer;
 
 mod director;
 
@@ -28,4 +29,6 @@ mod game_renderer;
 mod bsp_renderer;
 #[path = "console/console.rs"]
 mod console;
+#[path = "console/console_renderer.rs"]
+mod console_renderer;
 

@@ -9,9 +9,7 @@
       An aggregator of UI console items.
 */
 
-pub use self::console::Console;
 pub use self::activator::Console_Activator;
 
-mod console;
 mod activator;
 
