@@ -23,9 +23,9 @@ mod director;
 
 #[path = "game/game.rs"]
 mod game;
-#[path = "game_renderer/game_renderer.rs"]
+#[path = "game/game_renderer.rs"]
 mod game_renderer;
-#[path = "bsp_renderer/bsp_renderer.rs"]
+#[path = "game/bsp_renderer.rs"]
 mod bsp_renderer;
 #[path = "console/console.rs"]
 mod console;

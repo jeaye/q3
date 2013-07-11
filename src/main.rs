@@ -68,6 +68,7 @@ fn main()
 
     let _ui_renderer = ui::Renderer::new(window);
 
+    /* Create all the states we need. */
     let states = state::Director::new();
     let console_state = state::Console::new();
     let console_renderer_state = state::Console_Renderer::new(console_state);

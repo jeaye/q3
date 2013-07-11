@@ -3,7 +3,7 @@
     See licensing in LICENSE file, or at:
         http://www.opensource.org/licenses/BSD-3-Clause
 
-    File: state/game_renderer/game_renderer.rs
+    File: state/game/game_renderer.rs
     Author: Jesse 'Jeaye' Wilkerson
     Description:
       A client-only state that depends on
