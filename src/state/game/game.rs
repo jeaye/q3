@@ -23,7 +23,6 @@ pub struct Game
 {
   bsp_map: BSP_Map,
   voxel_map: @mut Voxel_Map,
-  name: ~str,
 }
 
 impl Game
@@ -41,7 +40,6 @@ impl Game
     {
       voxel_map: vmap,
       bsp_map: bmap,
-      name: ~"Default",
     };
 
     game

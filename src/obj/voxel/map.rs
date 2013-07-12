@@ -15,28 +15,14 @@ use extra;
 use math;
 use primitive::Triangle;
 use super::{ Vertex, Behavior, Invisible, Default };
-use ui;
-use gl2 = opengles::gl2;
-
-#[path = "../../gl/check.rs"]
-mod check;
 
 struct Map
 {
   resolution: u32,
   voxel_size: f32,
 
-  vao: gl2::GLuint,
-  vox_vbo: gl2::GLuint,
-  offset_tex_vbo: gl2::GLuint,
-  offset_tex: gl2::GLuint,
-  ibo: gl2::GLuint,
-
   states: ~[Behavior],
   voxels: ~[Vertex],
-  visible_voxels: ~[i32],
-
-  wireframe: bool,
 }
 
 impl Map
@@ -47,132 +33,14 @@ impl Map
     {
       resolution: res,
       voxel_size: 0.0,
-      vao: 0,
-      vox_vbo: 0,
-      offset_tex_vbo: 0,
-      offset_tex: 0,
-      ibo: 0,
 
       states: ~[],
       voxels: ~[],
-      visible_voxels: ~[],
-
-      wireframe: false,
     };
 
     map.voxelize(tris);
 
-    /* Single voxel that will be instance-rendered. */
-    let h: f32 = map.voxel_size / 2.0;
-    let voxel: ~[f32] = /* TRIANGLE_STRIP style. */
-    ~[
-      -h,-h,h,  h,-h,h,   
-      -h,h,h,   h,h,h,    
-
-      h,-h,h,   h,-h,-h,  
-      h,h,h,    h,h,-h,   
-
-      h,-h,-h,  -h,-h,-h, 
-      h,h,-h,   -h,h,-h,  
-
-      -h,-h,-h, -h,-h,h,  
-      -h,h,-h,  -h,h,h,   
-
-      -h,-h,-h, h,-h,-h,  
-      -h,-h,h,  h,-h,h,   
-
-      -h,h,h,   h,h,h,    
-      -h,h,-h,  h,h,-h,   
-    ];
-
-    let names = check!(gl2::gen_vertex_arrays(1));
-    assert!(names.len() == 1);
-    map.vao = names[0];
-
-    let names = check!(gl2::gen_buffers(3));
-    assert!(names.len() == 3);
-    map.vox_vbo = names[0];
-    map.offset_tex_vbo = names[1];
-    map.ibo = names[2];
-
-    check!(gl2::bind_vertex_array(map.vao));
-    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, map.vox_vbo));
-    check!(gl2::buffer_data(gl2::ARRAY_BUFFER, voxel, gl2::STATIC_DRAW));
-
-    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, map.ibo));
-    map.update_visibility(&math::Vec3f::zero());
-
-    check!(gl2::bind_buffer(gl2::TEXTURE_BUFFER, map.offset_tex_vbo));
-    check!(gl2::buffer_data(gl2::TEXTURE_BUFFER, map.voxels, gl2::STATIC_DRAW));
-
-    let name = check!(gl2::gen_textures(1));
-    assert!(name.len() == 1);
-    map.offset_tex = name[0];
-    check!(gl2::bind_texture(gl2::TEXTURE_BUFFER, map.offset_tex));
-    check!(gl2::tex_buffer(gl2::TEXTURE_BUFFER, 0x8815 /* RGB32F */, map.offset_tex_vbo));
-
-    /* Console functions. */
-    ui::Console_Activator::get().add_accessor("map.wireframe", |_|
-    { map.wireframe.to_str() });
-    ui::Console_Activator::get().add_mutator("map.wireframe", |p, x|
-    {
-      let mut error = ~"";
-      if x == "true"
-      { map.wireframe = true; }
-      else if x == "false"
-      { map.wireframe = false; }
-      else
-      { error = fmt!("Invalid value for %s (use 'true' or 'false')", p); }
-
-      if error.len() == 0
-      { None }
-      else
-      { Some(error) }
-    });
-
     map
-  }
-
-  pub fn draw(&mut self)
-  {
-    check!(gl2::bind_vertex_array(self.vao));
-
-    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.vox_vbo));
-    check!(gl2::vertex_attrib_pointer_f32(0, 3, false, 0, 0));
-    check!(gl2::enable_vertex_attrib_array(0));
-
-    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.ibo));
-    check!(gl2::vertex_attrib_i_pointer_i32(1, 1, 0, 0));
-    check!(gl2::enable_vertex_attrib_array(1));
-    check!(gl2::vertex_attrib_divisor(1, 1));
-
-    check!(gl2::bind_texture(gl2::TEXTURE_BUFFER, self.offset_tex));
-
-    if self.wireframe
-    { check!(gl2::polygon_mode(gl2::FRONT_AND_BACK, gl2::LINE)); }
-
-    check!(gl2::draw_arrays_instanced(gl2::TRIANGLE_STRIP, 0, 24, self.visible_voxels.len() as i32));
-
-    if self.wireframe
-    { check!(gl2::polygon_mode(gl2::FRONT_AND_BACK, gl2::FILL)); }
-
-    check!(gl2::disable_vertex_attrib_array(0));
-    check!(gl2::disable_vertex_attrib_array(1));
-    check!(gl2::bind_vertex_array(0));
-    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, 0));
-  }
-
-  pub fn update_visibility(&mut self, _cam_pos: &math::Vec3f)
-  {
-    self.visible_voxels.clear();
-
-    if self.visible_voxels.len() == 0
-    {
-      for self.voxels.iter().enumerate().advance |(i, _v)|
-      { self.visible_voxels.push(i as i32);}
-    }
-
-    check!(gl2::buffer_data(gl2::ARRAY_BUFFER, self.visible_voxels, gl2::STREAM_DRAW));
   }
 
   priv fn voxelize(&mut self, tris: &[Triangle])
@@ -517,8 +385,10 @@ priv fn plane_cube_intersect(normal: &math::Vec3f, vert: &math::Vec3f, box_size:
       vmax[q] = -box_size - v;
     }
   }
-  if (normal[0]*vmin[0]+normal[1]*vmin[1]+normal[2]*vmin[2]) > 0.0 { return false; }
-  if (normal[0]*vmax[0]+normal[1]*vmax[1]+normal[2]*vmax[2]) >= 0.0 { return true; }
+  if normal[0] * vmin[0] + normal[1] * vmin[1] + normal[2] * vmin[2] > 0.0
+  { return false; }
+  if normal[0] * vmax[0] + normal[1] * vmax[1] + normal[2] * vmax[2] >= 0.0
+  { return true; }
 
   false
 }

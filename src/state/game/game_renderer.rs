@@ -13,10 +13,12 @@
 
 use glfw;
 use super::{ State, Game };
-use gl2 = opengles::gl2;
 use gl;
 use ui;
 use math;
+use self::map_renderer::Map_Renderer;
+
+mod map_renderer;
 
 #[path = "../../gl/check.rs"]
 mod check;
@@ -25,12 +27,7 @@ pub struct Game_Renderer
 {
   game: @mut Game,
   camera: @mut gl::Camera,
-
-  shader: @gl::Shader,
-  proj_loc: gl2::GLint,
-  world_loc: gl2::GLint,
-  voxel_size_loc: gl2::GLint,
-  offsets_loc: gl2::GLint,
+  map_renderer: @mut Map_Renderer,
 
   fps_font: ui::Font,
 }
@@ -39,16 +36,12 @@ impl Game_Renderer
 {
   pub fn new(game: @mut Game, window: @glfw::Window) -> @mut Game_Renderer
   {
+    let cam = gl::Camera::new(window);
     let gr = @mut Game_Renderer
     {
       game: game,
-      camera: gl::Camera::new(window),
-
-      shader: gl::Shader_Builder::new_with_files("data/shaders/voxel.vert", "data/shaders/voxel.frag"),
-      proj_loc: 0,
-      world_loc: 0,
-      voxel_size_loc: 0,
-      offsets_loc: 0,
+      camera: cam,
+      map_renderer: Map_Renderer::new(game.voxel_map, cam),
 
       fps_font: ui::Font::new("data/fonts/test.ttf", 30),
     };
@@ -60,6 +53,7 @@ impl Game_Renderer
 
     gr
   }
+
 }
 
 impl State for Game_Renderer
@@ -68,17 +62,14 @@ impl State for Game_Renderer
   {
     debug!("Loading game renderer state.");
 
-    self.shader.bind();
-    self.proj_loc = self.shader.get_uniform_location("proj");
-    self.world_loc = self.shader.get_uniform_location("world");
-    self.voxel_size_loc = self.shader.get_uniform_location("voxel_size");
-    self.offsets_loc = self.shader.get_uniform_location("offsets");
-
-    self.shader.update_uniform_i32(self.offsets_loc, 0);
+    (self.map_renderer as @mut State).load();
   }
 
   pub fn unload(&mut self)
-  { debug!("Unloading game renderer state."); }
+  {
+    debug!("Unloading game renderer state.");
+    (self.map_renderer as @mut State).unload();
+  }
 
   pub fn update(&mut self, delta: f32) -> bool /* dt is in terms of seconds. */
   {
@@ -89,12 +80,7 @@ impl State for Game_Renderer
 
   pub fn render(&mut self) -> bool
   {
-    self.shader.bind();
-    self.shader.update_uniform_mat(self.proj_loc, &self.camera.projection);
-    self.shader.update_uniform_mat(self.world_loc, &self.camera.view);
-    self.shader.update_uniform_f32(self.voxel_size_loc, self.game.voxel_map.voxel_size);
-
-    self.game.voxel_map.draw();
+    (self.map_renderer as @mut State).render();
 
     let fps = self.camera.frame_rate;
 
