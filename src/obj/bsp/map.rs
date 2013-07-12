@@ -11,11 +11,8 @@
 
 use std::{ i32, cmp, path, io, sys, cast };
 use math;
+use super::lump;
 use primitive::{ Triangle, Vertex_PC };
-use gl2 = opengles::gl2;
-
-#[path = "lump.rs"]
-mod lump;
 
 #[path = "../../gl/check.rs"]
 mod check;
@@ -28,9 +25,7 @@ pub struct Map
   verts: ~[lump::Vertex],
   faces: ~[lump::Face],
   mesh_verts: ~[lump::Mesh_Vert], 
-  vao: gl2::GLuint,
-  vbo: gl2::GLuint, 
-  position: math::Vec3f, /* TODO: Trait for positional objects. */
+  position: math::Vec3f,
   bb: math::BB3
 }
 
@@ -46,8 +41,6 @@ impl Map
       verts: ~[],
       faces: ~[],
       mesh_verts: ~[],
-      vao: 0,
-      vbo: 0,
       position: math::Vec3f::zero(),
       bb: math::BB3::zero(),
     };
@@ -66,7 +59,6 @@ impl Map
     map.read_mesh_verts(fio);
 
     map.triangulate();
-    map.upload();
     
     map
   }
@@ -234,45 +226,5 @@ impl Map
     self.verts = verts;
     debug!("BSP: Trianglulated to %? faces.", self.verts.len());
   }
-
-  priv fn upload(&mut self)
-  {
-    let name = check!(gl2::gen_vertex_arrays(1));
-    assert!(name.len() == 1);
-    self.vao = name[0];
-
-    let name = check!(gl2::gen_buffers(1));
-    assert!(name.len() == 1);
-    self.vbo = name[0];
-
-    check!(gl2::bind_vertex_array(self.vao));
-    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.vbo));
-    check!(gl2::buffer_data(gl2::ARRAY_BUFFER, self.verts, gl2::STATIC_DRAW));
-  }
-
-  pub fn draw(&self)
-  {
-    check!(gl2::bind_vertex_array(self.vao));
-    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.vbo));
-    check!(gl2::enable_vertex_attrib_array(0));
-    check!(gl2::enable_vertex_attrib_array(1));
-
-    check!(gl2::vertex_attrib_pointer_f32(0, 3, false, 
-                sys::size_of::<lump::Vertex>() as i32, 
-                0));
-    check!(gl2::vertex_attrib_pointer_u8(1, 4, true, 
-                sys::size_of::<lump::Vertex>() as i32, 
-                sys::size_of::<lump::Vertex>() as u32 -
-                sys::size_of::<math::Vec4u8>() as u32));
-    check!(gl2::draw_arrays(gl2::TRIANGLES, 0, self.verts.len() as i32));
-
-    check!(gl2::disable_vertex_attrib_array(0));
-    check!(gl2::disable_vertex_attrib_array(1));
-    check!(gl2::bind_vertex_array(0));
-    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, 0));
-  }
-
-  pub fn center(&self) -> math::Vec3f
-  { self.bb.center_with_offset(self.position) }
 }
 

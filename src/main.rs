@@ -89,20 +89,24 @@ fn main()
     { states.key_char(c); }
     do window.set_key_callback |window, key, _scancode, action, mods|
     {
-      /* TODO: Ability to pop specific states. */
+      /* TODO: Ability to pop specific states or insert others. */
       if key == glfw::KEY_LEFT_BRACKET && action == glfw::PRESS
       {
+        states.pop(); /* console renderer */
         states.pop(); /* console */
         states.pop(); /* renderer */
         states.push(game_renderer_state as @mut state::State);
         states.push(console_state as @mut state::State);
+        states.push(console_renderer_state as @mut state::State);
       }
       else if key == glfw::KEY_RIGHT_BRACKET && action == glfw::PRESS
       {
+        states.pop(); /* console renderer */
         states.pop(); /* console */
         states.pop(); /* renderer */
         states.push(bsp_renderer_state as @mut state::State);
         states.push(console_state as @mut state::State);
+        states.push(console_renderer_state as @mut state::State);
       }
 
       states.key_action(key, action, mods);

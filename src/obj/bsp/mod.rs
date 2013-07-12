@@ -10,6 +10,8 @@
 */
 
 pub use self::map::Map;
+pub use self::lump::Lump;
 
 mod map;
+pub mod lump;
 
