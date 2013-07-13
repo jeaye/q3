@@ -17,12 +17,6 @@ extern mod stb_image;
 use std::libc;
 use gl2 = opengles::gl2;
 
-/* TODO: Should be able to remove. */
-#[cfg(target_os = "linux")]
-#[nolink]
-#[link_args = "-lX11 -lXrandr -lXi -lXxf86vm"]
-extern { }
-
 #[path = "gl/mod.rs"]
 pub mod gl;
 
