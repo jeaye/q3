@@ -37,6 +37,14 @@ macro_rules! declare
         pub fn zero() -> $Type
         { $Type{ x: 0 as $Component, y: 0 as $Component, z: 0 as $Component } }
 
+        pub fn new_normalized(vec: &$Type) -> $Type
+        {
+          let mut n = *vec;
+          n.normalize();
+
+          n
+        }
+
         pub fn normalize(&mut self)
         {
           let len = self.length();
