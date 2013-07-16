@@ -9,12 +9,14 @@
       An input listener to open/close the console.
 */
 
-use std::{ cast, local_data };
+use std::local_data;
 use std::hashmap::HashMap;
 
 priv type Property_Accessor = @fn(&str) -> ~str;
 priv type Property_Mutator = @fn(&str, &str) -> Option<~str>;
 priv type Function = @fn(&str, &str) -> Option<~str>;
+
+static tls_key: local_data::Key<@mut Console_Activator> = &local_data::Key;
 
 pub struct Console_Activator
 {
@@ -53,10 +55,6 @@ pub struct Console_Activator
 
 impl Console_Activator
 {
-  /*  Key function used to index our singleton in
-      task-local storage. */
-  priv fn tls_key(_: @@Console_Activator) { }
-
   pub fn new() -> @mut Console_Activator
   {
     let ca = @mut Console_Activator
@@ -67,14 +65,7 @@ impl Console_Activator
     };
 
     /* Store the activator in task-local storage. (singleton) */
-    unsafe
-    {
-      local_data::local_data_set
-      (
-        Console_Activator::tls_key,
-        @cast::transmute::<@mut Console_Activator, @Console_Activator>(ca)
-      );
-    }
+    local_data::set(tls_key, ca);
 
     ca
   }
@@ -82,11 +73,15 @@ impl Console_Activator
   /* Accesses the singleton activator from task-local storage. */
   pub fn get() -> @mut Console_Activator
   {
-    unsafe 
+    local_data::get(tls_key, 
+    |opt|
     {
-      cast::transmute::<@Console_Activator, @mut Console_Activator>
-      (*local_data::local_data_get(Console_Activator::tls_key).get())
-    }
+      match opt
+      {
+        Some(x) => *x,
+        None => fail!("Singleton not available")
+      }
+    })
   }
 
   pub fn add_accessor(&mut self, name: &str, accessor: Property_Accessor)

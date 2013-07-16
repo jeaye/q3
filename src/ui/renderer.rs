@@ -9,7 +9,7 @@
       A UI component renderer.
 */
 
-use std::{ cast, local_data };
+use std::local_data;
 use glfw;
 use gl;
 use math;
@@ -19,6 +19,8 @@ use gl2 = opengles::gl2;
 
 #[path = "../gl/check.rs"]
 mod check;
+
+static tls_key: local_data::Key<@mut Renderer> = &local_data::Key;
 
 struct Renderer
 {
@@ -46,10 +48,6 @@ struct Renderer
 
 impl Renderer
 {
-  /*  Key function used to index our singleton in
-      task-local storage. */
-  priv fn tls_key(_: @@Renderer) { }
-
   pub fn new(window: @glfw::Window) -> @mut Renderer
   {
     let renderer = @mut Renderer
@@ -73,14 +71,7 @@ impl Renderer
     };
 
     /* Store in task-local storage. (singleton) */
-    unsafe
-    {
-      local_data::local_data_set
-      (
-        Renderer::tls_key,
-        @cast::transmute::<@mut Renderer, @Renderer>(renderer)
-      );
-    }
+    local_data::set(tls_key, renderer);
 
     renderer.proj_loc = renderer.shader.get_uniform_location("proj");
     renderer.world_loc = renderer.shader.get_uniform_location("world");
@@ -129,11 +120,15 @@ impl Renderer
   /* Accesses the singleton from task-local storage. */
   pub fn get() -> @mut Renderer
   {
-    unsafe 
+    local_data::get(tls_key, 
+    |opt|
     {
-      cast::transmute::<@Renderer, @mut Renderer>
-      (*local_data::local_data_get(Renderer::tls_key).get())
-    }
+      match opt
+      {
+        Some(x) => *x,
+        None => fail!("Singleton not available")
+      }
+    })
   }
 
   pub fn begin(&mut self)

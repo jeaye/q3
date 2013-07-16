@@ -55,8 +55,8 @@ fn main()
     let window_res = glfw::Window::create(1024, 768, "Q^3", glfw::Windowed);
     let window = match window_res
     {
-      Some(win) => { @win },
-      None => { fail!("Failed to create window!") }
+      Ok(win) => { @win },
+      Err(()) => { fail!("Failed to create window!") }
     };
     window.make_context_current();
 

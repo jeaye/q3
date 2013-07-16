@@ -10,7 +10,9 @@
       and render signals.
 */
 
-use std::{ cast, local_data };
+use std::local_data;
+
+static tls_key: local_data::Key<@mut Director> = &local_data::Key;
 
 #[allow(default_methods)]
 pub trait State
@@ -46,10 +48,6 @@ pub struct Director
 
 impl Director
 {
-  /*  Key function used to index our singleton in
-      task-local storage. */
-  priv fn tls_key(_: @@Director) { }
-
   pub fn new() -> @mut Director
   {
     let director = @mut Director
@@ -58,14 +56,7 @@ impl Director
     };
 
     /* Store the director in task-local storage. (singleton) */
-    unsafe
-    {
-      local_data::local_data_set
-      (
-        Director::tls_key,
-        @cast::transmute::<@mut Director, @Director>(director)
-      );
-    }
+    local_data::set(tls_key, director);
 
     director
   }
@@ -73,11 +64,15 @@ impl Director
   /* Accesses the singleton director from task-local storage. */
   pub fn get() -> @mut Director
   {
-    unsafe 
+    local_data::get(tls_key, 
+    |opt|
     {
-      cast::transmute::<@Director, @mut Director>
-      (*local_data::local_data_get(Director::tls_key).get())
-    }
+      match opt
+      {
+        Some(x) => *x,
+        None => fail!("Singleton not available")
+      }
+    })
   }
 
   pub fn push(&mut self, mut state: @mut State)
