@@ -42,6 +42,9 @@ pub mod voxel;
 #[path = "state/mod.rs"]
 pub mod state;
 
+#[path = "obj/md5/mod.rs"]
+pub mod md5;
+
 fn main()
 {
   glfw::set_error_callback(error_callback);
