@@ -1,7 +1,7 @@
 MD5Version 10
 commandline "Please ignore this line -- it's worthless"
 
-numJoints 33s
+numJoints 33
 numMeshes 6
 
 joints {

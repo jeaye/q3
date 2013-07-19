@@ -15,6 +15,7 @@ use math;
 
 type Component = f32;
 
+#[deriving(Clone)]
 struct Quaternion
 {
   x: Component,

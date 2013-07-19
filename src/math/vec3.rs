@@ -20,7 +20,7 @@ macro_rules! declare
   (
     mod $Mod
     {
-      use std::{ cmp, ptr };
+      use std::{ cmp, ptr, clone };
 
       pub struct $Type
       {
@@ -191,6 +191,19 @@ macro_rules! declare
       {
         fn equals(&self, other: &$Type) -> bool
         { self == other }
+      }
+
+      impl clone::Clone for $Type
+      {
+        fn clone(&self) -> $Type
+        {
+          $Type
+          {
+            x: self.x,
+            y: self.y,
+            z: self.z,
+          }
+        }
       }
     }
   );

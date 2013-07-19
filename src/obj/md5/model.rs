@@ -11,7 +11,7 @@
       MD5 animated models.
 */
 
-use std::{ io, path };
+use std::{ io, path, vec, i32 };
 use super::{ Joint, Mesh };
 use math;
 
@@ -91,6 +91,16 @@ impl Model
       else
       { error!("Invalid %s in %s", name, file); }
     };
+    let read_f32 = |_val: &mut f32|
+    {
+      let name = param.clone(); /* TODO: Ouch -- lots of cloning. */
+      read_param();
+      let num = FromStr::from_str(param);
+      if num.is_some()
+      { *_val = num.get(); }
+      else
+      { error!("Invalid %s in %s", name, file); }
+    };
 
     /* Read the first param and jump into the parsing. */
     read_param();
@@ -109,12 +119,44 @@ impl Model
         ~"numJoints" =>
         {
           read_i32(&mut self.num_joints);
-          self.joints = vec::with_capacity(self.num_joints);
+          self.joints = vec::with_capacity(self.num_joints as uint);
         }
         ~"numMeshes" =>
         {
           read_i32(&mut self.num_meshes);
-          self.meshes = vec::with_capacity(self.num_meshes);
+          self.meshes = vec::with_capacity(self.num_meshes as uint);
+        }
+        ~"joints" =>
+        {
+          let mut joint = Joint::new();
+          read_param(); /* read { */
+          
+          for i32::range(0, self.num_joints) |_|
+          {
+            read_param();
+            joint.name = param.clone();
+
+            read_i32(&mut joint.parent);
+
+            read_param(); /* junk */
+            read_f32(&mut joint.position.x);
+            read_f32(&mut joint.position.y);
+            read_f32(&mut joint.position.z);
+            read_param(); /* junk */
+            read_param(); /* junk */
+            read_f32(&mut joint.orientation.x);
+            read_f32(&mut joint.orientation.y);
+            read_f32(&mut joint.orientation.z);
+            read_param(); /* junk */
+
+            joint.orientation.compute_w();
+            self.joints.push(joint.clone());
+
+            /* Ignore the rest of the line. */
+            fio.read_line();
+          }
+
+          read_param(); /* read } */
         }
         _ => { } 
       }

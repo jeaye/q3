@@ -12,6 +12,7 @@
 
 use math;
 
+#[deriving(Clone)]
 struct Joint
 {
   name: ~str,
