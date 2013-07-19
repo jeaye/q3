@@ -110,6 +110,8 @@ fn main()
       key_callback(window, key, action);
     }
 
+    let _model = md5::Model::new(~"data/models/bob.md5mesh");
+
     /* Console functions. */
     ui::Console_Activator::get().add_accessor("q3.version", |_|
     { fmt!("%s.%s", env!("VERSION"), env!("COMMIT")) });
