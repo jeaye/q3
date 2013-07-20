@@ -12,7 +12,7 @@
 */
 
 use std::{ io, path, vec, i32 };
-use super::{ Joint, Mesh };
+use super::{ Joint, Vertex, Triangle, Weight, Mesh };
 use math;
 
 struct Model
@@ -81,26 +81,19 @@ impl Model
         { param.push_char(ch); ch = fio.read_char(); }
       }
     };
-    let read_i32 = |_val: &mut i32|
-    {
-      let name = param.clone(); /* TODO: Ouch -- lots of cloning. */
-      read_param();
-      let num = FromStr::from_str(param);
-      if num.is_some()
-      { *_val = num.get(); }
-      else
-      { error!("Invalid %s in %s", name, file); }
-    };
-    let read_f32 = |_val: &mut f32|
-    {
-      let name = param.clone(); /* TODO: Ouch -- lots of cloning. */
-      read_param();
-      let num = FromStr::from_str(param);
-      if num.is_some()
-      { *_val = num.get(); }
-      else
-      { error!("Invalid %s in %s", name, file); }
-    };
+    macro_rules! read_type
+    (
+      ($var:expr) =>
+      ({
+        let name = param.clone();
+        read_param();
+        let num = FromStr::from_str(param);
+        if num.is_some()
+        { $var = num.get(); }
+        else
+        { error!("Invalid %s in %s", name, file); }
+      });
+    )
 
     /* Read the first param and jump into the parsing. */
     read_param();
@@ -111,42 +104,45 @@ impl Model
         ~"MD5Version" =>
         {
           /* Read version. */
-          read_i32(&mut self.version);
-          println(fmt!("Version: %?", self.version));
+          read_type!(self.version);
+          debug!("Model version: %?", self.version);
         }
         ~"commandline" =>
         { fio.read_line(); /* Ignore this line. */ }
         ~"numJoints" =>
         {
-          read_i32(&mut self.num_joints);
+          read_type!(self.num_joints);
           self.joints = vec::with_capacity(self.num_joints as uint);
+          debug!("Model joints: %?", self.num_joints);
         }
         ~"numMeshes" =>
         {
-          read_i32(&mut self.num_meshes);
+          read_type!(self.num_meshes);
           self.meshes = vec::with_capacity(self.num_meshes as uint);
+          debug!("Model meshes: %?", self.num_meshes);
         }
         ~"joints" =>
         {
           let mut joint = Joint::new();
           read_param(); /* read { */
+          debug!("Reading model joints");
           
           for i32::range(0, self.num_joints) |_|
           {
             read_param();
             joint.name = param.clone();
 
-            read_i32(&mut joint.parent);
+            read_type!(joint.parent);
 
             read_param(); /* junk */
-            read_f32(&mut joint.position.x);
-            read_f32(&mut joint.position.y);
-            read_f32(&mut joint.position.z);
+            read_type!(joint.position.x);
+            read_type!(joint.position.y);
+            read_type!(joint.position.z);
             read_param(); /* junk */
             read_param(); /* junk */
-            read_f32(&mut joint.orientation.x);
-            read_f32(&mut joint.orientation.y);
-            read_f32(&mut joint.orientation.z);
+            read_type!(joint.orientation.x);
+            read_type!(joint.orientation.y);
+            read_type!(joint.orientation.z);
             read_param(); /* junk */
 
             joint.orientation.compute_w();
@@ -157,6 +153,112 @@ impl Model
           }
 
           read_param(); /* read } */
+        }
+        ~"mesh" =>
+        {
+          let mut mesh = Mesh::new();
+          let mut vert = Vertex::new();
+          let mut tri = Triangle::new();
+          let mut weight = Weight::new();
+          let mut num_verts = 0;
+          let mut num_tris = 0;
+          let mut num_weights = 0;
+
+          debug!("Parsing mesh");
+
+          read_param(); /* Read } */
+          read_param();
+          while param != ~"}"
+          {
+            match param
+            {
+              ~"shader" => /* shader == texture path */
+              {
+                read_param();
+                mesh.texture = param.clone();
+                debug!("Mesh shader: %s", mesh.texture);
+
+                /* TODO: Load texture. */
+
+                fio.read_line();
+              }
+              ~"numverts" =>
+              {
+                read_type!(num_verts);
+                fio.read_line();
+
+                debug!("Mesh verts: %?", num_verts);
+
+                for i32::range(0, num_verts) |_|
+                {
+                  read_param(); /* junk */
+                  read_param(); /* junk */
+                  read_param(); /* junk */
+                  read_type!(vert.tex_coord.x);
+                  read_type!(vert.tex_coord.y);
+                  read_param(); /* junk */
+                  read_type!(vert.start_weight);
+                  read_type!(vert.weight_count);
+
+                  fio.read_line();
+
+                  mesh.verts.push(vert);
+                  mesh.tex_coords.push(vert.tex_coord);
+                }
+              }
+              ~"numtris" =>
+              {
+                read_type!(num_tris);
+                fio.read_line();
+                debug!("Mesh tris: %?", num_tris);
+
+                for i32::range(0, num_tris) |_|
+                {
+                  read_param(); /* junk */
+                  read_param(); /* junk */
+                  read_type!(tri.indices[0]);
+                  read_type!(tri.indices[1]);
+                  read_type!(tri.indices[2]);
+
+                  fio.read_line();
+
+                  mesh.triangles.push(tri);
+                  mesh.indices.push(tri.indices[0] as u32);
+                  mesh.indices.push(tri.indices[1] as u32);
+                  mesh.indices.push(tri.indices[2] as u32);
+                }
+              }
+              ~"numweights" =>
+              {
+                read_type!(num_weights);
+                fio.read_line();
+                debug!("Mesh weights: %?", num_weights);
+
+                for i32::range(0, num_weights) |_|
+                {
+                  read_param(); /* junk */
+                  read_param(); /* junk */
+                  read_type!(weight.joint_id);
+                  read_type!(weight.bias);
+                  read_param(); /* junk */
+                  read_type!(weight.position.x);
+                  read_type!(weight.position.y);
+                  read_type!(weight.position.z);
+                  read_param(); /* junk */
+
+                  fio.read_line();
+                  mesh.weights.push(weight);
+                }
+              }
+              _ =>
+              { fio.read_line(); }
+            }
+
+            read_param();
+          }
+
+          /* TODO: Prepare mesh. */
+          self.meshes.push(mesh);
         }
         _ => { } 
       }

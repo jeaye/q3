@@ -16,7 +16,7 @@ use math;
 
 struct Mesh
 {
-  shader: ~str,
+  texture: ~str,
   verts: ~[Vertex],
   triangles: ~[Triangle],
   weights: ~[Weight],
@@ -35,7 +35,7 @@ impl Mesh
   {
     Mesh
     {
-      shader: ~"",
+      texture: ~"",
       verts: ~[],
       triangles: ~[],
       weights: ~[],
