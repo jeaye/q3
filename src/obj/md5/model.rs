@@ -124,7 +124,7 @@ impl Model
         ~"joints" =>
         {
           let mut joint = Joint::new();
-          read_param(); /* read { */
+          read_param(); /* read { junk */
           debug!("Reading model joints");
           
           for i32::range(0, self.num_joints) |_|
@@ -152,7 +152,7 @@ impl Model
             fio.read_line();
           }
 
-          read_param(); /* read } */
+          read_param(); /* read } junk */
         }
         ~"mesh" =>
         {
@@ -166,7 +166,7 @@ impl Model
 
           debug!("Parsing mesh");
 
-          read_param(); /* Read } */
+          read_param(); /* Read } junk */
           read_param();
           while param != ~"}"
           {
@@ -257,7 +257,7 @@ impl Model
             read_param();
           }
 
-          /* TODO: Prepare mesh. */
+          self.prepare_mesh(&mut mesh);
           self.meshes.push(mesh);
         }
         _ => { } 
@@ -268,6 +268,34 @@ impl Model
     }
 
     true
+  }
+
+  priv fn prepare_mesh(&mut self, mesh: &mut Mesh)
+  {
+    mesh.positions.clear();
+    mesh.tex_coords.clear();
+
+    for i32::range(0, mesh.verts.len() as i32) |x|
+    {
+      let vert = &mut mesh.verts[x];
+      vert.position = math::Vec3f::zero();
+      vert.normal = math::Vec3f::zero();
+
+      /* Sum the position of all the weights. */
+      for i32::range(0, vert.weight_count) |w|
+      {
+        let weight = &mut mesh.weights[vert.start_weight + w];
+        let joint = &mut self.joints[weight.joint_id];
+
+        /* Convert the weight position from joint local to object space. */
+        let rot_pos = joint.orientation.translate_vec(&weight.position);
+        
+        vert.position = vert.position + (joint.position + rot_pos) * weight.bias;
+      }
+
+      mesh.positions.push(vert.position);
+      mesh.tex_coords.push(vert.tex_coord);
+    }
   }
 }
 

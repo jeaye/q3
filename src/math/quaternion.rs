@@ -97,6 +97,25 @@ impl Quaternion
     { self.w = -t.sqrt(); }
   }
 
+  pub fn translate_vec(&self, vec: &math::Vec3f) -> math::Vec3f
+  {
+    let vn = math::Vec3f::new_normalized(vec);
+    let vecq = Quaternion::new(vn.x, vn.y, vn.z, 0.0);
+    let mut resq = vecq;
+    resq * self.get_conjugate();
+    resq = resq * *self;
+
+    math::Vec3f::new(resq.x, resq.y, resq.z)
+  }
+
+  pub fn scale(&mut self, scalar: Component)
+  {
+    self.x *= scalar;
+    self.y *= scalar;
+    self.z *= scalar;
+    self.w *= scalar;
+  }
+
   pub fn to_vec(&self) -> math::Vec3f
   { math::Vec3f::new(self.x, self.y, self.z) }
 
