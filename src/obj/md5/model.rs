@@ -64,7 +64,7 @@ impl Model
     self.joints.clear();
     self.meshes.clear();
 
-    let fio = fior.get();
+    let fio = fior.unwrap();
     let mut param;
     macro_rules! read_param
     (

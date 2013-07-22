@@ -63,7 +63,7 @@ impl Texture
           x => { error!(fmt!("Invalid texture depth %?", x)); gl2::RGBA }
         };
 
-        let data = copy image.data;
+        let data = image.data.clone();
         unsafe {
           check!(gl2::glTexImage2D
           (

@@ -161,7 +161,7 @@ pub mod ll
   pub static LOAD_LINEAR_DESIGN: i32                = (1 << 13);
   pub static LOAD_NO_AUTOHINT: i32                  = (1 << 15);
 
-  pub extern
+  extern
   {
     pub fn FT_Init_FreeType(library: *Library) -> Error;
     pub fn FT_Done_FreeType(library: Library) -> Error;

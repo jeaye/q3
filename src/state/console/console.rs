@@ -162,7 +162,7 @@ impl State for Console
           {
             Some(f) =>
             {
-              let input = copy self.input;
+              let input = self.input.clone();
               match (*f)(func, input)
               {
                 Some(err) => { self.add_log(err); }
