@@ -51,6 +51,8 @@ impl Game_Renderer
     do window.set_size_callback |_, width, height|
     { gr.camera.resize(width as i32, height as i32); }
 
+    gl::Camera::set_active(gr.camera); /* TODO: Stop passing the camera around. */
+
     gr
   }
 
@@ -80,7 +82,7 @@ impl State for Game_Renderer
 
   pub fn render(&mut self) -> bool
   {
-    (self.map_renderer as @mut State).render();
+    //(self.map_renderer as @mut State).render();
 
     let fps = self.camera.frame_rate;
 

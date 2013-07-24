@@ -295,9 +295,9 @@ impl Model
         let joint = &mut self.joints[weight.joint_id];
 
         /* Convert the weight position from joint local to object space. */
-        let rot_pos = joint.orientation.translate_vec(&weight.position);
+        let rot_pos = joint.orientation.rotate_vec(&weight.position);
         
-        vert.position = vert.position + (joint.position + rot_pos) * weight.bias;
+        vert.position = vert.position + ((joint.position + rot_pos) * weight.bias);
       }
 
       mesh.positions.push(vert.position);

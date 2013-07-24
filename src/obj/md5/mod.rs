@@ -10,16 +10,20 @@
 */
 
 pub use self::model::Model;
+pub use self::model_renderer::Model_Renderer;
 pub use self::joint::Joint;
 pub use self::weight::Weight;
 pub use self::mesh::Mesh;
+pub use self::mesh_renderer::Mesh_Renderer;
 pub use self::triangle::Triangle;
 pub use self::vertex::Vertex;
 
 mod model;
+mod model_renderer;
 mod joint;
 mod weight;
 mod mesh;
+mod mesh_renderer;
 mod vertex;
 mod triangle;
 

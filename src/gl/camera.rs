@@ -10,6 +10,7 @@
       projection, viewport sizing, etc.
 */
 
+use std::local_data;
 use glfw;
 use gl2 = opengles::gl2;
 use std::f32;
@@ -25,6 +26,8 @@ static MOVE_FORWARD: u8 = 4;
 static MOVE_BACKWARD: u8 = 8;
 static MOVE_UP: u8 = 16;
 static MOVE_DOWN: u8 = 32;
+
+static tls_key: local_data::Key<@mut Camera> = &local_data::Key;
 
 pub struct Camera
 {
@@ -64,7 +67,7 @@ impl Camera
       position: math::Vec3f::zero(),
       angles: math::Vec2f::zero(),
       projection: math::Mat4x4::new(),
-      near_far: math::Vec2f::new(0.1, 50.0),
+      near_far: math::Vec2f::new(0.1, 500.0),
       fov: 100.0,
       view: math::Mat4x4::new(),
       look_speed: 0.001,
@@ -119,6 +122,22 @@ impl Camera
     });
 
     c
+  }
+
+  pub fn set_active(cam: @mut Camera)
+  { local_data::set(tls_key, cam); }
+
+  pub fn get_active() -> @mut Camera
+  { 
+    local_data::get(tls_key, 
+    |opt|
+    {
+      match opt
+      {
+        Some(x) => *x,
+        None => fail!("Singleton not available")
+      }
+    })
   }
 
   pub fn init(&mut self)

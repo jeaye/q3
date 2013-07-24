@@ -76,14 +76,17 @@ impl Quaternion
 
   pub fn normalize(&mut self)
   {
-    let mag2 = self.w * self.w + self.x * self.x + self.y * self.y + self.z * self.z;
-    if mag2.abs() > 0.00001 && (mag2 - 1.0).abs() > 0.00001
+    let mag = ((self.x * self.x) +
+              (self.y * self.y) +
+              (self.z * self.z) +
+              (self.w * self.w)).sqrt();
+    if mag > 0.0
     {
-      let mag = mag2.sqrt();
-      self.x /= mag;
-      self.y /= mag;
-      self.z /= mag;
-      self.w /= mag;
+      let one_over = 1.0 / mag;
+      self.x *= one_over;
+      self.y *= one_over;
+      self.z *= one_over;
+      self.w *= one_over;
     }
   }
 
@@ -97,15 +100,25 @@ impl Quaternion
     { self.w = -t.sqrt(); }
   }
 
-  pub fn translate_vec(&self, vec: &math::Vec3f) -> math::Vec3f
+  pub fn rotate_vec(&self, vec: &math::Vec3f) -> math::Vec3f
   {
-    let vn = math::Vec3f::new_normalized(vec);
-    let vecq = Quaternion::new(vn.x, vn.y, vn.z, 0.0);
-    let mut resq = vecq;
-    resq * self.get_conjugate();
-    resq = resq * *self;
+    let mut inv = Quaternion::new(-self.x, -self.y, -self.z, self.w);
+    inv.normalize();
 
-    math::Vec3f::new(resq.x, resq.y, resq.z)
+    let tmp = self.mul_vec(vec);
+    let final = tmp * inv;
+    math::Vec3f::new(final.x, final.y, final.z)
+  }
+
+  pub fn mul_vec(&self, vec: &math::Vec3f) -> Quaternion
+  {
+    Quaternion::new
+    (
+       (self.w * vec.x) + (self.y * vec.z) - (self.z * vec.y),
+       (self.w * vec.y) + (self.z * vec.x) - (self.x * vec.z),
+       (self.w * vec.z) + (self.x * vec.y) - (self.y * vec.x),
+      -(self.x * vec.x) - (self.y * vec.y) - (self.z * vec.z)
+    )
   }
 
   pub fn scale(&mut self, scalar: Component)
@@ -149,13 +162,13 @@ impl Mul<Quaternion, Quaternion> for Quaternion
 {
   fn mul(&self, rhs: &Quaternion) -> Quaternion
   {
-    Quaternion
-    {
-      x: self.w * rhs.x + self.x * self.w + self.y * rhs.z - self.z * rhs.y,
-      y: self.w * rhs.y + self.y * self.w + self.z * rhs.x - self.x * rhs.z,
-      z: self.w * rhs.z + self.z * self.w + self.x * rhs.y - self.y * rhs.x,
-      w: self.w * rhs.w - self.x * self.x - self.y * rhs.y - self.z * rhs.z
-    }
+    Quaternion::new
+    (
+      (self.x * rhs.w) + (self.w * rhs.x) + (self.y * rhs.z) - (self.z * rhs.y),
+      (self.y * rhs.w) + (self.w * rhs.y) + (self.z * rhs.x) - (self.x * rhs.z),
+      (self.z * rhs.w) + (self.w * rhs.z) + (self.x * rhs.y) - (self.y * rhs.x),
+      (self.w * rhs.w) - (self.x * rhs.x) - (self.y * rhs.y) - (self.z * rhs.z)
+    )
   }
 }
 
