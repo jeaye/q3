@@ -111,7 +111,7 @@ fn main()
     }
 
     let _model = md5::Model::new(~"data/models/bob/bob.md5mesh");
-    let mut _model_renderer = md5::Model_Renderer::new(&_model);
+    let _model_renderer = md5::Model_Renderer::new(&_model);
 
     /* Console functions. */
     ui::Console_Activator::get().add_accessor("q3.version", |_|
@@ -133,7 +133,6 @@ fn main()
 
       check!(gl2::clear(gl2::COLOR_BUFFER_BIT | gl2::DEPTH_BUFFER_BIT));
       {
-        _model_renderer.render();
         states.render();
       } window.swap_buffers();
     }
