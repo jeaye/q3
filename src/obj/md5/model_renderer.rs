@@ -54,10 +54,10 @@ impl<'self> Model_Renderer<'self>
 
   pub fn render(&mut self)
   {
-    self.shader.bind();
     check!(gl2::front_face(gl2::CW));
 
     let camera = gl::Camera::get_active();
+    self.shader.bind();
     self.shader.update_uniform_mat(self.proj_loc, &camera.projection);
     self.shader.update_uniform_mat(self.world_loc, &camera.view);
 
