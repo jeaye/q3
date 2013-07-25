@@ -11,12 +11,14 @@
       MD5 animated models.
 */
 
-use std::{ io, path, vec, i32 };
+use std::{ io, path, vec, i32, str };
 use super::{ Joint, Vertex, Triangle, Weight, Mesh };
 use math;
 
 struct Model
 {
+  file_directory: ~str,
+
   version: i32,
   num_joints: i32,
   num_meshes: i32,
@@ -34,8 +36,19 @@ impl Model
 {
   pub fn new(mesh_file: ~str) -> Model
   {
+    /* TODO: Custom Path type to handle this. */
+    let dir;
+    let mut posix = true;
+    for i32::range(0, mesh_file.len() as i32) |x|
+    { if mesh_file[x] == '\\' as u8 { posix = false; } }
+    if posix
+    { dir = path::PosixPath(mesh_file.clone()).normalize().dirname(); }
+    else
+    { dir = path::WindowsPath(mesh_file.clone()).normalize().dirname(); }
+
     let mut model = Model
     {
+      file_directory: dir,
       version: 0,
       num_joints: 0,
       num_meshes: 0,
@@ -182,10 +195,34 @@ impl Model
               ~"shader" => /* shader == texture path */
               {
                 read_param!();
-                mesh.texture = param.clone();
-                debug!("Mesh shader: %s", mesh.texture);
 
-                /* TODO: Load texture. */
+                /* Rust needs to know if it's a POSIX or Windows
+                 * path so it can parse it. Just loop through and
+                 * check for \ which indicates it's for Windows. */
+                let mut posix = true;
+                for i32::range(0, param.len() as i32) |x|
+                { if param[x] == '\\' as u8 { posix = false; } }
+                if posix
+                {
+                  mesh.texture =
+                    match path::PosixPath(param.clone()).normalize().filename()
+                    {
+                      Some(file) => { file },
+                      None => { ~"" }
+                    };
+                }
+                else
+                {
+                  mesh.texture =
+                    match path::WindowsPath(param.clone()).normalize().filename()
+                    {
+                      Some(file) => { file },
+                      None => { ~"" }
+                    };
+                }
+                /* Remove quotes. */
+                mesh.texture = self.file_directory + "/" + str::replace(mesh.texture, "\"", "");
+                debug!("Mesh shader/texture: %s", mesh.texture);
 
                 ignore_line!();
               }

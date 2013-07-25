@@ -110,7 +110,7 @@ fn main()
       key_callback(window, key, action);
     }
 
-    let _model = md5::Model::new(~"data/models/bob.md5mesh");
+    let _model = md5::Model::new(~"data/models/bob/bob.md5mesh");
     let mut _model_renderer = md5::Model_Renderer::new(&_model);
 
     /* Console functions. */
