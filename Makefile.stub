@@ -31,16 +31,16 @@ COLOR_YELLOW=$(shell tput setaf 3)
 COLOR_GREEN=$(shell tput setaf 2)
 
 # Output colorizing
-ECHO_PREFIX="${COLOR_RED}»»»${COLOR_OFF}"
+ECHO_PREFIX=${COLOR_RED}»»»${COLOR_OFF}
 ifeq ($(UNAME), Linux)
-	ECHO=echo -e "${ECHO_PREFIX}"
+	ECHO=echo -e ${ECHO_PREFIX}
 else
-	ECHO=echo "${ECHO_PREFIX}"
+	ECHO=echo ${ECHO_PREFIX}
 endif
 
 # Version names of the build types we can attempt
-VERSION_NAME_DEBUG="${COLOR_YELLOW}DEBUG${COLOR_OFF}"
-VERSION_NAME_RELEASE="${COLOR_GREEN}RELEASE${COLOR_OFF}"
+VERSION_NAME_DEBUG=${COLOR_YELLOW}DEBUG${COLOR_OFF}
+VERSION_NAME_RELEASE=${COLOR_GREEN}RELEASE${COLOR_OFF}
 
 LIBS=-L. -Lbuild/glfw_static -Lbuild/glfw-rs -Lbuild/rust-opengles -Lbuild/stb-image -L/opt/local/lib
 
