@@ -11,7 +11,7 @@
 
 pub use self::map::Map;
 pub use self::vertex::Vertex;
-pub use self::behavior::{ Behavior, Invisible, Default };
+pub use self::behavior::{ Visible };
 
 mod map;
 mod vertex;

@@ -11,6 +11,7 @@
       used only to render the voxel map.
 */
 
+use std::{ i32, vec };
 use state::State;
 use gl2 = opengles::gl2;
 use gl;
@@ -31,7 +32,7 @@ pub struct Map_Renderer
   offset_tex_vbo: gl2::GLuint,
   offset_tex: gl2::GLuint,
   ibo: gl2::GLuint,
-  visible_voxels: ~[i32],
+  visible_voxels: ~[u32],
 
   wireframe: bool,
 
@@ -105,7 +106,8 @@ impl Map_Renderer
     check!(gl2::buffer_data(gl2::ARRAY_BUFFER, voxel, gl2::STATIC_DRAW));
 
     check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, mr.ibo));
-    mr.update_visibility(&math::Vec3f::zero());
+    let ibo_buf = vec::from_elem((mr.map.resolution * mr.map.resolution * mr.map.resolution) as uint, 0);
+    check!(gl2::buffer_data(gl2::ARRAY_BUFFER, ibo_buf, gl2::STREAM_DRAW));
 
     check!(gl2::bind_buffer(gl2::TEXTURE_BUFFER, mr.offset_tex_vbo));
     check!(gl2::buffer_data(gl2::TEXTURE_BUFFER, mr.map.voxels, gl2::STATIC_DRAW));
@@ -139,17 +141,45 @@ impl Map_Renderer
     mr
   }
 
-  pub fn update_visibility(&mut self, _cam_pos: &math::Vec3f)
+  pub fn update_visibility(&mut self)
   {
+    let cam = gl::Camera::get_active();
+    let dist = (cam.near_far.y / 5.0 / self.map.voxel_size) as i32; /* How far the camera can see. */
+    let res = self.map.resolution as f32;
+    let pos = math::Vec3f::new(cam.position.x / self.map.voxel_size,
+                               cam.position.y / self.map.voxel_size,
+                               cam.position.z / self.map.voxel_size)
+                               + math::Vec3f::new(res / 2.0, res / 2.0, res / 2.0);
+    let start = math::Vec3i::new
+    (
+      (pos.x - dist as f32).clamp(&0.0, &(res - 1.0)) as i32,
+      (pos.y - dist as f32).clamp(&0.0, &(res - 1.0)) as i32,
+      (pos.z - dist as f32).clamp(&0.0, &(res - 1.0)) as i32
+    );
+    let end = math::Vec3i::new
+    (
+      (pos.x + dist as f32).clamp(&0.0, &(res - 1.0)) as i32,
+      (pos.y + dist as f32).clamp(&0.0, &(res - 1.0)) as i32,
+      (pos.z + dist as f32).clamp(&0.0, &(res - 1.0)) as i32
+    );
+
     self.visible_voxels.clear();
 
-    if self.visible_voxels.len() == 0
+    for i32::range(start.z, end.z) |z|
     {
-      for self.map.voxels.iter().enumerate().advance |(i, _v)|
-      { self.visible_voxels.push(i as i32);}
+      for i32::range(start.y, end.y) |y|
+      {
+        for i32::range(start.x, end.x) |x|
+        {
+          let index = (z * ((self.map.resolution * self.map.resolution) as i32)) + (y * (self.map.resolution as i32)) + x;
+          if (self.map.states[index] & voxel::Visible) != 0
+          { self.visible_voxels.push(self.map.states[index] & !voxel::Visible); }
+        }
+      }
     }
 
-    check!(gl2::buffer_data(gl2::ARRAY_BUFFER, self.visible_voxels, gl2::STREAM_DRAW));
+    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.ibo));
+    check!(gl2::buffer_sub_data(gl2::ARRAY_BUFFER, 0, self.visible_voxels));
   }
 }
 
@@ -170,6 +200,13 @@ impl State for Map_Renderer
 
   pub fn unload(&mut self)
   { debug!("Unloading map renderer state."); }
+
+  pub fn update(&mut self, delta: f32) -> bool /* dt is in terms of seconds. */
+  {
+    self.update_visibility();
+
+    false      
+  }
 
   pub fn render(&mut self) -> bool
   {

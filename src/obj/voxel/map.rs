@@ -14,14 +14,14 @@ use std::{ i32, uint, vec, cmp };
 use extra;
 use math;
 use primitive::Triangle;
-use super::{ Vertex, Behavior, Invisible, Default };
+use super::{ Vertex, Visible };
 
 struct Map
 {
   resolution: u32,
   voxel_size: f32,
 
-  states: ~[Behavior],
+  states: ~[u32],
   voxels: ~[Vertex],
 }
 
@@ -51,11 +51,11 @@ impl Map
 
     /* Bounding box of vert dimensions. */
     let mut min = math::Vec3f::new( tris[0].verts[0].position.x,
-                              tris[0].verts[0].position.y, 
-                              tris[0].verts[0].position.z);
+                                    tris[0].verts[0].position.y, 
+                                    tris[0].verts[0].position.z);
     let mut max = math::Vec3f::new( tris[0].verts[0].position.x,
-                              tris[0].verts[0].position.y,
-                              tris[0].verts[0].position.z);
+                                    tris[0].verts[0].position.y,
+                                    tris[0].verts[0].position.z);
     for tris.iter().advance |curr|
     {
       for curr.verts.iter().advance |vert|
@@ -71,8 +71,8 @@ impl Map
     }
     debug!("VOXEL: Min: %s Max: %s", min.to_str(), max.to_str());
     let center = math::Vec3f::new(max.x - ((max.x - min.x) / 2.0),
-                            max.y - ((max.y - min.y) / 2.0),
-                            max.z - ((max.z - min.z) / 2.0));
+                                  max.y - ((max.y - min.y) / 2.0),
+                                  max.z - ((max.z - min.z) / 2.0));
     debug!("VOXEL: Center of mesh is %s", center.to_str());
 
     /* Calculate, given resolution (how many states across), the dimensions of a voxel. */
@@ -91,12 +91,12 @@ impl Map
     { for uint::range(0, self.resolution as uint) |_y|
       { for uint::range(0, self.resolution as uint) |_x|
         {
-          self.states.push(Invisible);
+          self.states.push(0); /* Invisible. */
         }
       }
     }
 
-    let mut voxels = extra::treemap::TreeSet::new();
+    //let mut voxels = extra::treemap::TreeSet::new(); /* TODO: Bring back in; maintain indices. */
     for tris.iter().advance |tri|
     {
       /* Calculate bounding box of the triangle. */
@@ -150,10 +150,6 @@ impl Map
                 ((tri.verts[0].color.z + tri.verts[1].color.z + tri.verts[2].color.z) / 3.0) as f32 / 255.0
               );
 
-              /* Update the state of the voxel. */
-              let index = (z * ((self.resolution * self.resolution) as i32)) + (y * (self.resolution as i32)) + x;
-              self.states[index] = Default;
-
               /* Enable some debug rendering of invalid voxels. */
               let col = if x >= self.resolution as i32 || y >= self.resolution as i32 || z >= self.resolution as i32
               { math::Vec3f::new(1.0, 0.0, 0.0) }
@@ -163,14 +159,22 @@ impl Map
               { av_color };
 
               /* We have intersection; add a reference to this voxel to the index map. */
-              voxels.insert(
+              let new_val = true;
+              self.voxels.push(
               Vertex
               {
                 position: math::Vec3f::new( x as f32 - (self.resolution / 2) as f32, 
-                                      y as f32 - (self.resolution / 2) as f32,
-                                      z as f32 - (self.resolution / 2) as f32), 
+                                            y as f32 - (self.resolution / 2) as f32,
+                                            z as f32 - (self.resolution / 2) as f32), 
                 color: col
               });
+              if new_val
+              {
+                /* Update the state of the voxel. */
+                let index = (z * ((self.resolution * self.resolution) as i32)) + (y * (self.resolution as i32)) + x;
+                self.states[index] = self.voxels.len() as u32 - 1u32;
+                self.states[index] |= Visible;
+              }
             }
           }
         }
@@ -178,8 +182,8 @@ impl Map
     }
 
     /* Move to array form. */
-    for voxels.iter().advance |x|
-    { self.voxels.push(*x); }
+    //for voxels.iter().advance |x|
+    //{ self.voxels.push(*x); }
 
     debug!("VOXEL: Enabled %? of %? voxels", self.voxels.len(), self.states.len());
   }

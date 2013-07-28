@@ -55,6 +55,8 @@ fn main()
     glfw::window_hint::opengl_profile(glfw::OPENGL_CORE_PROFILE);
     glfw::window_hint::opengl_forward_compat(true);
 
+    glfw::set_swap_interval(0); /* Try to disable vsync. */
+
     let window_res = glfw::Window::create(1024, 768, "Q^3", glfw::Windowed);
     let window = match window_res
     {

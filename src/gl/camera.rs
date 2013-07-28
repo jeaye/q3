@@ -67,7 +67,7 @@ impl Camera
       position: math::Vec3f::zero(),
       angles: math::Vec2f::zero(),
       projection: math::Mat4x4::new(),
-      near_far: math::Vec2f::new(0.1, 500.0),
+      near_far: math::Vec2f::new(0.1, 50.0),
       fov: 100.0,
       view: math::Mat4x4::new(),
       look_speed: 0.001,

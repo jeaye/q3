@@ -9,9 +9,5 @@
       A collection of voxel types and behaviors.
 */
 
-pub enum Behavior
-{
-  Invisible,
-  Default,
-}
+pub static Visible: u32 = (1 << 31);
 

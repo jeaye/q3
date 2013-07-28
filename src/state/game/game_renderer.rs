@@ -76,6 +76,7 @@ impl State for Game_Renderer
   pub fn update(&mut self, delta: f32) -> bool /* dt is in terms of seconds. */
   {
     self.camera.update(delta);
+    self.map_renderer.update(delta);
 
     false
   }
@@ -89,7 +90,8 @@ impl State for Game_Renderer
     let ui_renderer = ui::Renderer::get();
     ui_renderer.begin();
     if self.camera.show_fps
-    { ui_renderer.render_font(fmt!("%?", fps), math::Vec2f::new(self.camera.window_size.x as f32 - 40.0, 0.0), &self.fps_font); }
+    { ui_renderer.render_font(fmt!("%?", fps), math::Vec2f::new(0.0, 0.0), &self.fps_font); }
+    ui_renderer.render_font(fmt!("%s", self.camera.position.to_str()), math::Vec2f::new(0.0, self.camera.window_size.y as f32 - 40.0), &self.fps_font);
     ui_renderer.end();
 
     false
