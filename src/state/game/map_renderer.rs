@@ -11,7 +11,7 @@
       used only to render the voxel map.
 */
 
-use std::{ i32, vec };
+use std::{ i32, vec, ptr, sys, cast };
 use state::State;
 use gl2 = opengles::gl2;
 use gl;
@@ -31,8 +31,10 @@ pub struct Map_Renderer
   vox_vbo: gl2::GLuint,
   offset_tex_vbo: gl2::GLuint,
   offset_tex: gl2::GLuint,
-  ibo: gl2::GLuint,
+  ibos: ~[gl2::GLuint],
+  curr_ibo: u32,
   visible_voxels: ~[u32],
+  prev_visible_voxel_count: u32,
 
   wireframe: bool,
 
@@ -56,8 +58,10 @@ impl Map_Renderer
       vox_vbo: 0,
       offset_tex_vbo: 0,
       offset_tex: 0,
-      ibo: 0,
-      visible_voxels: ~[],
+      ibos: vec::from_elem(2, 2u32),
+      curr_ibo: 0,
+      visible_voxels: vec::from_elem((map.resolution * map.resolution * map.resolution) as uint, 0u32),
+      prev_visible_voxel_count: 0,
 
       wireframe: false,
 
@@ -95,19 +99,23 @@ impl Map_Renderer
     assert!(names.len() == 1);
     mr.vao = names[0];
 
-    let names = check!(gl2::gen_buffers(3));
-    assert!(names.len() == 3);
+    let names = check!(gl2::gen_buffers(4));
+    assert!(names.len() == 4);
     mr.vox_vbo = names[0];
     mr.offset_tex_vbo = names[1];
-    mr.ibo = names[2];
+    mr.ibos[0] = names[2];
+    mr.ibos[1] = names[3];
 
     check!(gl2::bind_vertex_array(mr.vao));
     check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, mr.vox_vbo));
     check!(gl2::buffer_data(gl2::ARRAY_BUFFER, voxel, gl2::STATIC_DRAW));
 
-    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, mr.ibo));
+    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, mr.ibos[0]));
     let ibo_buf = vec::from_elem((mr.map.resolution * mr.map.resolution * mr.map.resolution) as uint, 0);
-    check!(gl2::buffer_data(gl2::ARRAY_BUFFER, ibo_buf, gl2::STREAM_DRAW));
+    check!(gl2::buffer_data(gl2::ARRAY_BUFFER, ibo_buf, gl2::DYNAMIC_DRAW));
+
+    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, mr.ibos[1]));
+    check!(gl2::buffer_data(gl2::ARRAY_BUFFER, ibo_buf, gl2::DYNAMIC_DRAW));
 
     check!(gl2::bind_buffer(gl2::TEXTURE_BUFFER, mr.offset_tex_vbo));
     check!(gl2::buffer_data(gl2::TEXTURE_BUFFER, mr.map.voxels, gl2::STATIC_DRAW));
@@ -143,8 +151,10 @@ impl Map_Renderer
 
   pub fn update_visibility(&mut self)
   {
+    self.prev_visible_voxel_count = self.visible_voxels.len() as u32;
+
     let cam = gl::Camera::get_active();
-    let dist = (cam.near_far.y / 5.0 / self.map.voxel_size) as i32; /* How far the camera can see. */
+    let dist = (cam.near_far.y  / self.map.voxel_size) as i32; /* How far the camera can see. */
     let res = self.map.resolution as f32;
     let pos = math::Vec3f::new(cam.position.x / self.map.voxel_size,
                                cam.position.y / self.map.voxel_size,
@@ -178,8 +188,15 @@ impl Map_Renderer
       }
     }
 
-    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.ibo));
-    check!(gl2::buffer_sub_data(gl2::ARRAY_BUFFER, 0, self.visible_voxels));
+    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.ibos[self.curr_ibo]));
+    //check!(gl2::buffer_sub_data(gl2::ARRAY_BUFFER, 0, self.visible_voxels));
+    unsafe
+    {
+      let size = self.visible_voxels.len() * sys::size_of::<u32>();
+      let mut mem = check!(gl2::glMapBufferRange(gl2::ARRAY_BUFFER, 0, size as i64, 2 | 32));
+      ptr::copy_nonoverlapping_memory(cast::transmute(mem), vec::raw::to_ptr(self.visible_voxels), size);
+      check!(gl2::glUnmapBuffer(gl2::ARRAY_BUFFER));
+    }
   }
 }
 
@@ -203,6 +220,11 @@ impl State for Map_Renderer
 
   pub fn update(&mut self, delta: f32) -> bool /* dt is in terms of seconds. */
   {
+    if self.curr_ibo == 0
+    { self.curr_ibo = 1; }
+    else
+    { self.curr_ibo = 0; }
+
     self.update_visibility();
 
     false      
@@ -221,7 +243,10 @@ impl State for Map_Renderer
     check!(gl2::vertex_attrib_pointer_f32(0, 3, false, 0, 0));
     check!(gl2::enable_vertex_attrib_array(0));
 
-    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.ibo));
+    if self.curr_ibo == 0
+    { check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.ibos[1])); }
+    else
+    { check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.ibos[0])); }
     check!(gl2::vertex_attrib_i_pointer_i32(1, 1, 0, 0));
     check!(gl2::enable_vertex_attrib_array(1));
     check!(gl2::vertex_attrib_divisor(1, 1));
@@ -231,7 +256,7 @@ impl State for Map_Renderer
     if self.wireframe
     { check!(gl2::polygon_mode(gl2::FRONT_AND_BACK, gl2::LINE)); }
 
-    check!(gl2::draw_arrays_instanced(gl2::TRIANGLE_STRIP, 0, 24, self.visible_voxels.len() as i32));
+    check!(gl2::draw_arrays_instanced(gl2::TRIANGLE_STRIP, 0, 24, self.prev_visible_voxel_count as i32));
 
     if self.wireframe
     { check!(gl2::polygon_mode(gl2::FRONT_AND_BACK, gl2::FILL)); }
