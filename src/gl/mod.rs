@@ -13,9 +13,11 @@ pub use self::camera::Camera;
 pub use self::shader::{ Shader, Shader_Builder };
 pub use self::texture::Texture;
 pub use self::util::*;
+pub use self::worker::Worker;
 
 mod camera;
 mod shader;
 mod texture;
 mod util;
+mod worker;
 

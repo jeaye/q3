@@ -11,7 +11,8 @@
       used only to render the voxel map.
 */
 
-use std::{ i32, vec, ptr, sys, cast };
+use std::{ i32, vec, ptr, sys, cast, cell };
+use extra;
 use state::State;
 use gl2 = opengles::gl2;
 use gl;
@@ -33,8 +34,11 @@ pub struct Map_Renderer
   offset_tex: gl2::GLuint,
   ibos: ~[gl2::GLuint],
   curr_ibo: u32,
-  visible_voxels: ~[u32],
+  visible_voxels: Option<~[u32]>,
   prev_visible_voxel_count: u32,
+
+  /* states, visible */
+  map_stream: extra::comm::DuplexStream<(cell::Cell<~[u32]>, cell::Cell<~[u32]>), (~[u32], ~[u32])>,
 
   wireframe: bool,
 
@@ -49,6 +53,8 @@ impl Map_Renderer
 {
   pub fn new(map: @mut voxel::Map, cam: @mut gl::Camera) -> @mut Map_Renderer
   {
+    let (local_stream, _) = extra::comm::DuplexStream();
+
     let mr = @mut Map_Renderer
     {
       map: map,
@@ -60,8 +66,10 @@ impl Map_Renderer
       offset_tex: 0,
       ibos: vec::from_elem(2, 2u32),
       curr_ibo: 0,
-      visible_voxels: vec::from_elem((map.resolution * map.resolution * map.resolution) as uint, 0u32),
+      visible_voxels: Some(vec::from_elem((map.resolution * map.resolution * map.resolution) as uint, 0u32)),
       prev_visible_voxel_count: 0,
+
+      map_stream: local_stream,
 
       wireframe: false,
 
@@ -151,7 +159,7 @@ impl Map_Renderer
 
   pub fn update_visibility(&mut self)
   {
-    self.prev_visible_voxel_count = self.visible_voxels.len() as u32;
+    self.prev_visible_voxel_count = self.visible_voxels.get_ref().len() as u32;
 
     let cam = gl::Camera::get_active();
     let dist = (cam.near_far.y  / self.map.voxel_size) as i32; /* How far the camera can see. */
@@ -173,29 +181,60 @@ impl Map_Renderer
       (pos.z + dist as f32).clamp(&0.0, &(res - 1.0)) as i32
     );
 
-    self.visible_voxels.clear();
+    self.visible_voxels.get_mut_ref().clear();
 
-    for i32::range(start.z, end.z) |z|
+    /* Updating visible voxels is an expensive task. To remedy this,
+     * the work is done on a background thread that has a shared OpenGL
+     * context. While that work is being done, the map renderer will
+     * not have visible voxels or voxel states, since they're moved
+     * to the task. Once the task is finished, however, the fields are
+     * sent back. */
+    let (local_stream, remote_stream) = extra::comm::DuplexStream();
+    self.map_stream = local_stream;
+
+    /* Send out the voxel states and visible voxels. */
+    self.map_stream.send((cell::Cell::new(self.map.states.take_unwrap()), cell::Cell::new(self.visible_voxels.take_unwrap())));
+
+    /* Start the new background task of culling far-away voxels. */
+    let resolution = self.map.resolution;
+    let ibo = self.ibos[self.curr_ibo];
+    do gl::Worker::new_task
     {
-      for i32::range(start.y, end.y) |y|
+      let (cell_states, cell_visible_voxels) = remote_stream.recv();
+      let states = cell_states.take();
+      let mut visible_voxels = cell_visible_voxels.take();
+
+      for i32::range(start.z, end.z) |z|
       {
-        for i32::range(start.x, end.x) |x|
+        for i32::range(start.y, end.y) |y|
         {
-          let index = (z * ((self.map.resolution * self.map.resolution) as i32)) + (y * (self.map.resolution as i32)) + x;
-          if (self.map.states[index] & voxel::Visible) != 0
-          { self.visible_voxels.push(self.map.states[index] & !voxel::Visible); }
+          for i32::range(start.x, end.x) |x|
+          {
+            let index = (z * ((resolution * resolution) as i32)) + (y * (resolution as i32)) + x;
+            if (states[index] & voxel::Visible) != 0
+            { visible_voxels.push(states[index] & !voxel::Visible); }
+          }
         }
       }
-    }
 
-    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.ibos[self.curr_ibo]));
-    //check!(gl2::buffer_sub_data(gl2::ARRAY_BUFFER, 0, self.visible_voxels));
-    unsafe
-    {
-      let size = self.visible_voxels.len() * sys::size_of::<u32>();
-      let mut mem = check!(gl2::glMapBufferRange(gl2::ARRAY_BUFFER, 0, size as i64, 2 | 32));
-      ptr::copy_nonoverlapping_memory(cast::transmute(mem), vec::raw::to_ptr(self.visible_voxels), size);
-      check!(gl2::glUnmapBuffer(gl2::ARRAY_BUFFER));
+      /* Upload the data in an unsynchronized manner. This will prevent
+       * OpenGL from trying to synchronize the mapping, which means it
+       * can be mapped without effectively without the need to glFinish.
+       * This is safe since an alternate set is being renderered while
+       * this is being updated. */
+      check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, ibo));
+      unsafe
+      {
+        let size = visible_voxels.len() * sys::size_of::<u32>();
+        let mem = check!(gl2::glMapBufferRange(gl2::ARRAY_BUFFER, 0, size as i64, 2 | 32));
+        ptr::copy_nonoverlapping_memory(cast::transmute(mem), vec::raw::to_ptr(visible_voxels), size);
+        check!(gl2::glUnmapBuffer(gl2::ARRAY_BUFFER));
+      }
+
+      /* Send the member data back. */
+      remote_stream.send((states, visible_voxels));
+
+      false /* Don't kill the GL worker. */
     }
   }
 }
@@ -213,6 +252,8 @@ impl State for Map_Renderer
     self.offsets_loc = self.shader.get_uniform_location("offsets");
 
     self.shader.update_uniform_i32(self.offsets_loc, 0);
+
+    self.update_visibility();
   }
 
   pub fn unload(&mut self)
@@ -220,11 +261,25 @@ impl State for Map_Renderer
 
   pub fn update(&mut self, delta: f32) -> bool /* dt is in terms of seconds. */
   {
+    /* Check if there is data available between the background
+     * thread and us. The last thing it does is send back some
+     * member data that we'll need to put back in place before
+     * doing any more work. */
+    if !self.map_stream.peek()
+    { return false; }
+
+    /* Extract the new data. */
+    let (states, visible_voxels) = self.map_stream.recv();
+    self.map.states = Some(states);
+    self.visible_voxels = Some(visible_voxels);
+    
+    /* TODO: Work goes here. */
+
+    /* Swap the current IBO and begin updating the old one. */
     if self.curr_ibo == 0
     { self.curr_ibo = 1; }
     else
     { self.curr_ibo = 0; }
-
     self.update_visibility();
 
     false      

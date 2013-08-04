@@ -57,13 +57,25 @@ fn main()
 
     glfw::set_swap_interval(0); /* Try to disable vsync. */
 
-    let window_res = glfw::Window::create(1024, 768, "Q^3", glfw::Windowed);
+    glfw::window_hint::visible(false);
+    let window_res = glfw::Window::create(1, 1, "", glfw::Windowed);
+    let worker_window = match window_res
+    {
+      Ok(win) => { win },
+      Err(()) => { fail!("Failed to create worker window!") }
+    };
+
+    glfw::window_hint::visible(true);
+    let window_res = glfw::Window::create_shared(1024, 768, "Q^3", glfw::Windowed, &worker_window);
     let window = match window_res
     {
       Ok(win) => { @win },
-      Err(()) => { fail!("Failed to create window!") }
+      Err(()) => { fail!("Failed to create main window!") }
     };
     window.make_context_current();
+
+    /* Start the background GL thread. */
+    let gl_worker_port = gl::Worker::initialize(worker_window);
 
     let _ui_renderer = ui::Renderer::new(window);
 
@@ -79,7 +91,7 @@ fn main()
     states.push(console_state as @mut state::State);
     states.push(console_renderer_state as @mut state::State);
 
-    /* Setup callbacks. */ /* TODO: Crash on close with these callbacks. */
+    /* Setup callbacks. */
     do window.set_focus_callback |_, focused|
     { if focused {window.set_cursor_mode(glfw::CURSOR_DISABLED); } }
     do window.set_cursor_pos_callback |_, x, y| 
@@ -138,6 +150,11 @@ fn main()
         states.render();
       } window.swap_buffers();
     }
+
+    /* Kill the worker. */
+    do gl::Worker::new_task
+    { true } 
+    gl_worker_port.recv(); /* Wait for the worker to finish. */
   }
 }
 

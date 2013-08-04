@@ -11,7 +11,6 @@
 */
 
 use std::{ i32, uint, vec, cmp };
-use extra;
 use math;
 use primitive::Triangle;
 use super::{ Vertex, Visible };
@@ -21,7 +20,7 @@ struct Map
   resolution: u32,
   voxel_size: f32,
 
-  states: ~[u32],
+  states: Option<~[u32]>,
   voxels: ~[Vertex],
 }
 
@@ -34,7 +33,7 @@ impl Map
       resolution: res,
       voxel_size: 0.0,
 
-      states: ~[],
+      states: None,
       voxels: ~[],
     };
 
@@ -85,13 +84,13 @@ impl Map
     debug!("VOXEL: Midpoint offset is %?", mid_offset);
 
     /* Create 3D array of states. */
-    self.states = vec::with_capacity(((self.resolution + 1) as f32).pow(&3.0) as uint);
-    self.voxels = vec::with_capacity(self.states.len() / 2); /* Half is just a (generous) guess. */
+    self.states = Some(vec::with_capacity(((self.resolution + 1) as f32).pow(&3.0) as uint));
+    self.voxels = vec::with_capacity(self.states.get_mut_ref().len() / 2); /* Half is just a (generous) guess. */
     for uint::range(0, self.resolution as uint) |_z| 
     { for uint::range(0, self.resolution as uint) |_y|
       { for uint::range(0, self.resolution as uint) |_x|
         {
-          self.states.push(0); /* Invisible. */
+          self.states.get_mut_ref().push(0); /* Invisible. */
         }
       }
     }
@@ -172,8 +171,8 @@ impl Map
               {
                 /* Update the state of the voxel. */
                 let index = (z * ((self.resolution * self.resolution) as i32)) + (y * (self.resolution as i32)) + x;
-                self.states[index] = self.voxels.len() as u32 - 1u32;
-                self.states[index] |= Visible;
+                self.states.get_mut_ref()[index] = self.voxels.len() as u32 - 1u32;
+                self.states.get_mut_ref()[index] |= Visible;
               }
             }
           }
@@ -185,7 +184,7 @@ impl Map
     //for voxels.iter().advance |x|
     //{ self.voxels.push(*x); }
 
-    debug!("VOXEL: Enabled %? of %? voxels", self.voxels.len(), self.states.len());
+    debug!("VOXEL: Enabled %? of %? voxels", self.voxels.len(), self.states.get_mut_ref().len());
   }
 }
 
