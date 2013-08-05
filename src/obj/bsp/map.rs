@@ -222,7 +222,7 @@ impl Map
           }
         }
         /* Something else. */
-        n => { log_info!(fmt!("Invalid face: %?", n)); }
+        n => { log_info!("Invalid face: %?", n); }
       }
     };
 
