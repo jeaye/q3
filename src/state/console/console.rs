@@ -14,6 +14,11 @@ use glfw;
 use ui;
 use math;
 use super::State;
+use util::Log;
+
+#[macro_escape]
+#[path = "../../util/log_macros.rs"]
+mod log_macros;
 
 struct Console
 {
@@ -117,10 +122,10 @@ impl Console
 impl State for Console
 {
   pub fn load(&mut self)
-  { debug!("Loading console state."); }
+  { log_debug!("Loading console state."); }
 
   pub fn unload(&mut self)
-  { debug!("Unloading console state."); }
+  { log_debug!("Unloading console state."); }
 
   pub fn update(&mut self, _delta: f32) -> bool /* dt is in terms of seconds. */
   { false }

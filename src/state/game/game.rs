@@ -18,6 +18,11 @@ use extra;
 use BSP_Map = bsp::Map;
 use Voxel_Map = voxel::Map;
 use super::State;
+use util::Log;
+
+#[macro_escape]
+#[path = "../../util/log_macros.rs"]
+mod log_macros;
 
 pub struct Game
 {
@@ -34,7 +39,7 @@ impl Game
     let start_time = extra::time::precise_time_s();
     let vmap = Voxel_Map::new(bmap.tris, 300);
     let time = extra::time::precise_time_s() - start_time;
-    error!("Voxelization took %? seconds", time);
+    log_info!("Voxelization took %? seconds", time);
 
     let game = @mut Game
     {
@@ -49,9 +54,9 @@ impl Game
 impl State for Game
 {
   pub fn load(&mut self)
-  { debug!("Loading game state."); }
+  { log_debug!("Loading game state."); }
   pub fn unload(&mut self)
-  { debug!("Unloading game state."); }
+  { log_debug!("Unloading game state."); }
 
   pub fn update(&mut self, _delta: f32) -> bool /* dt is in terms of seconds. */
   { false }

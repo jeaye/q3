@@ -14,6 +14,11 @@
 use std::{ io, path, vec, i32, str };
 use super::{ Joint, Vertex, Triangle, Weight, Mesh };
 use math;
+use util::Log;
+
+#[macro_escape]
+#[path = "../../util/log_macros.rs"]
+mod log_macros;
 
 struct Model
 {
@@ -71,7 +76,7 @@ impl Model
   {
     let fior = io::file_reader(&path::Path(file));
     if fior.is_err()
-    { error!("Failed to open model file %s", file); return false; }
+    { log_error!("Failed to open model file %s", file); return false; }
 
     /* Clear existing data. */
     self.joints.clear();
@@ -111,11 +116,13 @@ impl Model
         if num.is_some()
         { $var = num.get(); }
         else
-        { error!("Invalid %s in %s", name, file); }
+        { log_error!("Invalid %s in %s", name, file); }
       });
     )
 
     /* Read the first param and jump into the parsing. */
+    log_debug!("Parsing model");
+    log_push!();
     read_param!();
     while !fio.eof()
     {
@@ -125,7 +132,7 @@ impl Model
         {
           /* Read version. */
           read_type!(self.version);
-          debug!("Model version: %?", self.version);
+          log_debug!("Model version: %?", self.version);
         }
         ~"commandline" =>
         { ignore_line!(); }
@@ -133,19 +140,19 @@ impl Model
         {
           read_type!(self.num_joints);
           self.joints = vec::with_capacity(self.num_joints as uint);
-          debug!("Model joints: %?", self.num_joints);
+          log_debug!("Model joints: %?", self.num_joints);
         }
         ~"numMeshes" =>
         {
           read_type!(self.num_meshes);
           self.meshes = vec::with_capacity(self.num_meshes as uint);
-          debug!("Model meshes: %?", self.num_meshes);
+          log_debug!("Model meshes: %?", self.num_meshes);
         }
         ~"joints" =>
         {
           let mut joint = Joint::new();
           read_junk!();
-          debug!("Reading model joints");
+          log_debug!("Reading model joints");
           
           for i32::range(0, self.num_joints) |_|
           {
@@ -184,7 +191,8 @@ impl Model
           let mut num_tris = 0;
           let mut num_weights = 0;
 
-          debug!("Parsing mesh");
+          log_debug!("Parsing mesh");
+          log_push!();
 
           read_junk!();
           read_param!();
@@ -222,7 +230,7 @@ impl Model
                 }
                 /* Remove quotes. */
                 mesh.texture = self.file_directory + "/" + str::replace(mesh.texture, "\"", "");
-                debug!("Mesh shader/texture: %s", mesh.texture);
+                log_debug!("Mesh shader/texture: %s", mesh.texture);
 
                 ignore_line!();
               }
@@ -231,7 +239,7 @@ impl Model
                 read_type!(num_verts);
                 ignore_line!();
 
-                debug!("Mesh verts: %?", num_verts);
+                log_debug!("Mesh verts: %?", num_verts);
 
                 for i32::range(0, num_verts) |_|
                 {
@@ -254,7 +262,7 @@ impl Model
               {
                 read_type!(num_tris);
                 ignore_line!();
-                debug!("Mesh tris: %?", num_tris);
+                log_debug!("Mesh tris: %?", num_tris);
 
                 for i32::range(0, num_tris) |_|
                 {
@@ -276,7 +284,7 @@ impl Model
               {
                 read_type!(num_weights);
                 ignore_line!();
-                debug!("Mesh weights: %?", num_weights);
+                log_debug!("Mesh weights: %?", num_weights);
 
                 for i32::range(0, num_weights) |_|
                 {
@@ -303,6 +311,7 @@ impl Model
 
           self.prepare_mesh(&mut mesh);
           self.meshes.push(mesh);
+          log_pop!();
         }
         _ => { } 
       }
@@ -310,6 +319,7 @@ impl Model
       /* Move to the next param. */
       read_param!();
     }
+    log_pop!();
 
     true
   }

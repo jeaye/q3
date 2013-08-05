@@ -13,6 +13,7 @@
 use std::{ comm, task, local_data };
 use glfw;
 use gl2 = opengles::gl2;
+use util;
 
 #[macro_escape]
 mod check;
@@ -55,7 +56,7 @@ impl Worker
     exit_port
   }
 
-  pub fn get() -> @Worker
+  priv fn get() -> @Worker
   {
     local_data::get(tls_key, 
     |opt|
@@ -78,6 +79,7 @@ impl Worker
   {
     let (task_port, exit_channel, window) = data;
     window.make_context_current();
+    util::Log::initialize(); /* Done for every thread. */
 
     loop
     {

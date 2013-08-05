@@ -17,11 +17,16 @@ use gl;
 use ui;
 use math;
 use self::map_renderer::Map_Renderer;
+use util::Log;
 
 mod map_renderer;
 
 #[path = "../../gl/check.rs"]
 mod check;
+
+#[macro_escape]
+#[path = "../../util/log_macros.rs"]
+mod log_macros;
 
 pub struct Game_Renderer
 {
@@ -62,14 +67,14 @@ impl State for Game_Renderer
 {
   pub fn load(&mut self)
   {
-    debug!("Loading game renderer state.");
+    log_debug!("Loading game renderer state");
 
     (self.map_renderer as @mut State).load();
   }
 
   pub fn unload(&mut self)
   {
-    debug!("Unloading game renderer state.");
+    log_debug!("Unloading game renderer state");
     (self.map_renderer as @mut State).unload();
   }
 

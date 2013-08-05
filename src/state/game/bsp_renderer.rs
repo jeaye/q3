@@ -20,6 +20,11 @@ use gl;
 use ui;
 use math;
 use bsp;
+use util::Log;
+
+#[macro_escape]
+#[path = "../../util/log_macros.rs"]
+mod log_macros;
 
 #[path = "../../gl/check.rs"]
 mod check;
@@ -99,7 +104,7 @@ impl State for BSP_Renderer
 {
   pub fn load(&mut self)
   {
-    debug!("Loading bsp renderer state.");
+    log_debug!("Loading bsp renderer state.");
 
     self.game_renderer.camera.show_fps = true;
 
@@ -109,7 +114,7 @@ impl State for BSP_Renderer
   }
 
   pub fn unload(&mut self)
-  { debug!("Unloading bsp renderer state."); }
+  { log_debug!("Unloading bsp renderer state."); }
 
   pub fn update(&mut self, delta: f32) -> bool /* dt is in terms of seconds. */
   {

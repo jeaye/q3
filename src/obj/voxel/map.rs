@@ -14,6 +14,11 @@ use std::{ i32, uint, vec, cmp };
 use math;
 use primitive::Triangle;
 use super::{ Vertex, Visible };
+use util::Log;
+
+#[macro_escape]
+#[path = "../../util/log_macros.rs"]
+mod log_macros;
 
 struct Map
 {
@@ -46,7 +51,7 @@ impl Map
   {
     /* Require at least one triangle. */
     assert!(tris.len() >= 1);
-    debug!("VOXEL: Incoming triangles: %?", tris.len());
+    log_debug!("Incoming triangles: %?", tris.len());
 
     /* Bounding box of vert dimensions. */
     let mut min = math::Vec3f::new( tris[0].verts[0].position.x,
@@ -68,20 +73,20 @@ impl Map
         max.z = cmp::max(max.z, vert.position.z);
       }
     }
-    debug!("VOXEL: Min: %s Max: %s", min.to_str(), max.to_str());
+    log_debug!("Min: %s Max: %s", min.to_str(), max.to_str());
     let center = math::Vec3f::new(max.x - ((max.x - min.x) / 2.0),
                                   max.y - ((max.y - min.y) / 2.0),
                                   max.z - ((max.z - min.z) / 2.0));
-    debug!("VOXEL: Center of mesh is %s", center.to_str());
+    log_debug!("Center of mesh is %s", center.to_str());
 
     /* Calculate, given resolution (how many states across), the dimensions of a voxel. */
     self.voxel_size = cmp::max( max.x - min.x,
                                 cmp::max(max.y - min.y, max.z - min.z)) / (self.resolution as f32);
-    debug!("VOXEL: Voxel size is %?", self.voxel_size);
+    log_debug!("Voxel size is %?", self.voxel_size);
 
     /* World space mid point of the grid. */
     let mid_offset = (((self.resolution as f32) / 2.0) * self.voxel_size); 
-    debug!("VOXEL: Midpoint offset is %?", mid_offset);
+    log_debug!("Midpoint offset is %?", mid_offset);
 
     /* Create 3D array of states. */
     self.states = Some(vec::with_capacity(((self.resolution + 1) as f32).pow(&3.0) as uint));
@@ -123,7 +128,7 @@ impl Map
       { vox_amount.y = 1; }
       if vox_amount.z < 1
       { vox_amount.z = 1; }
-      //debug!("VOXEL: [Per voxel] Checking %s surrounding states with SAT", vox_amount.to_str());
+      //log_debug!("[Per voxel] Checking %s surrounding states with SAT", vox_amount.to_str());
 
       /* Get the starting indices of the triangle's bounding box. */
       let start_voxels = math::Vec3i::new( ((min.x - -mid_offset) / self.voxel_size) as i32, 
@@ -184,7 +189,7 @@ impl Map
     //for voxels.iter().advance |x|
     //{ self.voxels.push(*x); }
 
-    debug!("VOXEL: Enabled %? of %? voxels", self.voxels.len(), self.states.get_mut_ref().len());
+    log_debug!("Enabled %? of %? voxels", self.voxels.len(), self.states.get_mut_ref().len());
   }
 }
 
@@ -323,7 +328,7 @@ priv fn tri_cube_intersect(box_center: math::Vec3f, box_size: f32, tri: &Triangl
   _e1 = _v2 - _v1; /* Edge 1. */
   _e2 = _v0 - _v2; /* Edge 2. */
 
-  //debug!("VOXEL: [Per voxel SAT] Testing bullet 3 edge 0");
+  //log_debug!("[Per voxel SAT] Testing bullet 3 edge 0");
   /* Bullet 3. */
   _fex = _e0.x.abs();
   _fey = _e0.y.abs();
@@ -332,7 +337,7 @@ priv fn tri_cube_intersect(box_center: math::Vec3f, box_size: f32, tri: &Triangl
   axis_test_y02!(_e0.z, _e0.x, _fez, _fex);
   axis_test_z12!(_e0.y, _e0.x, _fey, _fex);
 
-  //debug!("VOXEL: [Per voxel SAT] Testing bullet 3 edge 1");
+  //log_debug!("[Per voxel SAT] Testing bullet 3 edge 1");
   _fex = _e1.x.abs();
   _fey = _e1.y.abs();
   _fez = _e1.z.abs();
@@ -340,7 +345,7 @@ priv fn tri_cube_intersect(box_center: math::Vec3f, box_size: f32, tri: &Triangl
   axis_test_y02!(_e1.z, _e1.x, _fez, _fex);
   axis_test_z0!(_e1.y, _e1.x, _fey, _fex);
 
-  //debug!("VOXEL: [Per voxel SAT] Testing bullet 3 edge 2");
+  //log_debug!("[Per voxel SAT] Testing bullet 3 edge 2");
   _fex = _e2.x.abs();
   _fey = _e2.y.abs();
   _fez = _e2.z.abs();
@@ -348,7 +353,7 @@ priv fn tri_cube_intersect(box_center: math::Vec3f, box_size: f32, tri: &Triangl
   axis_test_y1!(_e2.z, _e2.x, _fez, _fex);
   axis_test_z12!(_e2.y, _e2.x, _fey, _fex);
 
-  //debug!("VOXEL: [Per voxel SAT] Testing bullet 1");
+  //log_debug!("[Per voxel SAT] Testing bullet 1");
   /* Bullet 1. */
   /* Test in X-direction */
   find_min_max!(_v0.x, _v1.x, _v2.x);
@@ -362,7 +367,7 @@ priv fn tri_cube_intersect(box_center: math::Vec3f, box_size: f32, tri: &Triangl
   find_min_max!(_v0.z, _v1.z, _v2.z);
   if _min > box_size || _max < -box_size { return false; }
 
-  //debug!("VOXEL: [Per voxel SAT] Testing bullet 2");
+  //log_debug!("[Per voxel SAT] Testing bullet 2");
   /* Bullet 2. */
   _normal = _e0.cross(&_e1);
   plane_cube_intersect(&_normal, &_v0, box_size)

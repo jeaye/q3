@@ -13,9 +13,13 @@ use std::{ i32, cmp, path, io, sys, cast };
 use math;
 use super::lump;
 use primitive::{ Triangle, Vertex_PC };
+use util::Log;
 
 #[path = "../../gl/check.rs"]
 mod check;
+#[macro_escape]
+#[path = "../../util/log_macros.rs"]
+mod log_macros;
 
 pub struct Map
 {
@@ -62,7 +66,6 @@ impl Map
     
     map
   }
-
 
   priv fn read_verts(&mut self, fio: @io::Reader)
   {
@@ -219,12 +222,12 @@ impl Map
           }
         }
         /* Something else. */
-        n => { warn!(fmt!("BSP: Invalid face: %?", n)); }
+        n => { log_info!(fmt!("Invalid face: %?", n)); }
       }
     };
 
     self.verts = verts;
-    debug!("BSP: Trianglulated to %? faces.", self.verts.len());
+    log_debug!("Trianglulated to %? faces", self.verts.len());
   }
 }
 

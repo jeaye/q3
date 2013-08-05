@@ -19,9 +19,14 @@ use gl;
 use ui;
 use math;
 use voxel;
+use util::Log;
 
 #[path = "../../gl/check.rs"]
 mod check;
+
+#[macro_escape]
+#[path = "../../util/log_macros.rs"]
+mod log_macros;
 
 pub struct Map_Renderer
 {
@@ -243,7 +248,7 @@ impl State for Map_Renderer
 {
   pub fn load(&mut self)
   {
-    debug!("Loading map renderer state.");
+    log_debug!("Loading map renderer state");
 
     self.shader.bind();
     self.proj_loc = self.shader.get_uniform_location("proj");
@@ -257,7 +262,7 @@ impl State for Map_Renderer
   }
 
   pub fn unload(&mut self)
-  { debug!("Unloading map renderer state."); }
+  { log_debug!("Unloading map renderer state"); }
 
   pub fn update(&mut self, delta: f32) -> bool /* dt is in terms of seconds. */
   {

@@ -16,6 +16,7 @@ extern mod stb_image;
 
 use std::libc;
 use gl2 = opengles::gl2;
+use util::Log;
 
 #[path = "gl/mod.rs"]
 pub mod gl;
@@ -45,12 +46,22 @@ pub mod state;
 #[path = "obj/md5/mod.rs"]
 pub mod md5;
 
+#[path = "util/mod.rs"]
+pub mod util;
+
+#[macro_escape]
+#[path = "util/log_macros.rs"]
+mod log_macros;
+
 fn main()
 {
+  util::Log::initialize(); /* Main thread. */
   glfw::set_error_callback(error_callback);
 
   do glfw::spawn
   {
+    util::Log::initialize(); /* GLFW thread. */
+
     glfw::window_hint::context_version(3, 2);
     glfw::window_hint::opengl_profile(glfw::OPENGL_CORE_PROFILE);
     glfw::window_hint::opengl_forward_compat(true);
@@ -165,5 +176,5 @@ fn key_callback(window: &glfw::Window, key: libc::c_int, action: libc::c_int)
 }
 
 fn error_callback(error: libc::c_int, description: ~str)
-{ error!("GLFW Error %?: %s", error, description); }
+{ log_error!("GLFW %?: %s", error, description); }
 

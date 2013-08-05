@@ -15,6 +15,11 @@ use gl;
 use ui;
 use math;
 use super::{ State, Console };
+use util::Log;
+
+#[macro_escape]
+#[path = "../../util/log_macros.rs"]
+mod log_macros;
 
 struct Console_Renderer
 {
@@ -49,10 +54,10 @@ impl Console_Renderer
 impl State for Console_Renderer
 {
   pub fn load(&mut self)
-  { debug!("Loading console state."); }
+  { log_debug!("Loading console renderer state"); }
 
   pub fn unload(&mut self)
-  { debug!("Unloading console state."); }
+  { log_debug!("Unloading console renderer state"); }
 
   pub fn update(&mut self, delta: f32) -> bool /* dt is in terms of seconds. */
   {

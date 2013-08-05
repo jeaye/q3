@@ -13,9 +13,14 @@ use std::{ vec, cast };
 use gl2 = opengles::gl2;
 use stb_image;
 use math;
+use util::Log;
 
 #[macro_escape]
 mod check;
+
+#[macro_escape]
+#[path = "../util/log_macros.rs"]
+mod log_macros;
 
 struct Texture
 {
@@ -52,7 +57,7 @@ impl Texture
     {
       stb_image::image::ImageU8(ref image) => 
       {
-        debug!(fmt!("Loaded image %s with %?x%?:%?", 
+        log_debug!(fmt!("Loaded image %s with %?x%?:%?", 
                     tex.filename, image.width, image.height, image.depth));
 
         tex.size = math::Vec2i::new(image.width as i32, image.height as i32);
@@ -60,7 +65,7 @@ impl Texture
         {
           3 => { gl2::RGB },
           4 => { gl2::RGBA },
-          x => { error!(fmt!("Invalid texture depth %?", x)); gl2::RGBA }
+          x => { log_error!(fmt!("Invalid texture depth %?", x)); gl2::RGBA }
         };
 
         let data = image.data.clone();
