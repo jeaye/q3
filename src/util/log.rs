@@ -51,13 +51,17 @@ impl Log
   {
     let logger = @mut Log
     {
-      verbosity: match os::getenv("Q3_LOG").take_unwrap()
+      verbosity: match os::getenv("Q3_LOG").take()
                  {
-                   ~"0" => Verbosity_None,
-                   ~"1" => Verbosity_Error,
-                   ~"2" => Verbosity_Info,
-                   ~"3" => Verbosity_Debug,
-                   _ => Verbosity_Info, /* default */
+                   Some(val) => match val
+                   {
+                     ~"0" => Verbosity_None,
+                     ~"1" => Verbosity_Error,
+                     ~"2" => Verbosity_Info,
+                     ~"3" => Verbosity_Debug,
+                     _ => Verbosity_Info, /* default */
+                   },
+                   None => Verbosity_Info /* default */
                  },
       push_level: 0,
       terminal: term::Terminal::new(io::stdout()).unwrap(),
