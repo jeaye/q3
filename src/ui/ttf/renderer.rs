@@ -104,7 +104,7 @@ impl Renderer
 
     /* Render each line separately. */
     let mut line_count = 0;
-    for text.line_iter().advance |line|
+    for line in text.line_iter()
     {
       line_count += 1;
       let mut coords = vec::with_capacity::<Point>(line.len());
@@ -112,7 +112,7 @@ impl Renderer
       temp_pos.y += (font.height * line_count) as f32;
 
       let mut count = 0;
-      for line.iter().advance |curr|
+      for curr in line.iter()
       {
         let glyph = match font.glyphs.find(&(curr as u8))
         {

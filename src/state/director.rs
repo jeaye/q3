@@ -14,7 +14,6 @@ use std::local_data;
 
 static tls_key: local_data::Key<@mut Director> = &local_data::Key;
 
-#[allow(default_methods)]
 pub trait State
 {
   pub fn load(&mut self);
@@ -92,7 +91,7 @@ impl Director
   {
     assert!(self.states.len() > 0);
 
-    for self.states.mut_iter().advance |x|
+    for x in self.states.mut_iter()
     {
       if x.update(delta)
       { break; }
@@ -103,7 +102,7 @@ impl Director
   {
     assert!(self.states.len() > 0);
 
-    for self.states.mut_iter().advance |x|
+    for x in self.states.mut_iter()
     {
       if x.render()
       { break; }
@@ -115,7 +114,7 @@ impl Director
   {
     assert!(self.states.len() > 0);
 
-    for self.states.mut_rev_iter().advance |x|
+    for x in self.states.mut_rev_iter()
     {
       if x.key_action(key, action, mods)
       { break; }
@@ -126,7 +125,7 @@ impl Director
   {
     assert!(self.states.len() > 0);
 
-    for self.states.mut_rev_iter().advance |x|
+    for x in self.states.mut_rev_iter()
     {
       if x.key_char(ch)
       { break; }
@@ -137,7 +136,7 @@ impl Director
   {
     assert!(self.states.len() > 0);
 
-    for self.states.mut_rev_iter().advance |x|
+    for x in self.states.mut_rev_iter()
     {
       if x.mouse_action(button, action, mods)
       { break; }
@@ -148,7 +147,7 @@ impl Director
   {
     assert!(self.states.len() > 0);
 
-    for self.states.mut_rev_iter().advance |state|
+    for state in self.states.mut_rev_iter()
     {
       if state.mouse_moved(x, y)
       { break; }

@@ -12,8 +12,7 @@
 
 use gl2 = opengles::gl2;
 use gl;
-use math;
-use super::{ Model, Mesh, Mesh_Renderer };
+use super::{ Model, Mesh_Renderer };
 
 #[path = "../../gl/check.rs"]
 mod check;
@@ -46,7 +45,7 @@ impl<'self> Model_Renderer<'self>
     mr.proj_loc = mr.shader.get_uniform_location("proj");
     mr.world_loc = mr.shader.get_uniform_location("world");
 
-    for mr.model.meshes.iter().advance |x|
+    for x in mr.model.meshes.iter()
     { mr.mesh_renderers.push(Mesh_Renderer::new(x, mr.shader)); }
 
     mr
@@ -61,7 +60,7 @@ impl<'self> Model_Renderer<'self>
     self.shader.update_uniform_mat(self.proj_loc, &camera.projection);
     self.shader.update_uniform_mat(self.world_loc, &camera.view);
 
-    for self.mesh_renderers.iter().advance |x|
+    for x in self.mesh_renderers.iter()
     { x.render(); }
 
     check!(gl2::front_face(gl2::CCW));

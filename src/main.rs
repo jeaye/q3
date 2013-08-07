@@ -14,7 +14,7 @@ extern mod opengles;
 extern mod glfw;
 extern mod stb_image;
 
-use std::libc;
+use std::{ libc, rt };
 use gl2 = opengles::gl2;
 use util::Log;
 
@@ -53,119 +53,121 @@ pub mod util;
 #[path = "util/log_macros.rs"]
 mod log_macros;
 
-fn main()
+#[start]
+fn main(argc: int, argv: **u8, crate_map: *u8) -> int
 {
-  util::Log::initialize(); /* Main thread. */
-  glfw::set_error_callback(error_callback);
-
-  do glfw::spawn
+  do rt::start_on_main_thread(argc, argv, crate_map)
   {
-    util::Log::initialize(); /* GLFW thread. */
+    util::Log::initialize(); /* Main thread. */
+    glfw::set_error_callback(error_callback);
 
-    glfw::window_hint::context_version(3, 2);
-    glfw::window_hint::opengl_profile(glfw::OPENGL_CORE_PROFILE);
-    glfw::window_hint::opengl_forward_compat(true);
-
-    glfw::set_swap_interval(0); /* Try to disable vsync. */
-
-    glfw::window_hint::visible(false);
-    let window_res = glfw::Window::create(1, 1, "", glfw::Windowed);
-    let worker_window = match window_res
+    do glfw::start
     {
-      Ok(win) => { win },
-      Err(()) => { fail!("Failed to create worker window!") }
-    };
+      glfw::window_hint::context_version(3, 2);
+      glfw::window_hint::opengl_profile(glfw::OPENGL_CORE_PROFILE);
+      glfw::window_hint::opengl_forward_compat(true);
 
-    glfw::window_hint::visible(true);
-    let window_res = glfw::Window::create_shared(1024, 768, "Q^3", glfw::Windowed, &worker_window);
-    let window = match window_res
-    {
-      Ok(win) => { @win },
-      Err(()) => { fail!("Failed to create main window!") }
-    };
-    window.make_context_current();
-
-    /* Start the background GL thread. */
-    let gl_worker_port = gl::Worker::initialize(worker_window);
-
-    let _ui_renderer = ui::Renderer::new(window);
-
-    /* Create all the states we need. */
-    let states = state::Director::new();
-    let console_state = state::Console::new();
-    let console_renderer_state = state::Console_Renderer::new(console_state);
-    let game_state = state::Game::new();
-    let game_renderer_state = state::Game_Renderer::new(game_state, window);
-    let bsp_renderer_state = state::BSP_Renderer::new(game_renderer_state);
-    states.push(game_state as @mut state::State);
-    states.push(game_renderer_state as @mut state::State);
-    states.push(console_state as @mut state::State);
-    states.push(console_renderer_state as @mut state::State);
-
-    /* Setup callbacks. */
-    do window.set_focus_callback |_, focused|
-    { if focused {window.set_cursor_mode(glfw::CURSOR_DISABLED); } }
-    do window.set_cursor_pos_callback |_, x, y| 
-    { states.mouse_moved(x as f32, y as f32); }
-    do window.set_char_callback |_, c|
-    { states.key_char(c); }
-    do window.set_key_callback |window, key, _scancode, action, mods|
-    {
-      /* TODO: Ability to pop specific states or insert others. */
-      if key == glfw::KEY_LEFT_BRACKET && action == glfw::PRESS
+      glfw::window_hint::visible(false);
+      let window_res = glfw::Window::create(1, 1, "", glfw::Windowed);
+      let worker_window = match window_res
       {
-        states.pop(); /* console renderer */
-        states.pop(); /* console */
-        states.pop(); /* renderer */
-        states.push(game_renderer_state as @mut state::State);
-        states.push(console_state as @mut state::State);
-        states.push(console_renderer_state as @mut state::State);
+        Ok(win) => { win },
+        Err(()) => { fail!("Failed to create worker window!") }
+      };
+
+      glfw::window_hint::visible(true);
+      let window_res = glfw::Window::create_shared(1024, 768, "Q^3", glfw::Windowed, &worker_window);
+      let window = match window_res
+      {
+        Ok(win) => { @win },
+        Err(()) => { fail!("Failed to create main window!") }
+      };
+      window.make_context_current();
+
+      glfw::set_swap_interval(0); /* Try to disable vsync. */
+
+      /* Start the background GL thread. */
+      let gl_worker_port = gl::Worker::initialize(worker_window);
+
+      let _ui_renderer = ui::Renderer::new(window);
+
+      /* Create all the states we need. */
+      let states = state::Director::new();
+      let console_state = state::Console::new();
+      let console_renderer_state = state::Console_Renderer::new(console_state);
+      let game_state = state::Game::new();
+      let game_renderer_state = state::Game_Renderer::new(game_state, window);
+      let bsp_renderer_state = state::BSP_Renderer::new(game_renderer_state);
+      states.push(game_state as @mut state::State);
+      states.push(game_renderer_state as @mut state::State);
+      states.push(console_state as @mut state::State);
+      states.push(console_renderer_state as @mut state::State);
+
+      /* Setup callbacks. */
+      do window.set_focus_callback |_, focused|
+      { if focused {window.set_cursor_mode(glfw::CURSOR_DISABLED); } }
+      do window.set_cursor_pos_callback |_, x, y| 
+      { states.mouse_moved(x as f32, y as f32); }
+      do window.set_char_callback |_, c|
+      { states.key_char(c); }
+      do window.set_key_callback |window, key, _scancode, action, mods|
+      {
+        /* TODO: Ability to pop specific states or insert others. */
+        if key == glfw::KEY_LEFT_BRACKET && action == glfw::PRESS
+        {
+          states.pop(); /* console renderer */
+          states.pop(); /* console */
+          states.pop(); /* renderer */
+          states.push(game_renderer_state as @mut state::State);
+          states.push(console_state as @mut state::State);
+          states.push(console_renderer_state as @mut state::State);
+        }
+        else if key == glfw::KEY_RIGHT_BRACKET && action == glfw::PRESS
+        {
+          states.pop(); /* console renderer */
+          states.pop(); /* console */
+          states.pop(); /* renderer */
+          states.push(bsp_renderer_state as @mut state::State);
+          states.push(console_state as @mut state::State);
+          states.push(console_renderer_state as @mut state::State);
+        }
+
+        states.key_action(key, action, mods);
+        key_callback(window, key, action);
       }
-      else if key == glfw::KEY_RIGHT_BRACKET && action == glfw::PRESS
+
+      let _model = md5::Model::new(~"data/models/bob/bob.md5mesh");
+      let _model_renderer = md5::Model_Renderer::new(&_model);
+
+      /* Console functions. */
+      ui::Console_Activator::get().add_accessor("q3.version", |_|
+                                                { fmt!("%s.%s", env!("VERSION"), env!("COMMIT")) });
+
+      /* Delta time. */
+      let mut cur_time = extra::time::precise_time_s() as f32;
+      let mut last_time = cur_time;
+
+      while !window.should_close()
       {
-        states.pop(); /* console renderer */
-        states.pop(); /* console */
-        states.pop(); /* renderer */
-        states.push(bsp_renderer_state as @mut state::State);
-        states.push(console_state as @mut state::State);
-        states.push(console_renderer_state as @mut state::State);
+        glfw::poll_events();
+
+        let delta = cur_time - last_time;
+        last_time = cur_time;
+        cur_time = extra::time::precise_time_s() as f32;
+
+        states.update(delta);
+
+        check!(gl2::clear(gl2::COLOR_BUFFER_BIT | gl2::DEPTH_BUFFER_BIT));
+        {
+          states.render();
+        } window.swap_buffers();
       }
 
-      states.key_action(key, action, mods);
-      key_callback(window, key, action);
+      /* Kill the worker. */
+      do gl::Worker::new_task
+      { true } 
+      gl_worker_port.recv(); /* Wait for the worker to finish. */
     }
-
-    let _model = md5::Model::new(~"data/models/bob/bob.md5mesh");
-    let _model_renderer = md5::Model_Renderer::new(&_model);
-
-    /* Console functions. */
-    ui::Console_Activator::get().add_accessor("q3.version", |_|
-    { fmt!("%s.%s", env!("VERSION"), env!("COMMIT")) });
-
-    /* Delta time. */
-    let mut cur_time = extra::time::precise_time_s() as f32;
-    let mut last_time = cur_time;
-
-    while !window.should_close()
-    {
-      glfw::poll_events();
-
-      let delta = cur_time - last_time;
-      last_time = cur_time;
-      cur_time = extra::time::precise_time_s() as f32;
-
-      states.update(delta);
-
-      check!(gl2::clear(gl2::COLOR_BUFFER_BIT | gl2::DEPTH_BUFFER_BIT));
-      {
-        states.render();
-      } window.swap_buffers();
-    }
-
-    /* Kill the worker. */
-    do gl::Worker::new_task
-    { true } 
-    gl_worker_port.recv(); /* Wait for the worker to finish. */
   }
 }
 

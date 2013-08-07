@@ -9,7 +9,7 @@
       Loader and handler of BSP maps.
 */
 
-use std::{ i32, cmp, path, io, sys, cast };
+use std::{ cmp, path, io, sys, cast };
 use math;
 use super::lump;
 use primitive::{ Triangle, Vertex_PC };
@@ -75,7 +75,7 @@ impl Map
     assert!(num_verts > 0);
 
     let mut vert = lump::Vertex::new();
-    for i32::range(0, num_verts) |i|
+    for i in range(0, num_verts)
     {
       unsafe { fio.read( cast::transmute((&vert, sys::size_of::<lump::Vertex>())),
                 sys::size_of::<lump::Vertex>()); }
@@ -135,7 +135,7 @@ impl Map
     let mut max = math::Vec3f::new( self.verts[0].position.x,
                               self.verts[0].position.y,
                               self.verts[0].position.z);
-    for self.verts.iter().advance |v|
+    for v in self.verts.iter()
     {
       min.x = cmp::min(min.x, v.position.x);
       min.y = cmp::min(min.y, v.position.y);
@@ -150,7 +150,7 @@ impl Map
                             max.z - ((max.z - min.z) / 2.0));
 
     /* Move the mesh by the center to the origin (easier to voxelize). */
-    for self.verts.mut_iter().advance |v|
+    for v in self.verts.mut_iter()
     { v.position = v.position - center; }
   }
 
@@ -162,7 +162,7 @@ impl Map
     assert!(num_faces > 0);
 
     let face = lump::Face::new();
-    for i32::range(0, num_faces) |_|
+    for _ in range(0, num_faces)
     {
       unsafe { fio.read( cast::transmute((&face, sys::size_of::<lump::Face>())),
                 sys::size_of::<lump::Face>()); }
@@ -178,7 +178,7 @@ impl Map
     assert!(num_obj > 0);
 
     let obj = lump::Mesh_Vert::new();
-    for i32::range(0, num_obj) |_|
+    for _ in range(0, num_obj)
     {
       unsafe { fio.read( cast::transmute((&obj, sys::size_of::<lump::Mesh_Vert>())),
                 sys::size_of::<lump::Mesh_Vert>()); }
@@ -189,7 +189,7 @@ impl Map
   priv fn triangulate(&mut self)
   {
     let mut verts: ~[lump::Vertex] = ~[];
-    for self.faces.iter().advance |face|
+    for face in self.faces.iter()
     {
       if face.kind != 1 { loop; }
 
@@ -197,7 +197,7 @@ impl Map
       {
         n if n >= 3 =>
         {
-          for i32::range(0, n - 2) |i|
+          for i in range(0, n - 2)
           {
             verts.push(self.verts[face.start_vertex]);
             verts.push(self.verts[face.start_vertex + i + 2]);

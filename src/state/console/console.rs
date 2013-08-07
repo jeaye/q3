@@ -75,11 +75,11 @@ impl Console
       let mut error = ~"";
       let mut property = ~"";
       let mut params = params.to_owned();
-      for params.split_iter(' ').advance |x|
+      for x in params.split_iter(' ')
       { property = x.to_owned(); break; }
 
       /* Remove the property from the string. */
-      for property.iter().advance |_|
+      for _ in property.iter()
       { params.shift_char(); }
       params.shift_char();
 
@@ -154,11 +154,11 @@ impl State for Console
 
           /* Extract the function name. */
           let mut func = ~"";
-          for self.input.split_iter(' ').advance |x|
+          for x in self.input.split_iter(' ')
           { func = x.to_owned(); break; };
 
           /* Remove the function from the string. */
-          for func.iter().advance |_|
+          for _ in func.iter()
           { self.input.shift_char(); }
           self.input.shift_char();
 

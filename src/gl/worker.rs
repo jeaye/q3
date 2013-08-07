@@ -95,7 +95,7 @@ impl Worker
     }
 
     /* Let the main thread know we're done. */
-    glfw::detach_current_context();
+    glfw::make_context_current(None);
     exit_channel.send(true);
   }
 }

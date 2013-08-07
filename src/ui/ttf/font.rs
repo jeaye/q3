@@ -69,7 +69,7 @@ impl Font
 
       let chars = &" !\"#$%&'`()*+,-_./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^abcdefghijklmnopqrstuvwxyz{|}~";
 
-      for chars.iter().advance |curr|
+      for curr in chars.iter()
       {
         if ft::FT_Load_Char(font.face, curr as u32, ft::LOAD_RENDER) != 0
         { loop; }
@@ -124,7 +124,7 @@ impl Font
       /* Copy all glyphs into the texture atlas. */
       let mut offset = math::Vec2i::zero();
       row_height = 0;
-      for chars.iter().advance |curr|
+      for curr in chars.iter()
       {
         let glyph = match font.glyphs.find_mut(&(curr as u8))
         {

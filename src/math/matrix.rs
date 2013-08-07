@@ -10,7 +10,7 @@
       for representing orientational data.
 */
 
-use std::{ i32, ptr };
+use std::ptr;
 use math;
 
 type Component = f32;
@@ -183,14 +183,14 @@ impl Mul<Mat4x4, Mat4x4> for Mat4x4
   {
     let mut mat = Mat4x4::new();
 
-    for i32::range(0, 4) |i|
+    for i in range(0, 4)
     {
-      for i32::range(0, 4) |j|
+      for k in range(0, 4)
       {
-        mat.data[i][j] =  self.data[i][0] * rhs.data[0][j] +
-                          self.data[i][1] * rhs.data[1][j] +
-                          self.data[i][2] * rhs.data[2][j] +
-                          self.data[i][3] * rhs.data[3][j];
+        mat.data[i][k] =  self.data[i][0] * rhs.data[0][k] +
+                          self.data[i][1] * rhs.data[1][k] +
+                          self.data[i][2] * rhs.data[2][k] +
+                          self.data[i][3] * rhs.data[3][k];
       }
     }
 

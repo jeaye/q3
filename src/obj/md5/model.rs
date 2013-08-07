@@ -11,7 +11,7 @@
       MD5 animated models.
 */
 
-use std::{ io, path, vec, i32, str };
+use std::{ io, path, vec, str };
 use super::{ Joint, Vertex, Triangle, Weight, Mesh };
 use math;
 use util::Log;
@@ -44,7 +44,7 @@ impl Model
     /* TODO: Custom Path type to handle this. */
     let dir;
     let mut posix = true;
-    for i32::range(0, mesh_file.len() as i32) |x|
+    for x in range(0, mesh_file.len() as i32)
     { if mesh_file[x] == '\\' as u8 { posix = false; } }
     if posix
     { dir = path::PosixPath(mesh_file.clone()).normalize().dirname(); }
@@ -114,7 +114,7 @@ impl Model
         read_param!();
         let num = FromStr::from_str(param);
         if num.is_some()
-        { $var = num.get(); }
+        { $var = num.unwrap(); }
         else
         { log_error!("Invalid %s in %s", name, file); }
       });
@@ -154,7 +154,7 @@ impl Model
           read_junk!();
           log_debug!("Reading model joints");
           
-          for i32::range(0, self.num_joints) |_|
+          for _ in range(0, self.num_joints)
           {
             read_param!();
             joint.name = param.clone();
@@ -208,7 +208,7 @@ impl Model
                  * path so it can parse it. Just loop through and
                  * check for \ which indicates it's for Windows. */
                 let mut posix = true;
-                for i32::range(0, param.len() as i32) |x|
+                for x in range(0, param.len() as i32)
                 { if param[x] == '\\' as u8 { posix = false; } }
                 if posix
                 {
@@ -241,7 +241,7 @@ impl Model
 
                 log_debug!("Mesh verts: %?", num_verts);
 
-                for i32::range(0, num_verts) |_|
+                for _ in range(0, num_verts)
                 {
                   read_junk!();
                   read_junk!();
@@ -264,7 +264,7 @@ impl Model
                 ignore_line!();
                 log_debug!("Mesh tris: %?", num_tris);
 
-                for i32::range(0, num_tris) |_|
+                for _ in range(0, num_tris)
                 {
                   read_junk!();
                   read_junk!();
@@ -286,7 +286,7 @@ impl Model
                 ignore_line!();
                 log_debug!("Mesh weights: %?", num_weights);
 
-                for i32::range(0, num_weights) |_|
+                for _ in range(0, num_weights)
                 {
                   read_junk!();
                   read_junk!();
@@ -329,14 +329,14 @@ impl Model
     mesh.positions.clear();
     mesh.tex_coords.clear();
 
-    for i32::range(0, mesh.verts.len() as i32) |x|
+    for x in range(0, mesh.verts.len() as i32)
     {
       let vert = &mut mesh.verts[x];
       vert.position = math::Vec3f::zero();
       vert.normal = math::Vec3f::zero();
 
       /* Sum the position of all the weights. */
-      for i32::range(0, vert.weight_count) |w|
+      for w in range(0, vert.weight_count)
       {
         let weight = &mut mesh.weights[vert.start_weight + w];
         let joint = &mut self.joints[weight.joint_id];

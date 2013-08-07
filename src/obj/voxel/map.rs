@@ -10,7 +10,7 @@
       into OpenGL-ready cubes.
 */
 
-use std::{ i32, uint, vec, cmp };
+use std::{ vec, cmp };
 use math;
 use primitive::Triangle;
 use super::{ Vertex, Visible };
@@ -60,9 +60,9 @@ impl Map
     let mut max = math::Vec3f::new( tris[0].verts[0].position.x,
                                     tris[0].verts[0].position.y,
                                     tris[0].verts[0].position.z);
-    for tris.iter().advance |curr|
+    for curr in tris.iter()
     {
-      for curr.verts.iter().advance |vert|
+      for vert in curr.verts.iter()
       {
         min.x = cmp::min(min.x, vert.position.x);
         min.y = cmp::min(min.y, vert.position.y);
@@ -91,9 +91,9 @@ impl Map
     /* Create 3D array of states. */
     self.states = Some(vec::with_capacity(((self.resolution + 1) as f32).pow(&3.0) as uint));
     self.voxels = vec::with_capacity(self.states.get_mut_ref().len() / 2); /* Half is just a (generous) guess. */
-    for uint::range(0, self.resolution as uint) |_z| 
-    { for uint::range(0, self.resolution as uint) |_y|
-      { for uint::range(0, self.resolution as uint) |_x|
+    for _z in range(0, self.resolution as uint) 
+    { for _y in range(0, self.resolution as uint)
+      { for _x in range(0, self.resolution as uint)
         {
           self.states.get_mut_ref().push(0); /* Invisible. */
         }
@@ -101,12 +101,12 @@ impl Map
     }
 
     //let mut voxels = extra::treemap::TreeSet::new(); /* TODO: Bring back in; maintain indices. */
-    for tris.iter().advance |tri|
+    for tri in tris.iter()
     {
       /* Calculate bounding box of the triangle. */
       min = math::Vec3f::new(tri.verts[0].position.x, tri.verts[0].position.y, tri.verts[0].position.z);
       max = math::Vec3f::new(tri.verts[0].position.x, tri.verts[0].position.y, tri.verts[0].position.z);
-      for tri.verts.iter().advance |vert|
+      for vert in tri.verts.iter()
       {
         /* Adjust by half of a voxel to account for voxel centering. */
         min.x = cmp::min(min.x, vert.position.x - (self.voxel_size / 2.0));
@@ -136,9 +136,9 @@ impl Map
                                       ((min.z - -mid_offset) / self.voxel_size) as i32);
 
       /* Test intersection with each accepted voxel. */
-      for i32::range(start_voxels.z, start_voxels.z + vox_amount.z) |z|
-      { for i32::range(start_voxels.y, start_voxels.y + vox_amount.y) |y|
-        { for i32::range(start_voxels.x, start_voxels.x + vox_amount.x) |x|
+      for z in range(start_voxels.z, start_voxels.z + vox_amount.z)
+      { for y in range(start_voxels.y, start_voxels.y + vox_amount.y)
+        { for x in range(start_voxels.x, start_voxels.x + vox_amount.x)
           {
             /* Check for intersection. */
             let c = math::Vec3f::new( ((x as f32 - (self.resolution as f32 / 2.0)) * self.voxel_size) + (self.voxel_size / 2.0), 
@@ -186,7 +186,7 @@ impl Map
     }
 
     /* Move to array form. */
-    //for voxels.iter().advance |x|
+    //for x in voxels.iter()
     //{ self.voxels.push(*x); }
 
     log_debug!("Enabled %? of %? voxels", self.voxels.len(), self.states.get_mut_ref().len());
@@ -377,9 +377,9 @@ priv fn plane_cube_intersect(normal: &math::Vec3f, vert: &math::Vec3f, box_size:
 {
   let mut vmin: [f32, ..3] = [0.0, 0.0, 0.0];
   let mut vmax: [f32, ..3] = [0.0, 0.0, 0.0];
-  let mut v = 0.0;
+  let mut v;
 
-  for uint::range(0, 3) |q|
+  for q in range(0u, 3u)
   {
     v = vert[q];
     if normal[q] > 0.0

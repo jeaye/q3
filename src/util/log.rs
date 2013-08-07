@@ -22,7 +22,7 @@
       associated log_pop!().
 */
 
-use std::{ u8, io, local_data, os };
+use std::{ io, local_data, os };
 use extra::term;
 use extra::term::color;
 
@@ -136,7 +136,7 @@ impl Log
     logger.terminal.reset();
 
     /* Indent as per the push level. */
-    for u8::range(0, logger.push_level) |_|
+    for _ in range(0, logger.push_level)
     { print("  "); }
 
     match verbosity

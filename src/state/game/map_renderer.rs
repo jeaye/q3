@@ -11,7 +11,7 @@
       used only to render the voxel map.
 */
 
-use std::{ i32, vec, ptr, sys, cast, cell };
+use std::{ vec, ptr, sys, cast, cell };
 use extra;
 use state::State;
 use gl2 = opengles::gl2;
@@ -209,11 +209,11 @@ impl Map_Renderer
       let states = cell_states.take();
       let mut visible_voxels = cell_visible_voxels.take();
 
-      for i32::range(start.z, end.z) |z|
+      for z in range(start.z, end.z)
       {
-        for i32::range(start.y, end.y) |y|
+        for y in range(start.y, end.y)
         {
-          for i32::range(start.x, end.x) |x|
+          for x in range(start.x, end.x)
           {
             let index = (z * ((resolution * resolution) as i32)) + (y * (resolution as i32)) + x;
             if (states[index] & voxel::Visible) != 0
@@ -264,7 +264,7 @@ impl State for Map_Renderer
   pub fn unload(&mut self)
   { log_debug!("Unloading map renderer state"); }
 
-  pub fn update(&mut self, delta: f32) -> bool /* dt is in terms of seconds. */
+  pub fn update(&mut self, _delta: f32) -> bool /* dt is in terms of seconds. */
   {
     /* Check if there is data available between the background
      * thread and us. The last thing it does is send back some
