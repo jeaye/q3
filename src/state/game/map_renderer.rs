@@ -260,7 +260,16 @@ impl State for Map_Renderer
   }
 
   pub fn unload(&mut self)
-  { log_debug!("Unloading map renderer state"); }
+  {
+    log_debug!("Unloading map renderer state");
+    
+    /* Since the background worker is doing its thing, we'll
+     * need to wait for it to finish so that it doesn't try
+     * to update us when we're dead. */
+    let (states, visible_voxels) = self.map_stream.recv();
+    self.map.states = Some(states);
+    self.visible_voxels = Some(visible_voxels);
+  }
 
   pub fn update(&mut self, _delta: f32) -> bool /* dt is in terms of seconds. */
   {
