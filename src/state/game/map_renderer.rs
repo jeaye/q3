@@ -31,7 +31,6 @@ mod log_macros;
 pub struct Map_Renderer
 {
   map: @mut voxel::Map,
-  camera: @mut gl::Camera,
 
   vao: gl2::GLuint,
   vox_vbo: gl2::GLuint,
@@ -56,14 +55,13 @@ pub struct Map_Renderer
 
 impl Map_Renderer
 {
-  pub fn new(map: @mut voxel::Map, cam: @mut gl::Camera) -> @mut Map_Renderer
+  pub fn new(map: @mut voxel::Map) -> @mut Map_Renderer
   {
     let (local_stream, _) = extra::comm::DuplexStream();
 
     let mr = @mut Map_Renderer
     {
       map: map,
-      camera: cam,
 
       vao: 0,
       vox_vbo: 0,
@@ -292,9 +290,11 @@ impl State for Map_Renderer
 
   pub fn render(&mut self) -> bool
   {
+    let camera = gl::Camera::get_active();
+
     self.shader.bind();
-    self.shader.update_uniform_mat(self.proj_loc, &self.camera.projection);
-    self.shader.update_uniform_mat(self.world_loc, &self.camera.view);
+    self.shader.update_uniform_mat(self.proj_loc, &camera.projection);
+    self.shader.update_uniform_mat(self.world_loc, &camera.view);
     self.shader.update_uniform_f32(self.voxel_size_loc, self.map.voxel_size);
 
     check!(gl2::bind_vertex_array(self.vao));

@@ -46,7 +46,7 @@ impl Game_Renderer
     {
       game: game,
       camera: cam,
-      map_renderer: Map_Renderer::new(game.voxel_map, cam),
+      map_renderer: Map_Renderer::new(game.voxel_map),
 
       fps_font: ui::Font::new("data/fonts/test.ttf", 30),
     };
@@ -56,7 +56,7 @@ impl Game_Renderer
     do window.set_size_callback |_, width, height|
     { gr.camera.resize(width as i32, height as i32); }
 
-    gl::Camera::set_active(gr.camera); /* TODO: Stop passing the camera around. */
+    gl::Camera::set_active(gr.camera);
 
     gr
   }
