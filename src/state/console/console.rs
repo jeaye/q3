@@ -60,7 +60,7 @@ impl Console
         Some(func) =>
         { c.add_log(fmt!("%s = %s", property, (*func)(property))); }
         None =>
-        { err = fmt!("Error: Invalid property %s", property); }
+        { err = fmt!("Error: Invalid property '%s'", property); }
       }
 
       if err.len() == 0
@@ -78,31 +78,28 @@ impl Console
       for x in params.split_iter(' ')
       { property = x.to_owned(); break; }
 
-      /* Remove the property from the string. */
+      /* We require a property and a value.
+       * Remove the property from the string.
+       */
       for _ in property.iter()
       { params.shift_char(); }
-      params.shift_char();
+      if params.len() > 0
+      { params.shift_char(); }
 
-      /* We require a property and a value. */
-      if property.len() == 0
-      { error = fmt!("Invalid len for 'set' function arg list: %s", params); }
-      else
+      /* Check if this property exists. */
+      match c.activator.mutators.find(&property)
       {
-        /* Check if this property exists. */
-        match c.activator.mutators.find(&property)
+        Some(func) =>
         {
-          Some(func) =>
+          /* Pass the args to the property mutator. */
+          match (*func)(property, params)
           {
-            /* Pass the args to the property mutator. */
-            match (*func)(property, params)
-            {
-              /* Check if the mutator liked the args. */
-              Some(err) => { error = err; }
-              None => { }
-            }
+            /* Check if the mutator liked the args. */
+            Some(err) => { error = err; }
+            None => { }
           }
-          None => { error = fmt!("The property %s does not exist.", property); }
         }
+        None => { error = fmt!("The property '%s' does not exist.", property); }
       }
 
       if error.len() > 0
@@ -160,7 +157,8 @@ impl State for Console
           /* Remove the function from the string. */
           for _ in func.iter()
           { self.input.shift_char(); }
-          self.input.shift_char();
+          if self.input.len() > 0
+          { self.input.shift_char(); }
 
           /* Look for the function in the cached map. */
           match self.activator.functions.find(&func)
@@ -177,7 +175,7 @@ impl State for Console
             None => { self.add_log("Error: Invalid function"); }
           }
 
-          self.input = ~"";
+          self.input.clear();
           return true;
         }
         else if key == glfw::KEY_BACKSPACE
