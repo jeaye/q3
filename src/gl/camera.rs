@@ -57,6 +57,7 @@ pub struct Camera
   window: @glfw::Window,
   window_size: math::Vec2i,
   show_fps: bool,
+  vsync: bool,
 }
 impl Camera
 {
@@ -81,6 +82,7 @@ impl Camera
       window: win,
       window_size: math::Vec2i::zero(),
       show_fps: true,
+      vsync: true,
     };
 
     ui::Console_Activator::get().add_accessor("camera.fov", |_|
@@ -112,6 +114,29 @@ impl Camera
       { c.show_fps = true; }
       else if x == "false"
       { c.show_fps = false; }
+      else
+      { error = fmt!("Invalid value for %s (use 'true' or 'false')", p); }
+
+      if error.len() == 0
+      { None }
+      else
+      { Some(error) }
+    });
+    ui::Console_Activator::get().add_accessor("camera.vsync", |_|
+    { c.vsync.to_str() });
+    ui::Console_Activator::get().add_mutator("camera.vsync", |p, x|
+    {
+      let mut error = ~"";
+      if x == "true"
+      {
+        c.vsync = true;
+        glfw::set_swap_interval(1); /* TODO: Set this on startup. */
+      }
+      else if x == "false"
+      {
+        c.vsync = false;
+        glfw::set_swap_interval(0);
+      }
       else
       { error = fmt!("Invalid value for %s (use 'true' or 'false')", p); }
 

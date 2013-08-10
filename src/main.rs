@@ -84,8 +84,6 @@ fn main(argc: int, argv: **u8, crate_map: *u8) -> int
       };
       window.make_context_current();
 
-      glfw::set_swap_interval(0); /* Try to disable vsync. */
-
       /* Start the background GL thread. */
       let gl_worker_port = gl::Worker::initialize(worker_window);
 
