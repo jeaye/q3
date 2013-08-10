@@ -124,7 +124,7 @@ fn main(argc: int, argv: **u8, crate_map: *u8) -> int
       let _model_renderer = md5::Model_Renderer::new(&_model);
 
       /* Console functions. */
-      ui::Console_Activator::get().add_accessor("q3.version", |_|
+      state::Console::get().add_accessor("q3.version", |_|
                                                 { fmt!("%s.%s", env!("VERSION"), env!("COMMIT")) });
 
       /* Delta time. */

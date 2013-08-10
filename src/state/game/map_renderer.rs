@@ -16,9 +16,9 @@ use extra;
 use state::State;
 use gl2 = opengles::gl2;
 use gl;
-use ui;
 use math;
 use voxel;
+use state;
 use util::Log;
 
 #[path = "../../gl/check.rs"]
@@ -138,9 +138,9 @@ impl Map_Renderer
     check!(gl2::tex_buffer(gl2::TEXTURE_BUFFER, 0x8815 /* RGB32F */, mr.offset_tex_vbo));
 
     /* Console functions. */
-    ui::Console_Activator::get().add_accessor("map.wireframe", |_|
+    state::Console::get().add_accessor("map.wireframe", |_|
     { mr.wireframe.to_str() });
-    ui::Console_Activator::get().add_mutator("map.wireframe", |p, x|
+    state::Console::get().add_mutator("map.wireframe", |p, x|
     {
       let mut error = ~"";
       if x == "true"

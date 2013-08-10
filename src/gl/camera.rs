@@ -16,6 +16,7 @@ use gl2 = opengles::gl2;
 use std::f32;
 use math;
 use ui;
+use state;
 
 #[macro_escape]
 mod check;
@@ -85,9 +86,9 @@ impl Camera
       vsync: true,
     };
 
-    ui::Console_Activator::get().add_accessor("camera.fov", |_|
+    state::Console::get().add_accessor("camera.fov", |_|
     { c.fov.to_str() });
-    ui::Console_Activator::get().add_mutator("camera.fov", |p, fov|
+    state::Console::get().add_mutator("camera.fov", |p, fov|
     {
       let mut error = ~"";
 
@@ -105,9 +106,9 @@ impl Camera
       else
       { Some(error) }
     });
-    ui::Console_Activator::get().add_accessor("ui.show_fps", |_|
+    state::Console::get().add_accessor("ui.show_fps", |_|
     { c.show_fps.to_str() });
-    ui::Console_Activator::get().add_mutator("ui.show_fps", |p, x|
+    state::Console::get().add_mutator("ui.show_fps", |p, x|
     {
       let mut error = ~"";
       if x == "true"
@@ -122,15 +123,15 @@ impl Camera
       else
       { Some(error) }
     });
-    ui::Console_Activator::get().add_accessor("camera.vsync", |_|
+    state::Console::get().add_accessor("camera.vsync", |_|
     { c.vsync.to_str() });
-    ui::Console_Activator::get().add_mutator("camera.vsync", |p, x|
+    state::Console::get().add_mutator("camera.vsync", |p, x|
     {
       let mut error = ~"";
       if x == "true"
       {
         c.vsync = true;
-        glfw::set_swap_interval(1); /* TODO: Set this on startup. */
+        glfw::set_swap_interval(1); 
       }
       else if x == "false"
       {
@@ -145,6 +146,9 @@ impl Camera
       else
       { Some(error) }
     });
+
+    /* Set some defaults. */
+    state::Console::run_function(~"set camera.vsync true");
 
     c
   }

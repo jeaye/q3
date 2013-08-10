@@ -12,12 +12,9 @@
 pub use self::renderer::Renderer;
 pub use self::ttf::Font;
 pub use self::input::{ Input_Listener };
-pub use self::console::{ Console_Activator };
 
 mod renderer;
 #[path = "ttf/mod.rs"]
 mod ttf;
 mod input;
-#[path = "console/mod.rs"]
-mod console;
 

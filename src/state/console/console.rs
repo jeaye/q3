@@ -10,8 +10,9 @@
       of the in-game console.
 */
 
+use std::local_data;
+use std::hashmap::HashMap;
 use glfw;
-use ui;
 use math;
 use super::State;
 use util::Log;
@@ -20,16 +21,60 @@ use util::Log;
 #[path = "../../util/log_macros.rs"]
 mod log_macros;
 
+/* Takes: property name; Returns: property value. */
+priv type Property_Accessor = @fn(&str) -> ~str; 
+/* Takes: property name, new value; Returns: Some(failure message). */
+priv type Property_Mutator = @fn(&str, &str) -> Option<~str>;
+/* Takes: function name, params; Returns: sucess/failure, message. */
+priv type Function = @fn(&str, &str) -> (bool, ~str);
+
+static tls_key: local_data::Key<@mut Console> = &local_data::Key;
+
+struct Registry
+{
+  /*  
+      Maps of property names to callbacks (get and set).
+      Properties are invoked with a prebuilt 'set' or 'get'
+      function. 
+      
+      The only argument to the accessor is the property name
+      and it returns the value.
+
+      The first argument of the mutator is the
+      property name and the second is everything else 
+      contained in the command. The mutator returns a string
+      containing an error message if something didn't work well.
+
+      Ex: set map.wireframe on
+      Ex: get map.wireframe
+  */
+  accessors: HashMap<~str, Property_Accessor>,
+  mutators: HashMap<~str, Property_Mutator>,
+
+  /*
+      A map of arbitrary functions to callbacks.
+
+      The first argument is the function name and the second
+      is whatever else is supplied in the command. The return
+      value is a string containing an error message if something
+      didn't go well.
+
+      Ex: record my.avi
+      Ex: callvote kick annoying_dude
+  */
+  functions: HashMap<~str, Function>,
+}
+
 struct Console
 {
-  activator: @mut ui::Console_Activator,
-
   position: math::Vec2f,
   velocity: f32, /* On the Y axis only. */
   
   body: ~str,
   prefix: ~str,
   input: ~str,
+
+  registry: Registry,
 }
 
 impl Console
@@ -38,41 +83,48 @@ impl Console
   {
     let c = @mut Console
     {
-      activator: ui::Console_Activator::new(),
-
       position: math::Vec2f::zero(),
       velocity: 300.0,
 
       body: fmt!("Welcome to Q^3\nVersion: %s.%s", env!("VERSION"), env!("COMMIT")),
       prefix: ~"> ",
       input: ~"", 
+
+      registry: Registry
+      {
+        accessors: HashMap::new::<~str, Property_Accessor>(),
+        mutators: HashMap::new::<~str, Property_Mutator>(),
+        functions: HashMap::new::<~str, Function>(),
+      },
     };
 
+    /* Store the console in task-local storage. (singleton) */
+    local_data::set(tls_key, c);
+
     /* The 'get' and 'set' functions are built in to the console. */
-    c.activator.functions.insert(~"get",
-    |_get, property| -> Option<~str>
+    c.registry.functions.insert(~"get",
+    |_get, property| -> (bool, ~str)
     {
-      let mut err = ~"";
+      let mut msg;
+      let mut success = false;
 
       /* Check if this property exists. */
-      match c.activator.accessors.find(&property.to_owned())
+      match c.registry.accessors.find(&property.to_owned())
       {
         Some(func) =>
-        { c.add_log(fmt!("%s = %s", property, (*func)(property))); }
+        { msg = fmt!("%s = %s", property, (*func)(property)); success = true; }
         None =>
-        { err = fmt!("Error: Invalid property '%s'", property); }
+        { msg = fmt!("Error: Invalid property '%s'", property); }
       }
 
-      if err.len() == 0
-      { None }
-      else
-      { Some(err) }
+      (success, msg)
     });
 
-    c.activator.functions.insert(~"set",
-    |_set, params| -> Option<~str>
+    c.registry.functions.insert(~"set",
+    |_set, params| -> (bool, ~str)
     {
-      let mut error = ~"";
+      let mut msg;
+      let mut success = false;
       let mut property = ~"";
       let mut params = params.to_owned();
       for x in params.split_iter(' ')
@@ -87,7 +139,7 @@ impl Console
       { params.shift_char(); }
 
       /* Check if this property exists. */
-      match c.activator.mutators.find(&property)
+      match c.registry.mutators.find(&property)
       {
         Some(func) =>
         {
@@ -95,25 +147,68 @@ impl Console
           match (*func)(property, params)
           {
             /* Check if the mutator liked the args. */
-            Some(err) => { error = err; }
-            None => { }
+            Some(err) => { success = false; msg = err; }
+            None => { success = true; msg = fmt!("%s = %s", property, params); }
           }
         }
-        None => { error = fmt!("The property '%s' does not exist.", property); }
+        None => { msg = fmt!("The property '%s' does not exist.", property); }
       }
 
-      if error.len() > 0
-      { Some(fmt!("Error: %s", error)) }
-      else
-      { None }
+      (success, msg)
     });
 
 
     c
   }
 
+  /* Accesses the singleton consol from task-local storage. */
+  pub fn get() -> @mut Console
+  {
+    local_data::get(tls_key, 
+    |opt|
+    {
+      match opt
+      {
+        Some(x) => *x,
+        None => fail!("Singleton not available")
+      }
+    })
+  }
+
+  pub fn add_accessor(&mut self, name: &str, accessor: Property_Accessor)
+  { self.registry.accessors.insert(name.to_owned(), accessor); }
+  pub fn add_mutator(&mut self, name: &str, mutator: Property_Mutator)
+  { self.registry.mutators.insert(name.to_owned(), mutator); }
   pub fn add_log(&mut self, text: &str)
   { self.body.push_str("\n" + text); }
+
+  pub fn run_function(mut input_func: ~str) -> (bool, ~str)
+  {
+    let this = Console::get();
+
+    /* Extract the function name. */
+    let mut func = ~"";
+    input_func = input_func.trim().to_owned();
+    for x in input_func.split_iter(' ')
+    { func = x.to_owned(); break; };
+
+    /* Remove the function from the string. */
+    for _ in func.iter()
+    { input_func.shift_char(); }
+    if input_func.len() > 0
+    { input_func.shift_char(); }
+
+    /* Look for the function in the cached map. */
+    match this.registry.functions.find(&func)
+    {
+      Some(f) =>
+      {
+        let input = input_func.clone();
+        (*f)(func, input)
+      }
+      None => { (false, fmt!("Error: Invalid function '%s'", func)) }
+    }
+  }
 }
 
 impl State for Console
@@ -152,32 +247,10 @@ impl State for Console
           if self.input.len() == 0
           { return true; }
 
-          /* Extract the function name. */
-          let mut func = ~"";
-          self.input = self.input.trim().to_owned();
-          for x in self.input.split_iter(' ')
-          { func = x.to_owned(); break; };
-
-          /* Remove the function from the string. */
-          for _ in func.iter()
-          { self.input.shift_char(); }
-          if self.input.len() > 0
-          { self.input.shift_char(); }
-
-          /* Look for the function in the cached map. */
-          match self.activator.functions.find(&func)
-          {
-            Some(f) =>
-            {
-              let input = self.input.clone();
-              match (*f)(func, input)
-              {
-                Some(err) => { self.add_log(err); }
-                None => { }
-              }
-            }
-            None => { self.add_log(fmt!("Error: Invalid function '%s'", func)); }
-          }
+          /* Run the function and add the output to the log. */
+          let input = self.input.clone();
+          let (_res, output) = Console::run_function(input);
+          self.add_log(output);
 
           self.input.clear();
         }
