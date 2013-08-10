@@ -154,6 +154,7 @@ impl State for Console
 
           /* Extract the function name. */
           let mut func = ~"";
+          self.input = self.input.trim().to_owned();
           for x in self.input.split_iter(' ')
           { func = x.to_owned(); break; };
 
@@ -175,29 +176,27 @@ impl State for Console
                 None => { }
               }
             }
-            None => { self.add_log("Error: Invalid function"); }
+            None => { self.add_log(fmt!("Error: Invalid function '%s'", func)); }
           }
 
           self.input.clear();
-          return true;
         }
         else if key == glfw::KEY_BACKSPACE
         {
           if self.input.len() > 0
           { self.input.pop_char(); }
-          return true;
         }
         /* Non-whitespace. */
         else if key >= 32 && key <= 93
         {
           /* This will be handled when we receive it as a char. */
-          return true;
         }
+
+        return true;
       }
     }
 
     false
-
   }
 
   pub fn key_char(&mut self, ch: char) -> bool
