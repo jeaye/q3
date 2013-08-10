@@ -78,6 +78,9 @@ impl State for Game_Renderer
     (self.map_renderer as @mut State).unload();
   }
 
+  pub fn get_key(&self) -> &str
+  { &"game_renderer" }
+
   pub fn update(&mut self, delta: f32) -> bool /* dt is in terms of seconds. */
   {
     self.camera.update(delta);

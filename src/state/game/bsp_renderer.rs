@@ -116,6 +116,9 @@ impl State for BSP_Renderer
   pub fn unload(&mut self)
   { log_debug!("Unloading bsp renderer state."); }
 
+  pub fn get_key(&self) -> &str
+  { &"bsp_renderer" }
+
   pub fn update(&mut self, delta: f32) -> bool /* dt is in terms of seconds. */
   {
     self.game_renderer.camera.update(delta);

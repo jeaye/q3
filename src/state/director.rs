@@ -20,6 +20,10 @@ pub trait State
   pub fn unload(&mut self)
   { }
 
+  /* Each state must have a unique key that other
+   * objects can use to reference it. */
+  pub fn get_key(&self) -> &str;
+
   /*  Returns true when the event has been captured. If the event is not
       captured, it's set to the next lower state. (A state can capture
       renders, for example, as an optimization -- or updates as a sanity or
@@ -84,6 +88,46 @@ impl Director
   {
     let mut state = self.states.pop();
     state.unload();
+  }
+
+  /* Removes the state with the specified key. */
+  pub fn pull(&mut self, key: &str)
+  {
+    let index = do self.states.rposition |state|
+    {
+      state.get_key() == key
+    };
+    match index
+    {
+      Some(i) =>
+      {
+        let mut state = self.states.remove(i);
+        state.unload();
+      }
+      None => { }
+    }
+  }
+
+  /* Swaps the state specified by key with the newly
+   * specified state. */
+  pub fn swap(&mut self, key: &str, mut state: @mut State)
+  {
+    let index = do self.states.rposition |st|
+    {
+      st.get_key() == key
+    };
+    match index
+    {
+      Some(i) =>
+      {
+        let mut old_state = self.states[i];
+        old_state.unload();
+
+        state.load();
+        self.states[i] = state;
+      }
+      None => { }
+    }
   }
 
   /** Updating and rendering. **/

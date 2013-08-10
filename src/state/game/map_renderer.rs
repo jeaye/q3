@@ -271,6 +271,9 @@ impl State for Map_Renderer
     self.visible_voxels = Some(visible_voxels);
   }
 
+  pub fn get_key(&self) -> &str
+  { &"map_renderer" }
+
   pub fn update(&mut self, _delta: f32) -> bool /* dt is in terms of seconds. */
   {
     /* Check if there is data available between the background

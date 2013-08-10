@@ -59,6 +59,9 @@ impl State for Console_Renderer
   pub fn unload(&mut self)
   { log_debug!("Unloading console renderer state"); }
 
+  pub fn get_key(&self) -> &str
+  { &"console_renderer" }
+
   pub fn update(&mut self, delta: f32) -> bool /* dt is in terms of seconds. */
   {
     self.console.position.y += (self.console.velocity * delta);

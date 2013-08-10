@@ -58,6 +58,9 @@ impl State for Game
   pub fn unload(&mut self)
   { log_debug!("Unloading game state."); }
 
+  pub fn get_key(&self) -> &str
+  { &"game" }
+
   pub fn update(&mut self, _delta: f32) -> bool /* dt is in terms of seconds. */
   { false }
   pub fn render(&mut self) -> bool

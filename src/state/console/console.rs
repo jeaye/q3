@@ -124,6 +124,9 @@ impl State for Console
   pub fn unload(&mut self)
   { log_debug!("Unloading console state."); }
 
+  pub fn get_key(&self) -> &str
+  { &"console" }
+
   pub fn update(&mut self, _delta: f32) -> bool /* dt is in terms of seconds. */
   { false }
 
