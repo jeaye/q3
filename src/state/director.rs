@@ -94,9 +94,7 @@ impl Director
   pub fn pull(&mut self, key: &str)
   {
     let index = do self.states.rposition |state|
-    {
-      state.get_key() == key
-    };
+    { state.get_key() == key };
     match index
     {
       Some(i) =>
@@ -113,9 +111,7 @@ impl Director
   pub fn swap(&mut self, key: &str, mut state: @mut State)
   {
     let index = do self.states.rposition |st|
-    {
-      st.get_key() == key
-    };
+    { st.get_key() == key };
     match index
     {
       Some(i) =>
@@ -128,6 +124,13 @@ impl Director
       }
       None => { }
     }
+  }
+
+  /* Unloads all states from the top down. */
+  pub fn clear(&mut self)
+  {
+    while self.states.len() > 0
+    { self.states.pop().unload(); }
   }
 
   /** Updating and rendering. **/
