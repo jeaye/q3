@@ -175,6 +175,8 @@ impl Console
     })
   }
 
+  pub fn add_function(&mut self, name: ~str, func: Function)
+  { self.registry.functions.insert(name, func); }
   pub fn add_accessor(&mut self, name: &str, accessor: Property_Accessor)
   { self.registry.accessors.insert(name.to_owned(), accessor); }
   pub fn add_mutator(&mut self, name: &str, mutator: Property_Mutator)

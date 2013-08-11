@@ -126,6 +126,8 @@ fn main(argc: int, argv: **u8, crate_map: *u8) -> int
       /* Console functions. */
       state::Console::get().add_accessor("q3.version", |_|
                                                 { fmt!("%s.%s", env!("VERSION"), env!("COMMIT")) });
+      state::Console::get().add_function(~"quit", |_, _| -> (bool, ~str)
+                                                { window.set_should_close(true); (true, ~"")});
 
       /* Delta time. */
       let mut cur_time = extra::time::precise_time_s() as f32;
