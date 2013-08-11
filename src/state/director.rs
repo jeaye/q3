@@ -11,8 +11,13 @@
 */
 
 use std::local_data;
+use util::Log;
 
 static tls_key: local_data::Key<@mut Director> = &local_data::Key;
+
+#[macro_escape]
+#[path = "../util/log_macros.rs"]
+mod log;
 
 pub trait State
 {
@@ -102,7 +107,7 @@ impl Director
         let mut state = self.states.remove(i);
         state.unload();
       }
-      None => { }
+      None => { log_debug!("Invalid state to pull '%s'", key); }
     }
   }
 
@@ -122,7 +127,7 @@ impl Director
         state.load();
         self.states[i] = state;
       }
-      None => { }
+      None => { log_debug!("Invalid state to swap '%s'", key); }
     }
   }
 
