@@ -13,13 +13,14 @@
 #version 330
 
 uniform sampler2D tex0;
-uniform vec4 color0;
 
 in vec2 trans_coord;
+in vec3 trans_color; 
+
 out vec4 out_color;
 
 void main()
 {
-  out_color = vec4(1, 1, 1, texture(tex0, trans_coord).r); 
+  out_color = vec4(trans_color.r, trans_color.g, trans_color.b, texture(tex0, trans_coord).r); 
 }
 

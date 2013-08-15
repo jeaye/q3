@@ -9,7 +9,7 @@
       A TTF font renderer.
 */
 
-use std::vec;
+use std::{ vec, sys };
 use std::iterator::IteratorUtil;
 use gl;
 use super::Font;
@@ -90,18 +90,23 @@ impl Renderer
     check!(gl2::bind_vertex_array(self.vao));
     check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.vbo));
     check!(gl2::enable_vertex_attrib_array(0));
-    check!(gl2::vertex_attrib_pointer_f32(0, 4, false, 0, 0));
+    check!(gl2::vertex_attrib_pointer_f32(0, 4, false, sys::size_of::<Point>() as i32, 0));
+    check!(gl2::enable_vertex_attrib_array(1));
+    check!(gl2::vertex_attrib_pointer_f32(1, 3, false, sys::size_of::<Point>() as i32, (sys::size_of::<f32>() * 4) as u32));
 
+    #[packed]
     struct Point
     {
       x: f32, y: f32,
-      u: f32, v: f32
+      u: f32, v: f32,
+      r: f32, g: f32, b: f32,
     }
     impl Point
     {
-      pub fn new(nx: f32, ny: f32, nu: f32, nv: f32) -> Point
-      { Point { x: nx, y: ny, u: nu, v: nv } }
+      pub fn new(nx: f32, ny: f32, nu: f32, nv: f32, nr: f32, ng: f32, nb: f32) -> Point
+      { Point { x: nx, y: ny, u: nu, v: nv, r: nr, g: ng, b: nb } }
     }
+    let color = math::Vec3f::new(0.0, 1.0, 0.0);
 
     /* Render each line separately. */
     let mut line_count = 0;
@@ -133,12 +138,12 @@ impl Renderer
         if end_w <= 0.1 || end_h <= 0.1
         { loop; }
 
-        coords.push(Point::new(end_x, -end_y - end_h, glyph.tex.x, glyph.tex.y));
-        coords.push(Point::new(end_x, -end_y, glyph.tex.x, glyph.tex.y + (end_h / (font.atlas_dimensions.y as f32))));
-        coords.push(Point::new(end_x + end_w, -end_y, glyph.tex.x + (end_w / (font.atlas_dimensions.x as f32)), glyph.tex.y + (end_h / (font.atlas_dimensions.y as f32))));
-        coords.push(Point::new(end_x, -end_y - end_h, glyph.tex.x, glyph.tex.y));
-        coords.push(Point::new(end_x + end_w, -end_y, glyph.tex.x + (end_w / (font.atlas_dimensions.x as f32)), glyph.tex.y + (end_h / (font.atlas_dimensions.y as f32))));
-        coords.push(Point::new(end_x + end_w, -end_y - end_h, glyph.tex.x + (end_w / (font.atlas_dimensions.x as f32)), glyph.tex.y));
+        coords.push(Point::new(end_x, -end_y - end_h, glyph.tex.x, glyph.tex.y, color.x, color.y, color.z));
+        coords.push(Point::new(end_x, -end_y, glyph.tex.x, glyph.tex.y + (end_h / (font.atlas_dimensions.y as f32)), color.x, color.y, color.z));
+        coords.push(Point::new(end_x + end_w, -end_y, glyph.tex.x + (end_w / (font.atlas_dimensions.x as f32)), glyph.tex.y + (end_h / (font.atlas_dimensions.y as f32)), color.x, color.y, color.z));
+        coords.push(Point::new(end_x, -end_y - end_h, glyph.tex.x, glyph.tex.y, color.x, color.y, color.z));
+        coords.push(Point::new(end_x + end_w, -end_y, glyph.tex.x + (end_w / (font.atlas_dimensions.x as f32)), glyph.tex.y + (end_h / (font.atlas_dimensions.y as f32)), color.x, color.y, color.z));
+        coords.push(Point::new(end_x + end_w, -end_y - end_h, glyph.tex.x + (end_w / (font.atlas_dimensions.x as f32)), glyph.tex.y, color.x, color.y, color.z));
         count += 6;
       }
 

@@ -16,12 +16,15 @@ uniform mat4 proj;
 uniform mat4 world; 
 
 layout (location = 0) in vec4 in_coord; 
+layout (location = 1) in vec3 in_color; 
 
 out vec2 trans_coord; 
+out vec3 trans_color; 
 
 void main() 
 { 
   gl_Position = proj * vec4(in_coord.xy, -10.0, 1.0); 
   trans_coord = in_coord.zw; 
+  trans_color = in_color;
 }
 
