@@ -114,7 +114,7 @@ impl Console
         Some(func) =>
         { msg = fmt!("%s = %s", property, (*func)(property)); success = true; }
         None =>
-        { msg = fmt!("Error: Invalid property '%s'", property); }
+        { msg = fmt!("\\2Error: \\1Invalid property '%s'", property); }
       }
 
       (success, msg)
@@ -147,11 +147,11 @@ impl Console
           match (*func)(property, params)
           {
             /* Check if the mutator liked the args. */
-            Some(err) => { success = false; msg = err; }
-            None => { success = true; msg = fmt!("%s = %s", property, params); }
+            Some(err) => { success = false; msg = ~"\\2Error: \\1" + err; }
+            None => { success = true; msg = fmt!("\\3Success: \\1%s = %s", property, params); }
           }
         }
-        None => { msg = fmt!("The property '%s' does not exist.", property); }
+        None => { msg = fmt!("\\2Error: \\1The property '%s' does not exist.", property); }
       }
 
       (success, msg)
@@ -183,6 +183,8 @@ impl Console
   { self.registry.mutators.insert(name.to_owned(), mutator); }
   pub fn add_log(&mut self, text: &str)
   { self.body.push_str("\n" + text); }
+  pub fn add_error_log(&mut self, text: &str)
+  { self.body.push_str("\n\\2Error: \\1" + text); }
 
   pub fn run_function(mut input_func: ~str) -> (bool, ~str)
   {
@@ -208,7 +210,7 @@ impl Console
         let input = input_func.clone();
         (*f)(func, input)
       }
-      None => { (false, fmt!("Error: Invalid function '%s'", func)) }
+      None => { (false, fmt!("\\2Error: \\1Invalid function '%s'", func)) }
     }
   }
 }

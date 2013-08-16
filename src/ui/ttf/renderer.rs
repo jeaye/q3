@@ -9,7 +9,7 @@
       A TTF font renderer.
 */
 
-use std::{ vec, sys };
+use std::{ u32, vec, sys };
 use std::iterator::IteratorUtil;
 use gl;
 use super::Font;
@@ -106,7 +106,9 @@ impl Renderer
       pub fn new(nx: f32, ny: f32, nu: f32, nv: f32, nr: f32, ng: f32, nb: f32) -> Point
       { Point { x: nx, y: ny, u: nu, v: nv, r: nr, g: ng, b: nb } }
     }
-    let color = math::Vec3f::new(0.0, 1.0, 0.0);
+    let mut color = math::Vec3f::new(1.0, 1.0, 1.0);
+    let mut color_str = ~"";
+    let mut expecting_color = false;
 
     /* Render each line separately. */
     let mut line_count = 0;
@@ -125,6 +127,33 @@ impl Renderer
           Some(g) => g,
           None => fail!(fmt!("Invalid char (%?) in font %? len %?", curr, font.file, font.glyphs.len()))
         };
+
+        /* Parse color. */
+        if expecting_color
+        {
+          /* Build the number string. */
+          if curr.is_digit()
+          {
+            color_str.push_char(curr);
+            loop;
+          }
+          expecting_color = false;
+
+          /* Convert char to int. */
+          let num = u32::from_str(color_str);
+          match num
+          {
+            Some(val) => { color = self.get_color(val); },
+            None => { }
+          }
+        }
+        else if curr == '\\'
+        {
+          expecting_color = true;
+          color_str.clear();
+          color_str.reserve(2);
+          loop;
+        }
 
         let end_x = temp_pos.x + glyph.offset.x;
         let end_y = -temp_pos.y - (glyph.dimensions.y - glyph.offset.y);
@@ -154,6 +183,48 @@ impl Renderer
     check!(gl2::disable_vertex_attrib_array(0));
     check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, 0));
     check!(gl2::bind_vertex_array(0));
+  }
+
+  /* Standard Quake colors. */
+  priv fn get_color(&self, name: u32) -> math::Vec3f
+  {
+    match name
+    {
+      /* Black */
+      0 => { math::Vec3f::new(0.0, 0.0, 0.0) },
+      /* White */
+      1 => { math::Vec3f::new(1.0, 1.0, 1.0) },
+      /* Red */
+      2 => { math::Vec3f::new(1.0, 0.0, 0.0) },
+      /* Lime */
+      3 => { math::Vec3f::new(0.0, 1.0, 0.0) },
+      /* Blue */
+      4 => { math::Vec3f::new(0.0, 0.0, 1.0) },
+      /* Yellow */
+      5 => { math::Vec3f::new(1.0, 1.0, 0.0) },
+      /* Cyan */
+      6 => { math::Vec3f::new(0.0, 1.0, 1.0) },
+      /* Magenta */
+      7 => { math::Vec3f::new(1.0, 0.0, 1.0) },
+      /* Silver */
+      8 => { math::Vec3f::new(0.75, 0.75, 0.75) },
+      /* Gray */
+      9 => { math::Vec3f::new(0.5, 0.5, 0.5) },
+      /* Maroon */
+      10 => { math::Vec3f::new(0.5, 0.0, 0.0) },
+      /* Olive */
+      11 => { math::Vec3f::new(0.5, 0.5, 0.0) },
+      /* Green */
+      12 => { math::Vec3f::new(0.0, 0.5, 0.0) },
+      /* Purple */
+      13 => { math::Vec3f::new(0.5, 0.0, 0.5) },
+      /* Teal */
+      14 => { math::Vec3f::new(0.0, 0.5, 0.5) },
+      /* Navy */
+      15 => { math::Vec3f::new(0.0, 0.0, 0.5) },
+      /* Default */
+      _ => { math::Vec3f::new(1.0, 1.0, 1.0) },
+    }
   }
 }
 
