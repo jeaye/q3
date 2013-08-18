@@ -29,7 +29,7 @@ struct Mesh_Renderer<'self>
   tex0_loc: gl2::GLint,
 
   shader: @gl::Shader, 
-  texture: gl::Texture,
+  texture: Option<gl::Texture>,
 }
 
 impl<'self> Mesh_Renderer<'self>
@@ -47,8 +47,11 @@ impl<'self> Mesh_Renderer<'self>
       tex0_loc: 0,
 
       shader: sh,
-      texture: gl::Texture::new(gl2::TEXTURE_2D, m.texture),
+      texture: None,
     };
+
+    if m.texture.len() > 0
+    { mr.texture = Some(gl::Texture::new(gl2::TEXTURE_2D, m.texture)); }
 
     mr.shader.bind();
     mr.tex0_loc = mr.shader.get_uniform_location("tex0");
@@ -85,7 +88,11 @@ impl<'self> Mesh_Renderer<'self>
 
   pub fn render(&self)
   {
-    self.texture.bind(gl2::TEXTURE_2D);
+    match self.texture
+    {
+      Some(tex) => { tex.bind(gl2::TEXTURE_2D); },
+      None => { }
+    }
 
     check!(gl2::bind_vertex_array(self.vao));
 
