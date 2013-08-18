@@ -11,7 +11,6 @@
       camera and uses it to render the map data.
 */
 
-use glfw;
 use super::{ State, Game };
 use gl;
 use ui;
@@ -39,24 +38,16 @@ pub struct Game_Renderer
 
 impl Game_Renderer
 {
-  pub fn new(game: @mut Game, window: @glfw::Window) -> @mut Game_Renderer
+  pub fn new(game: @mut Game) -> @mut Game_Renderer
   {
-    let cam = gl::Camera::new(window);
     let gr = @mut Game_Renderer
     {
       game: game,
-      camera: cam,
+      camera: gl::Camera::get_active(),
       map_renderer: Map_Renderer::new(game.voxel_map),
 
       fps_font: ui::Font::new("data/fonts/test.ttf", 30),
     };
-
-    gr.camera.init();
-
-    do window.set_size_callback |_, width, height|
-    { gr.camera.resize(width as i32, height as i32); }
-
-    gl::Camera::set_active(gr.camera);
 
     gr
   }

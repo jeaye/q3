@@ -86,15 +86,22 @@ fn main(argc: int, argv: **u8, crate_map: *u8) -> int
 
       /* Start the background GL thread. */
       let gl_worker_port = gl::Worker::initialize(worker_window);
-
       let _ui_renderer = ui::Renderer::new(window);
 
       /* Create all the states we need. */
       let states = state::Director::new();
       let console_state = state::Console::new();
       let console_renderer_state = state::Console_Renderer::new(console_state);
+
+      /* Initialize the default camera. */
+      let cam = gl::Camera::new(window);
+      cam.init();
+      gl::Camera::set_active(cam);
+      do window.set_size_callback |_, width, height|
+      { cam.resize(width as i32, height as i32); }
+
       let game_state = state::Game::new();
-      let game_renderer_state = state::Game_Renderer::new(game_state, window);
+      let game_renderer_state = state::Game_Renderer::new(game_state);
       let bsp_renderer_state = state::BSP_Renderer::new(game_renderer_state);
       states.push(game_state as @mut state::State);
       states.push(game_renderer_state as @mut state::State);
