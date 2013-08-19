@@ -22,7 +22,7 @@ struct Model_Renderer<'self>
   model: &'self Model,
   mesh_renderers: ~[Mesh_Renderer<'self>],
 
-  shader: @gl::Shader, /* TODO: shared */
+  shader: @mut gl::Shader, /* TODO: shared */
   proj_loc: gl2::GLint,
   world_loc: gl2::GLint,
 }

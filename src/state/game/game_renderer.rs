@@ -56,23 +56,23 @@ impl Game_Renderer
 
 impl State for Game_Renderer
 {
-  pub fn load(&mut self)
+  fn load(&mut self)
   {
     log_debug!("Loading game renderer state");
 
     (self.map_renderer as @mut State).load();
   }
 
-  pub fn unload(&mut self)
+  fn unload(&mut self)
   {
     log_debug!("Unloading game renderer state");
     (self.map_renderer as @mut State).unload();
   }
 
-  pub fn get_key(&self) -> &str
+  fn get_key(&self) -> &str
   { &"game_renderer" }
 
-  pub fn update(&mut self, delta: f32) -> bool /* dt is in terms of seconds. */
+  fn update(&mut self, delta: f32) -> bool /* dt is in terms of seconds. */
   {
     self.camera.update(delta);
     self.map_renderer.update(delta);
@@ -80,7 +80,7 @@ impl State for Game_Renderer
     false
   }
 
-  pub fn render(&mut self) -> bool
+  fn render(&mut self) -> bool
   {
     (self.map_renderer as @mut State).render();
 
@@ -96,9 +96,9 @@ impl State for Game_Renderer
     false
   }
 
-  pub fn key_action(&mut self, key: i32, action: i32, _mods: i32) -> bool
+  fn key_action(&mut self, key: i32, action: i32, _mods: i32) -> bool
   { (self.camera as @mut ui::Input_Listener).key_action(key, action, _mods) }
-  pub fn mouse_moved(&mut self, x: f32, y: f32) -> bool
+  fn mouse_moved(&mut self, x: f32, y: f32) -> bool
   { (self.camera as @mut ui::Input_Listener).mouse_moved(x, y) }
 }
 

@@ -22,11 +22,11 @@ use util::Log;
 mod log_macros;
 
 /* Takes: property name; Returns: property value. */
-priv type Property_Accessor = @fn(&str) -> ~str; 
+type Property_Accessor = @fn(&str) -> ~str; 
 /* Takes: property name, new value; Returns: Some(failure message). */
-priv type Property_Mutator = @fn(&str, &str) -> Option<~str>;
+type Property_Mutator = @fn(&str, &str) -> Option<~str>;
 /* Takes: function name, params; Returns: sucess/failure, message. */
-priv type Function = @fn(&str, &str) -> (bool, ~str);
+type Function = @fn(&str, &str) -> (bool, ~str);
 
 static tls_key: local_data::Key<@mut Console> = &local_data::Key;
 
@@ -217,22 +217,22 @@ impl Console
 
 impl State for Console
 {
-  pub fn load(&mut self)
+  fn load(&mut self)
   { log_debug!("Loading console state."); }
 
-  pub fn unload(&mut self)
+  fn unload(&mut self)
   { log_debug!("Unloading console state."); }
 
-  pub fn get_key(&self) -> &str
+  fn get_key(&self) -> &str
   { &"console" }
 
-  pub fn update(&mut self, _delta: f32) -> bool /* dt is in terms of seconds. */
+  fn update(&mut self, _delta: f32) -> bool /* dt is in terms of seconds. */
   { false }
 
-  pub fn render(&mut self) -> bool
+  fn render(&mut self) -> bool
   { false }
 
-  pub fn key_action(&mut self, key: i32, action: i32, _mods: i32) -> bool
+  fn key_action(&mut self, key: i32, action: i32, _mods: i32) -> bool
   {
     if action == glfw::PRESS || action == glfw::REPEAT
     {
@@ -276,7 +276,7 @@ impl State for Console
     false
   }
 
-  pub fn key_char(&mut self, ch: char) -> bool
+  fn key_char(&mut self, ch: char) -> bool
   {
     /* Check if the console is enabled. */
     if self.velocity > 0.0

@@ -72,7 +72,7 @@ impl Log
     log_debug!("Logging system initialized");
   }
 
-  priv fn get() -> @mut Log
+  fn get() -> @mut Log
   {
     local_data::get(tls_key, 
     |opt|
@@ -126,7 +126,7 @@ impl Log
     logger.push_level -= 1;
   }
 
-  priv fn log(module: &str, message: &str, verbosity: Verbosity)
+  fn log(module: &str, message: &str, verbosity: Verbosity)
   {
     let logger = Log::get();
 

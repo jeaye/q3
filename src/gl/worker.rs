@@ -56,7 +56,7 @@ impl Worker
     exit_port
   }
 
-  priv fn get() -> @Worker
+  fn get() -> @Worker
   {
     local_data::get(tls_key, 
     |opt|
@@ -75,7 +75,7 @@ impl Worker
     worker.task_channel.send(func);
   }
 
-  priv fn thread(data: (comm::Port<GL_Func>, comm::Chan<bool>, glfw::Window))
+  fn thread(data: (comm::Port<GL_Func>, comm::Chan<bool>, glfw::Window))
   {
     let (task_port, exit_channel, window) = data;
     window.make_context_current();

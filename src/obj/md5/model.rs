@@ -72,7 +72,7 @@ impl Model
     model
   }
 
-  priv fn load(&mut self, file: ~str) -> bool
+  fn load(&mut self, file: ~str) -> bool
   {
     let fior = io::file_reader(&path::Path(file));
     if fior.is_err()
@@ -324,7 +324,7 @@ impl Model
     true
   }
 
-  priv fn prepare_mesh(&mut self, mesh: &mut Mesh)
+  fn prepare_mesh(&mut self, mesh: &mut Mesh)
   {
     mesh.positions.clear();
     mesh.tex_coords.clear();

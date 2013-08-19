@@ -30,7 +30,7 @@ static MOVE_DOWN: u8 = 32;
 
 static tls_key: local_data::Key<@mut Camera> = &local_data::Key;
 
-pub struct Camera
+struct Camera
 {
   position: math::Vec3f,
   angles: math::Vec2f,
@@ -247,7 +247,7 @@ impl Camera
 
 impl ui::Input_Listener for Camera
 {
-  pub fn key_action(&mut self, key: i32, action: i32, _mods: i32) -> bool
+  fn key_action(&mut self, key: i32, action: i32, _mods: i32) -> bool
   {
     let mut captured = true;
 
@@ -280,11 +280,11 @@ impl ui::Input_Listener for Camera
 
     captured
   }
-  pub fn key_char(&mut self, _ch: char) -> bool
+  fn key_char(&mut self, _ch: char) -> bool
   { false }
-  pub fn mouse_action(&mut self, _button: i32, _action: i32, _mods: i32) -> bool
+  fn mouse_action(&mut self, _button: i32, _action: i32, _mods: i32) -> bool
   { false }
-  pub fn mouse_moved(&mut self, x: f32, y: f32) -> bool
+  fn mouse_moved(&mut self, x: f32, y: f32) -> bool
   {
     let dx = x - (self.window_size.x / 2) as f32;
     let dy = y - (self.window_size.y / 2) as f32;

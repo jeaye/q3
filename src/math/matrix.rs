@@ -179,7 +179,7 @@ impl Mat4x4
 /***** Operator Overloads *****/
 impl Mul<Mat4x4, Mat4x4> for Mat4x4
 {
-  pub fn mul(&self, rhs: &Mat4x4) -> Mat4x4
+  fn mul(&self, rhs: &Mat4x4) -> Mat4x4
   {
     let mut mat = Mat4x4::new();
 

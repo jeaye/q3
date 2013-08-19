@@ -28,7 +28,7 @@ struct Renderer
   vbo: gl2::GLuint,
 
   /* Shader uniforms. */
-  shader: @gl::Shader,
+  shader: @mut gl::Shader,
   world: math::Mat4x4,
   tex_world: math::Mat4x4,
 
@@ -187,7 +187,7 @@ impl Renderer
     self.shader.bind();
   }
 
-  priv fn render(&mut self, tex: &gl::Texture)
+  fn render(&mut self, tex: &gl::Texture)
   {
     tex.bind(0);
 

@@ -36,7 +36,7 @@ pub struct BSP_Renderer
   vao: gl2::GLuint,
   vbo: gl2::GLuint, 
 
-  shader: @gl::Shader,
+  shader: @mut gl::Shader,
   proj_loc: gl2::GLint,
   world_loc: gl2::GLint,
 }
@@ -62,7 +62,7 @@ impl BSP_Renderer
     gr
   }
 
-  priv fn upload(&mut self)
+  fn upload(&mut self)
   {
     let name = check!(gl2::gen_vertex_arrays(1));
     assert!(name.len() == 1);
@@ -77,7 +77,7 @@ impl BSP_Renderer
     check!(gl2::buffer_data(gl2::ARRAY_BUFFER, self.game_renderer.game.bsp_map.verts, gl2::STATIC_DRAW));
   }
 
-  priv fn render_mesh(&self)
+  fn render_mesh(&self)
   {
     check!(gl2::bind_vertex_array(self.vao));
     check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.vbo));
@@ -102,7 +102,7 @@ impl BSP_Renderer
 
 impl State for BSP_Renderer
 {
-  pub fn load(&mut self)
+  fn load(&mut self)
   {
     log_debug!("Loading bsp renderer state.");
 
@@ -113,20 +113,20 @@ impl State for BSP_Renderer
     self.world_loc = self.shader.get_uniform_location("world");
   }
 
-  pub fn unload(&mut self)
+  fn unload(&mut self)
   { log_debug!("Unloading bsp renderer state."); }
 
-  pub fn get_key(&self) -> &str
+  fn get_key(&self) -> &str
   { &"bsp_renderer" }
 
-  pub fn update(&mut self, delta: f32) -> bool /* dt is in terms of seconds. */
+  fn update(&mut self, delta: f32) -> bool /* dt is in terms of seconds. */
   {
     self.game_renderer.camera.update(delta);
 
     false
   }
 
-  pub fn render(&mut self) -> bool
+  fn render(&mut self) -> bool
   {
     self.shader.bind();
     self.shader.update_uniform_mat(self.proj_loc, &self.game_renderer.camera.projection);
@@ -151,9 +151,9 @@ impl State for BSP_Renderer
     false
   }
 
-  pub fn key_action(&mut self, key: i32, action: i32, _mods: i32) -> bool
+  fn key_action(&mut self, key: i32, action: i32, _mods: i32) -> bool
   { (self.game_renderer.camera as @mut ui::Input_Listener).key_action(key, action, _mods) }
-  pub fn mouse_moved(&mut self, x: f32, y: f32) -> bool
+  fn mouse_moved(&mut self, x: f32, y: f32) -> bool
   { (self.game_renderer.camera as @mut ui::Input_Listener).mouse_moved(x, y) }
 }
 

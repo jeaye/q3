@@ -10,7 +10,6 @@
 */
 
 use std::{ u32, vec, sys };
-use std::iterator::IteratorUtil;
 use gl;
 use super::Font;
 use math;
@@ -23,7 +22,7 @@ struct Renderer
 {
   vao: gl2::GLuint,
   vbo: gl2::GLuint,
-  shader: @gl::Shader,
+  shader: @mut gl::Shader,
   proj_loc: gl2::GLint,
 }
 
@@ -186,7 +185,7 @@ impl Renderer
   }
 
   /* Standard Quake colors. */
-  priv fn get_color(&self, name: u32) -> math::Vec3f
+  fn get_color(&self, name: u32) -> math::Vec3f
   {
     match name
     {

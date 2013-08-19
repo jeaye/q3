@@ -21,31 +21,31 @@ mod log;
 
 pub trait State
 {
-  pub fn load(&mut self);
-  pub fn unload(&mut self)
+  fn load(&mut self);
+  fn unload(&mut self)
   { }
 
   /* Each state must have a unique key that other
    * objects can use to reference it. */
-  pub fn get_key(&self) -> &str;
+  fn get_key(&self) -> &str;
 
   /*  Returns true when the event has been captured. If the event is not
       captured, it's set to the next lower state. (A state can capture
       renders, for example, as an optimization -- or updates as a sanity or
       security measure). Rinse and repeat. */
-  pub fn update(&mut self, _delta: f32) -> bool /* dt is in terms of seconds. */
+  fn update(&mut self, _delta: f32) -> bool /* dt is in terms of seconds. */
   { false }
-  pub fn render(&mut self) -> bool
+  fn render(&mut self) -> bool
   { false }
 
   /* TODO: Trait inheritance with Input_Listener. */
-  pub fn key_action(&mut self, _key: i32, _action: i32, _mods: i32) -> bool
+  fn key_action(&mut self, _key: i32, _action: i32, _mods: i32) -> bool
   { false }
-  pub fn key_char(&mut self, _ch: char) -> bool
+  fn key_char(&mut self, _ch: char) -> bool
   { false }
-  pub fn mouse_action(&mut self, _button: i32, _action: i32, _mods: i32) -> bool
+  fn mouse_action(&mut self, _button: i32, _action: i32, _mods: i32) -> bool
   { false }
-  pub fn mouse_moved(&mut self, _x: f32, _y: f32) -> bool
+  fn mouse_moved(&mut self, _x: f32, _y: f32) -> bool
   { false }
 }
 
@@ -83,7 +83,7 @@ impl Director
     })
   }
 
-  pub fn push(&mut self, mut state: @mut State)
+  pub fn push(&mut self, state: @mut State)
   {
     state.load();
     self.states.push(state);
@@ -91,7 +91,7 @@ impl Director
 
   pub fn pop(&mut self)
   {
-    let mut state = self.states.pop();
+    let state = self.states.pop();
     state.unload();
   }
 
@@ -104,7 +104,7 @@ impl Director
     {
       Some(i) =>
       {
-        let mut state = self.states.remove(i);
+        let state = self.states.remove(i);
         state.unload();
       }
       None => { log_debug!("Invalid state to pull '%s'", key); }
@@ -113,7 +113,7 @@ impl Director
 
   /* Swaps the state specified by key with the newly
    * specified state. */
-  pub fn swap(&mut self, key: &str, mut state: @mut State)
+  pub fn swap(&mut self, key: &str, state: @mut State)
   {
     let index = do self.states.rposition |st|
     { st.get_key() == key };
@@ -121,7 +121,7 @@ impl Director
     {
       Some(i) =>
       {
-        let mut old_state = self.states[i];
+        let old_state = self.states[i];
         old_state.unload();
 
         state.load();

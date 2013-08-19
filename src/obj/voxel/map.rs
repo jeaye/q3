@@ -47,7 +47,7 @@ impl Map
     map
   }
 
-  priv fn voxelize(&mut self, tris: &[Triangle])
+  fn voxelize(&mut self, tris: &[Triangle])
   {
     /* Require at least one triangle. */
     assert!(tris.len() >= 1);
@@ -299,7 +299,7 @@ macro_rules! axis_test_z0
   )
 )
 
-priv fn tri_cube_intersect(box_center: math::Vec3f, box_size: f32, tri: &Triangle) -> bool
+fn tri_cube_intersect(box_center: math::Vec3f, box_size: f32, tri: &Triangle) -> bool
 {
   let _v0;
   let _v1;
@@ -373,7 +373,7 @@ priv fn tri_cube_intersect(box_center: math::Vec3f, box_size: f32, tri: &Triangl
   plane_cube_intersect(&_normal, &_v0, box_size)
 }
 
-priv fn plane_cube_intersect(normal: &math::Vec3f, vert: &math::Vec3f, box_size: f32) -> bool
+fn plane_cube_intersect(normal: &math::Vec3f, vert: &math::Vec3f, box_size: f32) -> bool
 {
   let mut vmin: [f32, ..3] = [0.0, 0.0, 0.0];
   let mut vmax: [f32, ..3] = [0.0, 0.0, 0.0];

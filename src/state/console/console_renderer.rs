@@ -53,16 +53,16 @@ impl Console_Renderer
 
 impl State for Console_Renderer
 {
-  pub fn load(&mut self)
+  fn load(&mut self)
   { log_debug!("Loading console renderer state"); }
 
-  pub fn unload(&mut self)
+  fn unload(&mut self)
   { log_debug!("Unloading console renderer state"); }
 
-  pub fn get_key(&self) -> &str
+  fn get_key(&self) -> &str
   { &"console_renderer" }
 
-  pub fn update(&mut self, delta: f32) -> bool /* dt is in terms of seconds. */
+  fn update(&mut self, delta: f32) -> bool /* dt is in terms of seconds. */
   {
     self.console.position.y += (self.console.velocity * delta);
     self.console.position.y = self.console.position.y.clamp(&(-(self.tex_left.size.y + 1) as f32), &0.0);
@@ -70,7 +70,7 @@ impl State for Console_Renderer
     false
   }
 
-  pub fn render(&mut self) -> bool
+  fn render(&mut self) -> bool
   {
     let renderer = ui::Renderer::get();
     renderer.begin();

@@ -53,17 +53,17 @@ impl Game
 
 impl State for Game
 {
-  pub fn load(&mut self)
+  fn load(&mut self)
   { log_debug!("Loading game state."); }
-  pub fn unload(&mut self)
+  fn unload(&mut self)
   { log_debug!("Unloading game state."); }
 
-  pub fn get_key(&self) -> &str
+  fn get_key(&self) -> &str
   { &"game" }
 
-  pub fn update(&mut self, _delta: f32) -> bool /* dt is in terms of seconds. */
+  fn update(&mut self, _delta: f32) -> bool /* dt is in terms of seconds. */
   { false }
-  pub fn render(&mut self) -> bool
+  fn render(&mut self) -> bool
   { false }
 }
 

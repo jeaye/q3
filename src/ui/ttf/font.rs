@@ -12,7 +12,6 @@
 use std::{ vec, cmp, ptr };
 use std::hashmap::HashMap;
 use std::libc::{ c_uint };
-use std::iterator::IteratorUtil;
 use math;
 use self::glyph::Glyph;
 use gl2 = opengles::gl2;
@@ -53,7 +52,7 @@ impl Font
     {
       ft::FT_Init_FreeType(&font.library);
 
-      do filename.as_c_str() |c_str|
+      do filename.to_c_str().with_ref() |c_str|
       {
         if ft::FT_New_Face(font.library, c_str, 0, &font.face) != 0
         { fail!(~"Failed to create TTF face."); }

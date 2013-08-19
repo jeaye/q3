@@ -67,7 +67,7 @@ impl Map
     map
   }
 
-  priv fn read_verts(&mut self, fio: @io::Reader)
+  fn read_verts(&mut self, fio: @io::Reader)
   {
     fio.seek(self.header.lumps[lump::Vertex_Type as int].offset as int, io::SeekSet);
     let num_verts = (self.header.lumps[lump::Vertex_Type as int].length) /
@@ -154,7 +154,7 @@ impl Map
     { v.position = v.position - center; }
   }
 
-  priv fn read_faces(&mut self, fio: @io::Reader)
+  fn read_faces(&mut self, fio: @io::Reader)
   {
     fio.seek(self.header.lumps[lump::Face_Type as int].offset as int, io::SeekSet);
     let num_faces = (self.header.lumps[lump::Face_Type as int].length) /
@@ -170,7 +170,7 @@ impl Map
     }
   }
 
-  priv fn read_mesh_verts(&mut self, fio: @io::Reader)
+  fn read_mesh_verts(&mut self, fio: @io::Reader)
   {
     fio.seek(self.header.lumps[lump::Mesh_Vert_Type as int].offset as int, io::SeekSet);
     let num_obj = (self.header.lumps[lump::Mesh_Vert_Type as int].length) /
@@ -186,7 +186,7 @@ impl Map
     }
   }
 
-  priv fn triangulate(&mut self)
+  fn triangulate(&mut self)
   {
     let mut verts: ~[lump::Vertex] = ~[];
     for face in self.faces.iter()

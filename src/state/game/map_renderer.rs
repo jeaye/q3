@@ -46,7 +46,7 @@ pub struct Map_Renderer
 
   wireframe: bool,
 
-  shader: @gl::Shader,
+  shader: @mut gl::Shader,
   proj_loc: gl2::GLint,
   world_loc: gl2::GLint,
   voxel_size_loc: gl2::GLint,
@@ -244,7 +244,7 @@ impl Map_Renderer
 
 impl State for Map_Renderer
 {
-  pub fn load(&mut self)
+  fn load(&mut self)
   {
     log_debug!("Loading map renderer state");
 
@@ -259,7 +259,7 @@ impl State for Map_Renderer
     self.update_visibility();
   }
 
-  pub fn unload(&mut self)
+  fn unload(&mut self)
   {
     log_debug!("Unloading map renderer state");
     
@@ -271,10 +271,10 @@ impl State for Map_Renderer
     self.visible_voxels = Some(visible_voxels);
   }
 
-  pub fn get_key(&self) -> &str
+  fn get_key(&self) -> &str
   { &"map_renderer" }
 
-  pub fn update(&mut self, _delta: f32) -> bool /* dt is in terms of seconds. */
+  fn update(&mut self, _delta: f32) -> bool /* dt is in terms of seconds. */
   {
     /* Check if there is data available between the background
      * thread and us. The last thing it does is send back some
@@ -300,7 +300,7 @@ impl State for Map_Renderer
     false      
   }
 
-  pub fn render(&mut self) -> bool
+  fn render(&mut self) -> bool
   {
     let camera = gl::Camera::get_active();
 

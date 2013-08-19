@@ -28,13 +28,13 @@ struct Mesh_Renderer<'self>
   ibo: gl2::GLuint, 
   tex0_loc: gl2::GLint,
 
-  shader: @gl::Shader, 
+  shader: @mut gl::Shader, 
   texture: Option<gl::Texture>,
 }
 
 impl<'self> Mesh_Renderer<'self>
 {
-  pub fn new(m: &'self Mesh, sh: @gl::Shader) -> Mesh_Renderer<'self>
+  pub fn new(m: &'self Mesh, sh: @mut gl::Shader) -> Mesh_Renderer<'self>
   {
     let mut mr = Mesh_Renderer
     {
@@ -62,7 +62,7 @@ impl<'self> Mesh_Renderer<'self>
     mr
   }
 
-  priv fn upload(&mut self)
+  fn upload(&mut self)
   {
     let name = check!(gl2::gen_vertex_arrays(1));
     assert!(name.len() == 1);
