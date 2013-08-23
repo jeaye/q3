@@ -16,7 +16,6 @@ use gl2 = opengles::gl2;
 use std::f32;
 use math;
 use ui;
-use state;
 
 #[macro_escape]
 mod check;
@@ -65,7 +64,7 @@ impl<'self> Camera
 {
   pub fn new(win: @glfw::Window) -> Camera
   {
-    let mut c = Camera
+    let c = Camera
     {
       position: math::Vec3f::zero(),
       angles: math::Vec2f::zero(),

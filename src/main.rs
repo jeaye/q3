@@ -103,11 +103,11 @@ fn main(argc: int, argv: **u8, crate_map: *u8) -> int
         { cam.resize(width as i32, height as i32); }
       }
 
+      let game_state = state::Game::new();
+      let game_renderer_state = state::Game_Renderer::new(game_state);
+      let bsp_renderer_state = state::BSP_Renderer::new(game_renderer_state);
       do state::Director::get_mut |director|
       {
-        let game_state = state::Game::new();
-        let game_renderer_state = state::Game_Renderer::new(game_state);
-        let bsp_renderer_state = state::BSP_Renderer::new(game_renderer_state);
         director.push(game_state as @mut state::State);
         director.push(game_renderer_state as @mut state::State);
         director.push(console_state as @mut state::State);
@@ -124,12 +124,19 @@ fn main(argc: int, argv: **u8, crate_map: *u8) -> int
       do window.set_key_callback |window, key, _scancode, action, mods|
       {
         /* Debugging hack to allow switching between voxel and non-voxel renderers. */
-        //if key == glfw::KEY_LEFT_BRACKET && action == glfw::PRESS
-        //{ states.swap("bsp_renderer", (game_renderer_state as @mut state::State)); }
-        //else if key == glfw::KEY_RIGHT_BRACKET && action == glfw::PRESS
-        //{ states.swap("game_renderer", (bsp_renderer_state as @mut state::State)); }
+        if key == glfw::KEY_LEFT_BRACKET && action == glfw::PRESS
+        { 
+          do state::Director::get_mut |director|
+          { director.swap("bsp_renderer", (game_renderer_state as @mut state::State)); }
+        }
+        else if key == glfw::KEY_RIGHT_BRACKET && action == glfw::PRESS
+        { 
+          do state::Director::get_mut |director|
+          { director.swap("game_renderer", (bsp_renderer_state as @mut state::State)); }
+        }
 
-        //states.key_action(key, action, mods);
+        do state::Director::get_mut |director|
+        { director.key_action(key, action, mods); }
         key_callback(window, key, action);
       }
 
@@ -154,11 +161,13 @@ fn main(argc: int, argv: **u8, crate_map: *u8) -> int
         last_time = cur_time;
         cur_time = extra::time::precise_time_s() as f32;
 
-        //states.update(delta);
+        do state::Director::get_mut |director|
+        { director.update(delta); }
 
         check!(gl2::clear(gl2::COLOR_BUFFER_BIT | gl2::DEPTH_BUFFER_BIT));
         {
-          //states.render();
+          do state::Director::get_mut |director|
+          { director.render(); }
         } window.swap_buffers();
       }
 
