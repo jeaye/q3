@@ -55,10 +55,12 @@ impl<'self> Model_Renderer<'self>
   {
     check!(gl2::front_face(gl2::CW));
 
-    let camera = gl::Camera::get_active();
-    self.shader.bind();
-    self.shader.update_uniform_mat(self.proj_loc, &camera.projection);
-    self.shader.update_uniform_mat(self.world_loc, &camera.view);
+    do gl::Camera::get_active() |camera|
+    {
+      self.shader.bind();
+      self.shader.update_uniform_mat(self.proj_loc, &camera.projection);
+      self.shader.update_uniform_mat(self.world_loc, &camera.view);
+    }
 
     for x in self.mesh_renderers.iter()
     { x.render(); }

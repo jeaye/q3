@@ -106,7 +106,8 @@ impl State for BSP_Renderer
   {
     log_debug!("Loading bsp renderer state.");
 
-    self.game_renderer.camera.show_fps = true;
+    do gl::Camera::get_active |camera|
+    { camera.show_fps = true; }
 
     self.shader.bind();
     self.proj_loc = self.shader.get_uniform_location("proj");
@@ -121,7 +122,8 @@ impl State for BSP_Renderer
 
   fn update(&mut self, delta: f32) -> bool /* dt is in terms of seconds. */
   {
-    self.game_renderer.camera.update(delta);
+    do gl::Camera::get_active |camera| 
+    { camera.update(delta); }
 
     false
   }
@@ -129,31 +131,43 @@ impl State for BSP_Renderer
   fn render(&mut self) -> bool
   {
     self.shader.bind();
-    self.shader.update_uniform_mat(self.proj_loc, &self.game_renderer.camera.projection);
-    self.shader.update_uniform_mat(self.world_loc, &self.game_renderer.camera.view);
+    do gl::Camera::get_active |camera|
+    {
+      self.shader.update_uniform_mat(self.proj_loc, &camera.projection);
+      self.shader.update_uniform_mat(self.world_loc, &camera.view);
+    }
 
     self.render_mesh();
 
-    let fps = self.game_renderer.camera.frame_rate;
-
-    let ui_renderer = ui::Renderer::get();
-    ui_renderer.begin();
+    do gl::Camera::get_active |camera|
     {
-      if self.game_renderer.camera.show_fps
+      let fps = camera.frame_rate;
+
+      let ui_renderer = ui::Renderer::get();
+      ui_renderer.begin();
       {
-        ui_renderer.render_font(
-          fmt!("%?", fps), 
-          math::Vec2f::new(self.game_renderer.camera.window_size.x as f32 - 40.0, 0.0), 
-          &self.game_renderer.fps_font); 
-      }
-    } ui_renderer.end();
+        if camera.show_fps
+        {
+          ui_renderer.render_font(
+            fmt!("%?", fps), 
+            math::Vec2f::new(camera.window_size.x as f32 - 40.0, 0.0), 
+            &self.game_renderer.fps_font); 
+        }
+      } ui_renderer.end();
+    }
 
     false
   }
 
   fn key_action(&mut self, key: i32, action: i32, _mods: i32) -> bool
-  { (self.game_renderer.camera as @mut ui::Input_Listener).key_action(key, action, _mods) }
+  {
+    do gl::Camera::get_active() |camera|
+    { (camera as &mut ui::Input_Listener).key_action(key, action, _mods) }
+  }
   fn mouse_moved(&mut self, x: f32, y: f32) -> bool
-  { (self.game_renderer.camera as @mut ui::Input_Listener).mouse_moved(x, y) }
+  {
+    do gl::Camera::get_active() |camera|
+    { (camera as &mut ui::Input_Listener).mouse_moved(x, y) }
+  }
 }
 

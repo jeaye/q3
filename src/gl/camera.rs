@@ -28,7 +28,7 @@ static MOVE_BACKWARD: u8 = 8;
 static MOVE_UP: u8 = 16;
 static MOVE_DOWN: u8 = 32;
 
-static tls_key: local_data::Key<@mut Camera> = &local_data::Key;
+static tls_key: local_data::Key<~Camera> = &local_data::Key;
 
 struct Camera
 {
@@ -60,11 +60,12 @@ struct Camera
   show_fps: bool,
   vsync: bool,
 }
-impl Camera
+
+impl<'self> Camera
 {
-  pub fn new(win: @glfw::Window) -> @mut Camera
+  pub fn new(win: @glfw::Window) -> Camera
   {
-    let c = @mut Camera
+    let mut c = Camera
     {
       position: math::Vec3f::zero(),
       angles: math::Vec2f::zero(),
@@ -86,85 +87,85 @@ impl Camera
       vsync: true,
     };
 
-    state::Console::get().add_accessor("camera.fov", |_|
-    { c.fov.to_str() });
-    state::Console::get().add_mutator("camera.fov", |p, fov|
-    {
-      let mut error = ~"";
+    //state::Console::get().add_accessor("camera.fov", |_|
+    //{ c.fov.to_str() });
+    //state::Console::get().add_mutator("camera.fov", |p, fov|
+    //{
+    //  let mut error = ~"";
 
-      c.fov = match f32::from_str(fov)
-      {
-        Some(x) => { x },
-        None => { error = fmt!("Invalid value for %s (use a floating point number)", p); c.fov }
-      };
+    //  c.fov = match f32::from_str(fov)
+    //  {
+    //    Some(x) => { x },
+    //    None => { error = fmt!("Invalid value for %s (use a floating point number)", p); c.fov }
+    //  };
 
-      /* Rebuild the projection info. */
-      c.resize(c.window_size.x, c.window_size.y);
+    //  /* Rebuild the projection info. */
+    //  c.resize(c.window_size.x, c.window_size.y);
 
-      if error.len() == 0
-      { None }
-      else
-      { Some(error) }
-    });
-    state::Console::get().add_accessor("ui.show_fps", |_|
-    { c.show_fps.to_str() });
-    state::Console::get().add_mutator("ui.show_fps", |p, x|
-    {
-      let mut error = ~"";
-      if x == "true"
-      { c.show_fps = true; }
-      else if x == "false"
-      { c.show_fps = false; }
-      else
-      { error = fmt!("Invalid value for %s (use 'true' or 'false')", p); }
+    //  if error.len() == 0
+    //  { None }
+    //  else
+    //  { Some(error) }
+    //});
+    //state::Console::get().add_accessor("ui.show_fps", |_|
+    //{ c.show_fps.to_str() });
+    //state::Console::get().add_mutator("ui.show_fps", |p, x|
+    //{
+    //  let mut error = ~"";
+    //  if x == "true"
+    //  { c.show_fps = true; }
+    //  else if x == "false"
+    //  { c.show_fps = false; }
+    //  else
+    //  { error = fmt!("Invalid value for %s (use 'true' or 'false')", p); }
 
-      if error.len() == 0
-      { None }
-      else
-      { Some(error) }
-    });
-    state::Console::get().add_accessor("camera.vsync", |_|
-    { c.vsync.to_str() });
-    state::Console::get().add_mutator("camera.vsync", |p, x|
-    {
-      let mut error = ~"";
-      if x == "true"
-      {
-        c.vsync = true;
-        glfw::set_swap_interval(1); 
-      }
-      else if x == "false"
-      {
-        c.vsync = false;
-        glfw::set_swap_interval(0);
-      }
-      else
-      { error = fmt!("Invalid value for %s (use 'true' or 'false')", p); }
+    //  if error.len() == 0
+    //  { None }
+    //  else
+    //  { Some(error) }
+    //});
+    //state::Console::get().add_accessor("camera.vsync", |_|
+    //{ c.vsync.to_str() });
+    //state::Console::get().add_mutator("camera.vsync", |p, x|
+    //{
+    //  let mut error = ~"";
+    //  if x == "true"
+    //  {
+    //    c.vsync = true;
+    //    glfw::set_swap_interval(1); 
+    //  }
+    //  else if x == "false"
+    //  {
+    //    c.vsync = false;
+    //    glfw::set_swap_interval(0);
+    //  }
+    //  else
+    //  { error = fmt!("Invalid value for %s (use 'true' or 'false')", p); }
 
-      if error.len() == 0
-      { None }
-      else
-      { Some(error) }
-    });
+    //  if error.len() == 0
+    //  { None }
+    //  else
+    //  { Some(error) }
+    //});
 
     /* Set some defaults. */
-    state::Console::run_function(~"set camera.vsync true");
+    //state::Console::run_function(~"set camera.vsync true");
 
     c
   }
 
-  pub fn set_active(cam: @mut Camera)
+  pub fn set_active(cam: ~Camera)
   { local_data::set(tls_key, cam); }
 
-  pub fn get_active() -> @mut Camera
+  pub fn get_active<T>(handler: &fn(&mut Camera) -> T) -> T
   { 
-    local_data::get(tls_key, 
+    local_data::get_mut(tls_key, 
     |opt|
     {
       match opt
       {
-        Some(x) => *x,
-        None => fail!("Singleton not available")
+        Some(x) => handler(&mut **x),
+        None => fail!("Singleton not available: Camera")
       }
     })
   }

@@ -164,13 +164,17 @@ impl Map_Renderer
   {
     self.prev_visible_voxel_count = self.visible_voxels.get_ref().len() as u32;
 
-    let cam = gl::Camera::get_active();
-    let dist = (cam.near_far.y  / self.map.voxel_size) as i32; /* How far the camera can see. */
     let res = self.map.resolution as f32;
-    let pos = math::Vec3f::new(cam.position.x / self.map.voxel_size,
-                               cam.position.y / self.map.voxel_size,
-                               cam.position.z / self.map.voxel_size)
-                               + math::Vec3f::new(res / 2.0, res / 2.0, res / 2.0);
+    let (dist, pos) = do gl::Camera::get_active() |cam|
+    {
+      let dist = (cam.near_far.y  / self.map.voxel_size) as i32; /* How far the camera can see. */
+      let pos = math::Vec3f::new(cam.position.x / self.map.voxel_size,
+                                 cam.position.y / self.map.voxel_size,
+                                 cam.position.z / self.map.voxel_size)
+                                 + math::Vec3f::new(res / 2.0, res / 2.0, res / 2.0);
+      (dist, pos)
+    };
+
     let start = math::Vec3i::new
     (
       (pos.x - dist as f32).clamp(&0.0, &(res - 1.0)) as i32,
@@ -302,11 +306,12 @@ impl State for Map_Renderer
 
   fn render(&mut self) -> bool
   {
-    let camera = gl::Camera::get_active();
-
     self.shader.bind();
-    self.shader.update_uniform_mat(self.proj_loc, &camera.projection);
-    self.shader.update_uniform_mat(self.world_loc, &camera.view);
+    do gl::Camera::get_active() |camera|
+    {
+      self.shader.update_uniform_mat(self.proj_loc, &camera.projection);
+      self.shader.update_uniform_mat(self.world_loc, &camera.view);
+    }
     self.shader.update_uniform_f32(self.voxel_size_loc, self.map.voxel_size);
 
     check!(gl2::bind_vertex_array(self.vao));

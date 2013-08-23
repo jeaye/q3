@@ -94,11 +94,14 @@ fn main(argc: int, argv: **u8, crate_map: *u8) -> int
       let console_renderer_state = state::Console_Renderer::new(console_state);
 
       /* Initialize the default camera. */
-      let cam = gl::Camera::new(window);
+      let mut cam = ~gl::Camera::new(window);
       cam.init();
       gl::Camera::set_active(cam);
       do window.set_size_callback |_, width, height|
-      { cam.resize(width as i32, height as i32); }
+      {
+        do gl::Camera::get_active |cam|
+        { cam.resize(width as i32, height as i32); }
+      }
 
       let game_state = state::Game::new();
       let game_renderer_state = state::Game_Renderer::new(game_state);

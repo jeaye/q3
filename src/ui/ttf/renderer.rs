@@ -71,9 +71,11 @@ impl Renderer
     check!(gl2::blend_func(gl2::SRC_ALPHA, gl2::ONE_MINUS_SRC_ALPHA));
 
     self.shader.bind();
-    let camera = gl::Camera::get_active();
-    let proj = math::Mat4x4::new_orthographic(0.0, camera.window_size.x as f32, camera.window_size.y as f32, 0.0,  1.0, 100.0);
-    self.shader.update_uniform_mat(self.proj_loc, &proj);
+    do gl::Camera::get_active() |camera|
+    {
+      let proj = math::Mat4x4::new_orthographic(0.0, camera.window_size.x as f32, camera.window_size.y as f32, 0.0,  1.0, 100.0);
+      self.shader.update_uniform_mat(self.proj_loc, &proj);
+    }
   }
 
   pub fn end(&mut self)
