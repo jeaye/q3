@@ -13,7 +13,7 @@
 use std::local_data;
 use util::Log;
 
-static tls_key: local_data::Key<@mut Director> = &local_data::Key;
+static tls_key: local_data::Key<Director> = &local_data::Key;
 
 #[macro_escape]
 #[path = "../util/log_macros.rs"]
@@ -56,29 +56,27 @@ pub struct Director
 
 impl Director
 {
-  pub fn new() -> @mut Director
+  pub fn create()
   {
-    let director = @mut Director
+    let director = Director
     {
       states: ~[],
     };
 
     /* Store the director in task-local storage. (singleton) */
     local_data::set(tls_key, director);
-
-    director
   }
 
   /* Accesses the singleton director from task-local storage. */
-  pub fn get() -> @mut Director
-  {
-    local_data::get(tls_key, 
+  pub fn get_mut<T>(handler: &fn(&mut Director) -> T) -> T
+  { 
+    local_data::get_mut(tls_key, 
     |opt|
     {
       match opt
       {
-        Some(x) => *x,
-        None => fail!("Singleton not available")
+        Some(x) => handler(&mut *x),
+        None => fail!("Singleton not available: Director")
       }
     })
   }

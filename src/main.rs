@@ -89,7 +89,7 @@ fn main(argc: int, argv: **u8, crate_map: *u8) -> int
       let _ui_renderer = ui::Renderer::new(window);
 
       /* Create all the states we need. */
-      let states = state::Director::new();
+      state::Director::create();
       let console_state = state::Console::new();
       let console_renderer_state = state::Console_Renderer::new(console_state);
 
@@ -103,30 +103,33 @@ fn main(argc: int, argv: **u8, crate_map: *u8) -> int
         { cam.resize(width as i32, height as i32); }
       }
 
-      let game_state = state::Game::new();
-      let game_renderer_state = state::Game_Renderer::new(game_state);
-      let bsp_renderer_state = state::BSP_Renderer::new(game_renderer_state);
-      states.push(game_state as @mut state::State);
-      states.push(game_renderer_state as @mut state::State);
-      states.push(console_state as @mut state::State);
-      states.push(console_renderer_state as @mut state::State);
+      do state::Director::get_mut |director|
+      {
+        let game_state = state::Game::new();
+        let game_renderer_state = state::Game_Renderer::new(game_state);
+        let bsp_renderer_state = state::BSP_Renderer::new(game_renderer_state);
+        director.push(game_state as @mut state::State);
+        director.push(game_renderer_state as @mut state::State);
+        director.push(console_state as @mut state::State);
+        director.push(console_renderer_state as @mut state::State);
+      }
 
       /* Setup callbacks. */
       do window.set_focus_callback |_, focused|
       { if focused {window.set_cursor_mode(glfw::CURSOR_DISABLED); } }
-      do window.set_cursor_pos_callback |_, x, y| 
-      { states.mouse_moved(x as f32, y as f32); }
-      do window.set_char_callback |_, c|
-      { states.key_char(c); }
+      //do window.set_cursor_pos_callback |_, x, y| 
+      //{ states.mouse_moved(x as f32, y as f32); }
+      //do window.set_char_callback |_, c|
+      //{ states.key_char(c); }
       do window.set_key_callback |window, key, _scancode, action, mods|
       {
         /* Debugging hack to allow switching between voxel and non-voxel renderers. */
-        if key == glfw::KEY_LEFT_BRACKET && action == glfw::PRESS
-        { states.swap("bsp_renderer", (game_renderer_state as @mut state::State)); }
-        else if key == glfw::KEY_RIGHT_BRACKET && action == glfw::PRESS
-        { states.swap("game_renderer", (bsp_renderer_state as @mut state::State)); }
+        //if key == glfw::KEY_LEFT_BRACKET && action == glfw::PRESS
+        //{ states.swap("bsp_renderer", (game_renderer_state as @mut state::State)); }
+        //else if key == glfw::KEY_RIGHT_BRACKET && action == glfw::PRESS
+        //{ states.swap("game_renderer", (bsp_renderer_state as @mut state::State)); }
 
-        states.key_action(key, action, mods);
+        //states.key_action(key, action, mods);
         key_callback(window, key, action);
       }
 
@@ -151,11 +154,11 @@ fn main(argc: int, argv: **u8, crate_map: *u8) -> int
         last_time = cur_time;
         cur_time = extra::time::precise_time_s() as f32;
 
-        states.update(delta);
+        //states.update(delta);
 
         check!(gl2::clear(gl2::COLOR_BUFFER_BIT | gl2::DEPTH_BUFFER_BIT));
         {
-          states.render();
+          //states.render();
         } window.swap_buffers();
       }
 
