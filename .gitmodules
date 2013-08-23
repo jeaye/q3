@@ -1,6 +1,6 @@
 [submodule "lib/rust-opengles"]
 	path = lib/rust-opengles
-	url = git://github.com/Jeaye/rust-opengles.git
+	url = git://github.com/jeaye/rust-opengles.git
   ignore = dirty
 [submodule "lib/glfw"]
 	path = lib/glfw
@@ -8,10 +8,10 @@
   ignore = dirty
 [submodule "lib/glfw-rs"]
 	path = lib/glfw-rs
-	url = git://github.com/Jeaye/glfw-rs.git
+	url = git://github.com/jeaye/glfw-rs.git
   ignore = dirty
 [submodule "lib/stb-image"]
 	path = lib/stb-image
-	url = git://github.com/Jeaye/rust-stb-image.git
+	url = git://github.com/jeaye/rust-stb-image.git
   ignore = dirty
 
