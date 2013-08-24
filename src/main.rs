@@ -117,10 +117,16 @@ fn main(argc: int, argv: **u8, crate_map: *u8) -> int
       /* Setup callbacks. */
       do window.set_focus_callback |_, focused|
       { if focused {window.set_cursor_mode(glfw::CURSOR_DISABLED); } }
-      //do window.set_cursor_pos_callback |_, x, y| 
-      //{ states.mouse_moved(x as f32, y as f32); }
-      //do window.set_char_callback |_, c|
-      //{ states.key_char(c); }
+      do window.set_cursor_pos_callback |_, x, y| 
+      {
+        do state::Director::get_mut |director|
+        { director.mouse_moved(x as f32, y as f32); }
+      }
+      do window.set_char_callback |_, c|
+      {
+        do state::Director::get_mut |director|
+        { director.key_char(c); }
+      }
       do window.set_key_callback |window, key, _scancode, action, mods|
       {
         /* Debugging hack to allow switching between voxel and non-voxel renderers. */
