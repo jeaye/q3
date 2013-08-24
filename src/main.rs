@@ -88,10 +88,15 @@ fn main(argc: int, argv: **u8, crate_map: *u8) -> int
       let gl_worker_port = gl::Worker::initialize(worker_window);
       let _ui_renderer = ui::Renderer::new(window);
 
-      /* Create all the states we need. */
+      /* Create the console state. */
       state::Director::create();
       let console_state = state::Console::new();
       let console_renderer_state = state::Console_Renderer::new(console_state);
+      do state::Director::get_mut |director|
+      {
+        director.push(console_state as @mut state::State);
+        director.push(console_renderer_state as @mut state::State);
+      }
 
       /* Initialize the default camera. */
       let cam = gl::Camera::new(window);
@@ -100,51 +105,17 @@ fn main(argc: int, argv: **u8, crate_map: *u8) -> int
       do window.set_size_callback |_, width, height|
       { cam.resize(width as i32, height as i32); }
 
-      let game_state = state::Game::new();
-      let game_renderer_state = state::Game_Renderer::new(game_state);
-      let bsp_renderer_state = state::BSP_Renderer::new(game_renderer_state);
-      do state::Director::get_mut |director|
-      {
-        director.push(game_state as @mut state::State);
-        director.push(game_renderer_state as @mut state::State);
-        director.push(console_state as @mut state::State);
-        director.push(console_renderer_state as @mut state::State);
-      }
-
       /* Setup callbacks. */
       do window.set_focus_callback |_, focused|
       { if focused {window.set_cursor_mode(glfw::CURSOR_DISABLED); } }
       do window.set_cursor_pos_callback |_, x, y| 
-      {
-        do state::Director::get_mut |director|
-        { director.mouse_moved(x as f32, y as f32); }
-      }
+      { state::Director::mouse_moved(x as f32, y as f32); }
       do window.set_char_callback |_, c|
-      {
-        do state::Director::get_mut |director|
-        { director.key_char(c); }
-      }
+      { state::Director::key_char(c); }
       do window.set_key_callback |window, key, _scancode, action, mods|
       {
-        /* Debugging hack to allow switching between voxel and non-voxel renderers. */
-        if key == glfw::KEY_LEFT_BRACKET && action == glfw::PRESS
-        {
-          do state::Director::get_mut |director|
-          { director.swap("bsp_renderer", (game_renderer_state as @mut state::State)); }
-        }
-        else if key == glfw::KEY_RIGHT_BRACKET && action == glfw::PRESS
-        {
-          do state::Director::get_mut |director|
-          { director.swap("game_renderer", (bsp_renderer_state as @mut state::State)); }
-        }
-        else
-        {
-          do state::Director::get_mut |director|
-          {
-            director.key_action(key, action, mods);
-            key_callback(window, key, action);
-          }
-        }
+        state::Director::key_action(key, action, mods);
+        key_callback(window, key, action);
       }
 
       let _model = md5::Model::new(~"data/models/bob/bob.md5mesh");
@@ -152,14 +123,35 @@ fn main(argc: int, argv: **u8, crate_map: *u8) -> int
 
       /* Console functions. */
       state::Console::get().add_accessor("q3.version", |_|
-                                                { fmt!("%s.%s", env!("VERSION"), env!("COMMIT")) });
+      { fmt!("%s.%s", env!("VERSION"), env!("COMMIT")) });
       state::Console::get().add_function(~"quit", |_, _| -> (bool, ~str)
-                                                { window.set_should_close(true); (true, ~"")});
+      { window.set_should_close(true); (true, ~"")});
+      state::Console::get().add_function(~"load_map", |_, map_name| -> (bool, ~str)
+      {
+        /* TODO #38: Return Option since loading could fail. */
+        let game_state = state::Game::new(map_name);
+        let game_renderer_state = state::Game_Renderer::new(game_state);
+        do state::Director::get_mut |director|
+        {
+          /* Remove any existing game states. */
+          do director.remove_if |state|
+          { state.get_key() == (game_state as @mut state::State).get_key() || 
+            state.get_key() == (game_renderer_state as @mut state::State).get_key() }
+
+          director.unshift(game_state as @mut state::State);
+          director.unshift(game_renderer_state as @mut state::State);
+        }
+
+        (true, ~"Loaded map: \\5" + map_name + "\\1")
+      });
+      /* Load the default map. */
+      state::Console::run_function(~"load_map q3ctf1");
 
       /* Delta time. */
       let mut cur_time = extra::time::precise_time_s() as f32;
       let mut last_time = cur_time;
 
+      /* Enter game loop. */
       while !window.should_close()
       {
         glfw::poll_events();
@@ -168,13 +160,11 @@ fn main(argc: int, argv: **u8, crate_map: *u8) -> int
         last_time = cur_time;
         cur_time = extra::time::precise_time_s() as f32;
 
-        do state::Director::get_mut |director|
-        { director.update(delta); }
+        state::Director::update(delta);
 
         check!(gl2::clear(gl2::COLOR_BUFFER_BIT | gl2::DEPTH_BUFFER_BIT));
         {
-          do state::Director::get_mut |director|
-          { director.render(); }
+          state::Director::render();
         } window.swap_buffers();
       }
 

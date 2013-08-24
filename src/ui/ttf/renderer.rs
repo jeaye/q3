@@ -146,7 +146,7 @@ impl Renderer
             None => { }
           }
         }
-        else if curr == '\\'
+        if curr == '\\'
         {
           expecting_color = true;
           color_str.clear();

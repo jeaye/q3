@@ -52,6 +52,7 @@ pub trait State
 pub struct Director
 {
   states: ~[@mut State],
+  deferreds: ~[@fn()],
 }
 
 impl Director
@@ -61,6 +62,7 @@ impl Director
     let director = Director
     {
       states: ~[],
+      deferreds: ~[],
     };
 
     /* Store the director in task-local storage. (singleton) */
@@ -80,6 +82,18 @@ impl Director
       }
     })
   }
+  pub fn get<T>(handler: &fn(&Director) -> T) -> T
+  {
+    local_data::get(tls_key, 
+    |opt|
+    {
+      match opt
+      {
+        Some(x) => handler(&*x),
+        None => fail!("Singleton not available: Director")
+      }
+    })
+  }
 
   pub fn push(&mut self, state: @mut State)
   {
@@ -91,6 +105,49 @@ impl Director
   {
     let state = self.states.pop();
     state.unload();
+  }
+
+  pub fn unshift(&mut self, state: @mut State)
+  {
+    state.load();
+    self.states.unshift(state);
+  }
+
+  pub fn shift(&mut self)
+  {
+    let state = self.states.shift();
+    state.unload();
+  }
+
+  pub fn push_deferred(def: @fn())
+  {
+    do Director::get_mut |director|
+    { director.deferreds.push(def); }
+  }
+
+  fn run_deferreds(&mut self)
+  {
+    for x in self.deferreds.iter()
+    { (*x)(); }
+    self.deferreds.clear();
+  }
+
+  pub fn remove_if(&mut self, cmp: &fn(@mut State) -> bool)
+  {
+    if self.states.len() == 0
+    { return; }
+
+    let mut x = 0;
+    while x < self.states.len()
+    {
+      if cmp(self.states[x])
+      {
+        let state = self.states.remove(x);
+        state.unload();
+        x -= 1;
+      }
+      x += 1;
+    }
   }
 
   /* Removes the state with the specified key. */
@@ -137,71 +194,101 @@ impl Director
   }
 
   /** Updating and rendering. **/
-  pub fn update(&mut self, delta: f32)
+  pub fn update(delta: f32)
   {
-    assert!(self.states.len() > 0);
+    let mut states = do Director::get |director|
+    { do director.states.map |x| { *x } };
+    assert!(states.len() > 0);
 
-    for x in self.states.mut_iter()
+    for x in states.mut_iter()
     {
       if x.update(delta)
       { break; }
     }
+    
+    do Director::get_mut |director|
+    { director.run_deferreds(); }
   }
 
-  pub fn render(&mut self)
+  pub fn render()
   {
-    assert!(self.states.len() > 0);
+    let mut states = do Director::get |director|
+    { do director.states.map |x| { *x } };
+    assert!(states.len() > 0);
 
-    for x in self.states.mut_iter()
+    for x in states.mut_iter()
     {
       if x.render()
       { break; }
     }
+
+    do Director::get_mut |director|
+    { director.run_deferreds(); }
   }
 
   /** Input handling. **/
-  pub fn key_action(&mut self, key: i32, action: i32, mods: i32)
+  pub fn key_action(key: i32, action: i32, mods: i32)
   {
-    assert!(self.states.len() > 0);
+    let mut states = do Director::get |director|
+    { do director.states.map |x| { *x } };
+    assert!(states.len() > 0);
 
-    for x in self.states.mut_rev_iter()
+    for x in states.mut_rev_iter()
     {
       if x.key_action(key, action, mods)
       { break; }
     }
+
+    do Director::get_mut |director|
+    { director.run_deferreds(); }
   }
 
-  pub fn key_char(&mut self, ch: char)
+  pub fn key_char(ch: char)
   {
-    assert!(self.states.len() > 0);
+    let mut states = do Director::get |director|
+    { do director.states.map |x| { *x } };
+    assert!(states.len() > 0);
 
-    for x in self.states.mut_rev_iter()
+    for x in states.mut_rev_iter()
     {
       if x.key_char(ch)
       { break; }
     }
+
+    do Director::get_mut |director|
+    { director.run_deferreds(); }
   }
 
-  pub fn mouse_action(&mut self, button: i32, action: i32, mods: i32)
+  pub fn mouse_action(button: i32, action: i32, mods: i32)
   {
-    assert!(self.states.len() > 0);
+    let mut states = do Director::get |director|
+    { do director.states.map |x| { *x } };
+    assert!(states.len() > 0);
 
-    for x in self.states.mut_rev_iter()
+    for x in states.mut_rev_iter()
     {
       if x.mouse_action(button, action, mods)
       { break; }
     }
+
+    do Director::get_mut |director|
+    { director.run_deferreds(); }
   }
 
-  pub fn mouse_moved(&mut self, x: f32, y: f32)
+  pub fn mouse_moved(x: f32, y: f32)
   {
-    assert!(self.states.len() > 0);
+    let mut states = do Director::get |director|
+    { do director.states.map |x| { *x } };
+    assert!(states.len() > 0);
 
-    for state in self.states.mut_rev_iter()
+    for state in states.mut_rev_iter()
     {
       if state.mouse_moved(x, y)
       { break; }
     }
+
+    do Director::get_mut |director|
+    { director.run_deferreds(); }
   }
 }
 

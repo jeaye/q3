@@ -32,9 +32,9 @@ pub struct Game
 
 impl Game
 {
-  pub fn new() -> @mut Game
+  pub fn new(map_name: &str) -> @mut Game
   {
-    let bmap = BSP_Map::new("data/maps/q3ctf1.bsp");
+    let bmap = BSP_Map::new(~"data/maps/" + map_name + ".bsp");
 
     let start_time = extra::time::precise_time_s();
     let vmap = Voxel_Map::new(bmap.tris, 300);

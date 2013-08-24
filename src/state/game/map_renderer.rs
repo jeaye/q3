@@ -138,24 +138,26 @@ impl Map_Renderer
     check!(gl2::tex_buffer(gl2::TEXTURE_BUFFER, 0x8815 /* RGB32F */, mr.offset_tex_vbo));
 
     /* Console functions. */
-    state::Console::get().add_accessor("map.wireframe", |_|
-    { mr.wireframe.to_str() });
-    state::Console::get().add_mutator("map.wireframe", |p, x|
+    do state::Director::push_deferred ||
     {
-      let mut error = ~"";
-      if x == "true"
-      { mr.wireframe = true; }
-      else if x == "false"
-      { mr.wireframe = false; }
-      else
-      { error = fmt!("Invalid value for %s (use 'true' or 'false')", p); }
+      state::Console::get().registry.accessors.insert(~"map.wireframe", |_|
+      { mr.wireframe.to_str() });
+      state::Console::get().add_mutator("map.wireframe", |p, x|
+      {
+        let mut error = ~"";
+        if x == "true"
+        { mr.wireframe = true; }
+        else if x == "false"
+        { mr.wireframe = false; }
+        else
+        { error = fmt!("Invalid value for %s (use 'true' or 'false')", p); }
 
-      if error.len() == 0
-      { None }
-      else
-      { Some(error) }
-    });
-
+        if error.len() == 0
+        { None }
+        else
+        { Some(error) }
+      });
+    }
 
     mr
   }

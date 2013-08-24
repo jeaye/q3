@@ -148,7 +148,7 @@ impl Console
           {
             /* Check if the mutator liked the args. */
             Some(err) => { success = false; msg = ~"\\2Error: \\1" + err; }
-            None => { success = true; msg = fmt!("\\3Success: \\1%s = %s", property, params); }
+            None => { success = true; msg = fmt!("\\1%s = %s", property, params); }
           }
         }
         None => { msg = fmt!("\\2Error: \\1The property '%s' does not exist.", property); }
@@ -188,8 +188,6 @@ impl Console
 
   pub fn run_function(mut input_func: ~str) -> (bool, ~str)
   {
-    let this = Console::get();
-
     /* Extract the function name. */
     let mut func = ~"";
     input_func = input_func.trim().to_owned();
@@ -203,7 +201,8 @@ impl Console
     { input_func.shift_char(); }
 
     /* Look for the function in the cached map. */
-    match this.registry.functions.find(&func)
+    let fun = Console::get().registry.functions.find(&func);
+    match fun
     {
       Some(f) =>
       {
