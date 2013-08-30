@@ -35,6 +35,7 @@ struct Font
 
 impl Font
 {
+  #[fixed_stack_segment]
   pub fn new(filename: &str, size: i32) -> Font
   {
     let mut font = Font
@@ -44,7 +45,7 @@ impl Font
       face: ptr::null(),
       texture_atlas: 0,
       atlas_dimensions: math::Vec2i::zero(),
-      glyphs: HashMap::new::<u8, Glyph>(),
+      glyphs: HashMap::<u8, Glyph>::new(),
       height: 0,
     };
 
@@ -165,6 +166,7 @@ impl Font
 
 impl Drop for Font
 {
+  #[fixed_stack_segment]
   fn drop(&self)
   {
     unsafe

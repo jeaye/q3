@@ -162,6 +162,7 @@ impl Map_Renderer
     mr
   }
 
+  #[fixed_stack_segment]
   pub fn update_visibility(&mut self)
   {
     self.prev_visible_voxel_count = self.visible_voxels.get_ref().len() as u32;
@@ -231,9 +232,9 @@ impl Map_Renderer
       unsafe
       {
         let size = visible_voxels.len() * sys::size_of::<u32>();
-        let mem = check!(gl2::glMapBufferRange(gl2::ARRAY_BUFFER, 0, size as i64, 2 | 32));
+        let mem = check!(gl2::map_buffer_range(gl2::ARRAY_BUFFER, 0, size as i64, 2 | 32));
         ptr::copy_nonoverlapping_memory(cast::transmute(mem), vec::raw::to_ptr(visible_voxels), size);
-        check!(gl2::glUnmapBuffer(gl2::ARRAY_BUFFER));
+        check!(gl2::unmap_buffer(gl2::ARRAY_BUFFER));
       }
 
       /* Send the member data back. */

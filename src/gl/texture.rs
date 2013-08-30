@@ -32,6 +32,7 @@ struct Texture
 
 impl Texture
 {
+  #[fixed_stack_segment]
   pub fn new(targ: gl2::GLenum, file: &str) -> Texture
   {
     let mut tex = Texture

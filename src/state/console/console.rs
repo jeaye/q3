@@ -92,9 +92,9 @@ impl Console
 
       registry: Registry
       {
-        accessors: HashMap::new::<~str, Property_Accessor>(),
-        mutators: HashMap::new::<~str, Property_Mutator>(),
-        functions: HashMap::new::<~str, Function>(),
+        accessors: HashMap::<~str, Property_Accessor>::new(),
+        mutators: HashMap::<~str, Property_Mutator>::new(),
+        functions: HashMap::<~str, Function>::new(),
       },
     };
 
