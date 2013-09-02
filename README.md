@@ -1,14 +1,14 @@
-Q^3
+Q³
 ===
 ![Screenshot](pics/012_1_no_wire.png)
 
-### What is Q^3?
+### What is Q³?
 Q^3 is a project using Mozilla's Rust language and OpenGL to create a Quake 3 like game that takes 
 Quake 3 and QuakeLive maps, voxelizes them, and allows groups of players to blow the shit out 
 of everything in a fast-paced Quake-esque first person shooter with 100% destructible maps.
 
-### What's the current state of Q^3?
-Q^3 is not a game yet! It's still a side project that I'm working on in my spare time.  
+### What's the current state of Q³?
+Q³ is not a game yet! It's still a side project that I'm working on in my spare time.  
 * Multithreaded OpenGL rendering
 * Half-baked BSP renderer (Quake 3 and Quake Live)
   * Quake Live map rendering is... buggy
@@ -20,8 +20,8 @@ Q^3 is not a game yet! It's still a side project that I'm working on in my spare
 * Tested on Linux and Mac OS X
 * [Documentation on a wiki](https://github.com/Jeaye/q3/wiki)
 
-### How do I get Q^3 running on my system?
-I run on the (nearly) latest Rust master; I generally pull every few days. Q^3 currently has 
+### How do I get Q³ running on my system?
+I run on the (nearly) latest Rust master; I generally pull every few days. Q³ currently has 
 [glfw3](https://github.com/glfw/glfw), 
 [glfw-rs](https://github.com/Jeaye/glfw-rs), 
 [rust-opengles](https://github.com/Jeaye/rust-opengles), and 

@@ -150,7 +150,7 @@ impl Map_Renderer
         else if x == "false"
         { mr.wireframe = false; }
         else
-        { error = fmt!("Invalid value for %s (use 'true' or 'false')", p); }
+        { error = format!("Invalid value for {} (use 'true' or 'false')", p); }
 
         if error.len() == 0
         { None }

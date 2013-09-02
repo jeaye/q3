@@ -93,7 +93,7 @@ cd build
     make -B
   popd
 
-## Q^3
+## Q³
   cd .. # Back to the original invoking directory
   
   # Move over the make file
@@ -109,5 +109,5 @@ cd build
     ln -s $SWD/data data
   fi
 
-echo "Done configuring Q^3."
+echo "Done configuring Q³."
 

@@ -312,7 +312,7 @@ mod shared
     let name = check!(gl2::get_uniform_location(shader.prog, uniform.to_owned()));
     match name
     {
-      -1 => { error!(fmt!("Uniform '%s' not found!", uniform)); name }
+      -1 => { error!(format!("Uniform '{}' not found!", uniform)); name }
       _ => { name }
     }
   }

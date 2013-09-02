@@ -5,7 +5,7 @@
 #  File: Makefile.stub
 #  Author: Jesse 'Jeaye' Wilkerson
 #  Description:
-#  	Makefile for Q^3 that's modified by configure
+#  	Makefile for Q³ that's modified by configure
 #
 
 # Set by configure
@@ -53,16 +53,16 @@ setup:
 	mkdir -p bin
 
 debug: clean
-	${ECHO} "${ECHO_PREFIX} Building ${VERSION_NAME_DEBUG} Q^3 [commit: ${COMMIT}](this can take a while)"
+	${ECHO} "${ECHO_PREFIX} Building ${VERSION_NAME_DEBUG} Q³ [commit: ${COMMIT}](this can take a while)"
 	echo
 	rustc ${PROJ_DIR}/src/main.rs -o bin/q3 ${LIBS} ${DEBUG_CONFIGS} --opt-level ${DEBUG_OPTIMIZATION}
-	${ECHO} "${ECHO_PREFIX} Finished building ${VERSION_NAME_DEBUG} Q^3"
+	${ECHO} "${ECHO_PREFIX} Finished building ${VERSION_NAME_DEBUG} Q³"
 
 release: clean
-	${ECHO} "${ECHO_PREFIX} Building ${VERSION_NAME_RELEASE} Q^3 [commit: ${COMMIT}](this can take a while)"
+	${ECHO} "${ECHO_PREFIX} Building ${VERSION_NAME_RELEASE} Q³ [commit: ${COMMIT}](this can take a while)"
 	echo
 	rustc ${PROJ_DIR}/src/main.rs -o bin/q3 ${LIBS} ${RELEASE_CONFIGS} --opt-level ${RELEASE_OPTIMIZATION}
-	${ECHO} "${ECHO_PREFIX} Finished building ${VERSION_NAME_RELEASE} Q^3"
+	${ECHO} "${ECHO_PREFIX} Finished building ${VERSION_NAME_RELEASE} Q³"
 
 pretty:
 	rustc ${PROJ_DIR}/src/main.rs -o bin/q3 ${LIBS} --pretty normal

@@ -142,7 +142,7 @@ impl State for BSP_Renderer
       if self.game_renderer.camera.show_fps
       {
         ui_renderer.render_font(
-          fmt!("%?", fps), 
+          format!("{}", fps), 
           math::Vec2f::new(self.game_renderer.camera.window_size.x as f32 - 40.0, 0.0), 
           &self.game_renderer.fps_font); 
       }

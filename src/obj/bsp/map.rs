@@ -30,12 +30,13 @@ pub struct Map
   faces: ~[lump::Face],
   mesh_verts: ~[lump::Mesh_Vert], 
   position: math::Vec3f,
-  bb: math::BB3
+  bb: math::BB3,
+  error: ~str,
 }
 
 impl Map
 {
-  pub fn new(file: &str) -> Map
+  pub fn new(file: &str) -> Result<Map, ~str>
   {
     let mut map = Map
     {
@@ -47,9 +48,13 @@ impl Map
       mesh_verts: ~[],
       position: math::Vec3f::zero(),
       bb: math::BB3::zero(),
+      error: ~"",
     };
 
-    let fio = io::file_reader(@path::PosixPath(file)).unwrap();
+    let fio = io::file_reader(@path::PosixPath(file));
+    if fio.is_err()
+    { return Err(format!("Failed to read file: {}", file)); }
+    let fio = fio.unwrap();
     unsafe {  fio.read( cast::transmute((&map.header, sys::size_of::<lump::Header>())),
                         sys::size_of::<lump::Header>()); }
 
@@ -58,21 +63,25 @@ impl Map
              map.header.magic[2] == 'S' as i8 &&
              map.header.magic[3] == 'P' as i8);
 
-    map.read_verts(fio);
-    map.read_faces(fio);
-    map.read_mesh_verts(fio);
+    if !map.read_verts(fio)
+    { return Err(map.error); }
+    if !map.read_faces(fio)
+    { return Err(map.error); }
+    if !map.read_mesh_verts(fio)
+    { return Err(map.error); }
 
     map.triangulate();
     
-    map
+    Ok(map)
   }
 
-  fn read_verts(&mut self, fio: @io::Reader)
+  fn read_verts(&mut self, fio: @io::Reader) -> bool
   {
     fio.seek(self.header.lumps[lump::Vertex_Type as int].offset as int, io::SeekSet);
     let num_verts = (self.header.lumps[lump::Vertex_Type as int].length) /
                     (sys::size_of::<lump::Vertex>() as i32);
-    assert!(num_verts > 0);
+    if !(num_verts > 0)
+    { self.error = ~"Invalid vertex count"; return false; }
 
     let mut vert = lump::Vertex::new();
     for i in range(0, num_verts)
@@ -152,14 +161,17 @@ impl Map
     /* Move the mesh by the center to the origin (easier to voxelize). */
     for v in self.verts.mut_iter()
     { v.position = v.position - center; }
+
+    true
   }
 
-  fn read_faces(&mut self, fio: @io::Reader)
+  fn read_faces(&mut self, fio: @io::Reader) -> bool
   {
     fio.seek(self.header.lumps[lump::Face_Type as int].offset as int, io::SeekSet);
     let num_faces = (self.header.lumps[lump::Face_Type as int].length) /
                     (sys::size_of::<lump::Face>() as i32);
-    assert!(num_faces > 0);
+    if !(num_faces > 0)
+    { self.error = ~"Invalid face count"; return false; }
 
     let face = lump::Face::new();
     for _ in range(0, num_faces)
@@ -168,14 +180,17 @@ impl Map
                 sys::size_of::<lump::Face>()); }
       self.faces.push(face);
     }
+
+    true
   }
 
-  fn read_mesh_verts(&mut self, fio: @io::Reader)
+  fn read_mesh_verts(&mut self, fio: @io::Reader) -> bool
   {
     fio.seek(self.header.lumps[lump::Mesh_Vert_Type as int].offset as int, io::SeekSet);
     let num_obj = (self.header.lumps[lump::Mesh_Vert_Type as int].length) /
                     (sys::size_of::<lump::Mesh_Vert>() as i32);
-    assert!(num_obj > 0);
+    if !(num_obj > 0)
+    { self.error = ~"Invalid object count"; return false; }
 
     let obj = lump::Mesh_Vert::new();
     for _ in range(0, num_obj)
@@ -184,6 +199,8 @@ impl Map
                 sys::size_of::<lump::Mesh_Vert>()); }
       self.mesh_verts.push(obj);
     }
+
+    true
   }
 
   fn triangulate(&mut self)
@@ -222,12 +239,12 @@ impl Map
           }
         }
         /* Something else. */
-        n => { log_info!("Invalid face: %?", n); }
+        n => { log_info!("Invalid face: {}", n); }
       }
     };
 
     self.verts = verts;
-    log_debug!("Trianglulated to %? faces", self.verts.len());
+    log_debug!("Trianglulated to {} faces", self.verts.len());
   }
 }
 

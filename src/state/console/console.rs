@@ -86,7 +86,7 @@ impl Console
       position: math::Vec2f::zero(),
       velocity: 300.0,
 
-      body: fmt!("Welcome to Q^3\nVersion: %s.%s", env!("VERSION"), env!("COMMIT")),
+      body: format!("Welcome to Q³\nVersion: {}.{}", env!("VERSION"), env!("COMMIT")),
       prefix: ~"> ",
       input: ~"", 
 
@@ -112,9 +112,9 @@ impl Console
       match c.registry.accessors.find(&property.to_owned())
       {
         Some(func) =>
-        { msg = fmt!("%s = %s", property, (*func)(property)); success = true; }
+        { msg = format!("{} = {}", property, (*func)(property)); success = true; }
         None =>
-        { msg = fmt!("\\2Error: \\1Invalid property '%s'", property); }
+        { msg = format!("\\2Error: \\1Invalid property '{}'", property); }
       }
 
       (success, msg)
@@ -148,10 +148,10 @@ impl Console
           {
             /* Check if the mutator liked the args. */
             Some(err) => { success = false; msg = ~"\\2Error: \\1" + err; }
-            None => { success = true; msg = fmt!("\\1%s = %s", property, params); }
+            None => { success = true; msg = format!("\\1{} = {}", property, params); }
           }
         }
-        None => { msg = fmt!("\\2Error: \\1The property '%s' does not exist.", property); }
+        None => { msg = format!("\\2Error: \\1The property '{}' does not exist.", property); }
       }
 
       (success, msg)
@@ -209,7 +209,7 @@ impl Console
         let input = input_func.clone();
         (*f)(func, input)
       }
-      None => { (false, fmt!("\\2Error: \\1Invalid function '%s'", func)) }
+      None => { (false, format!("\\2Error: \\1Invalid function '{}'", func)) }
     }
   }
 }

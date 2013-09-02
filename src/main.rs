@@ -76,7 +76,7 @@ fn main(argc: int, argv: **u8, crate_map: *u8) -> int
       };
 
       glfw::window_hint::visible(true);
-      let window_res = glfw::Window::create_shared(1024, 768, "Q^3", glfw::Windowed, &worker_window);
+      let window_res = glfw::Window::create_shared(1024, 768, "Q³", glfw::Windowed, &worker_window);
       let window = match window_res
       {
         Ok(win) => { @win },
@@ -123,29 +123,43 @@ fn main(argc: int, argv: **u8, crate_map: *u8) -> int
 
       /* Console functions. */
       state::Console::get().add_accessor("q3.version", |_|
-      { fmt!("%s.%s", env!("VERSION"), env!("COMMIT")) });
+      { format!("{}.{}", env!("VERSION"), env!("COMMIT")) });
       state::Console::get().add_function(~"quit", |_, _| -> (bool, ~str)
       { window.set_should_close(true); (true, ~"")});
       state::Console::get().add_function(~"load_map", |_, map_name| -> (bool, ~str)
       {
-        /* TODO #38: Return Option since loading could fail. */
-        let game_state = state::Game::new(map_name);
-        let game_renderer_state = state::Game_Renderer::new(game_state);
-        do state::Director::get_mut |director|
-        {
-          /* Remove any existing game states. */
-          do director.remove_if |state|
-          { state.get_key() == (game_state as @mut state::State).get_key() || 
-            state.get_key() == (game_renderer_state as @mut state::State).get_key() }
+        let mut err = ~"";
 
-          director.unshift(game_state as @mut state::State);
-          director.unshift(game_renderer_state as @mut state::State);
+        /* Try to load the new map. */
+        let game_state = state::Game::new(map_name);
+        if game_state.is_err()
+        { err = game_state.unwrap_err(); }
+        else
+        {
+          let game_state = game_state.unwrap();
+
+          let game_renderer_state = state::Game_Renderer::new(game_state);
+          do state::Director::get_mut |director|
+          {
+            /* Remove any existing game states. */
+            do director.remove_if |state|
+            { state.get_key() == (game_state as @mut state::State).get_key() || 
+              state.get_key() == (game_renderer_state as @mut state::State).get_key() }
+
+            director.unshift(game_state as @mut state::State);
+            director.unshift(game_renderer_state as @mut state::State);
+          }
+          gl::Camera::get_active().reset(); /* Jump back to the origin. */
         }
 
-        (true, ~"Loaded map: \\5" + map_name + "\\1")
+        if err.len() > 0
+        { (false, ~"\\2Error: \\1" + err) }
+        else
+        { (true, ~"Loaded map: \\5" + map_name + "\\1") }
       });
       /* Load the default map. */
-      state::Console::run_function(~"load_map q3ctf1");
+      let (_loaded, msg) = state::Console::run_function(~"load_map q3ctf1");
+      state::Console::get().add_log(msg);
 
       /* Delta time. */
       let mut cur_time = extra::time::precise_time_s() as f32;
@@ -183,5 +197,5 @@ fn key_callback(window: &glfw::Window, key: libc::c_int, action: libc::c_int)
 }
 
 fn error_callback(error: libc::c_int, description: ~str)
-{ log_error!("GLFW %?: %s", error, description); }
+{ log_error!("GLFW {}: {}", error, description); }
 

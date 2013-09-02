@@ -27,11 +27,12 @@ struct Map
 
   states: Option<~[u32]>,
   voxels: ~[Vertex],
+  error: ~str,
 }
 
 impl Map
 {
-  pub fn new(tris: &[Triangle], res: u32) -> @mut Map
+  pub fn new(tris: &[Triangle], res: u32) -> Result<@mut Map, ~str>
   {
     let map = @mut Map
     {
@@ -40,18 +41,22 @@ impl Map
 
       states: None,
       voxels: ~[],
+      error: ~"",
     };
 
-    map.voxelize(tris);
+    if !map.voxelize(tris)
+    { return Err(map.error.clone()); }
 
-    map
+    Ok(map)
   }
 
-  fn voxelize(&mut self, tris: &[Triangle])
+  fn voxelize(&mut self, tris: &[Triangle]) -> bool
   {
     /* Require at least one triangle. */
-    assert!(tris.len() >= 1);
-    log_debug!("Incoming triangles: %?", tris.len());
+    if !(tris.len() >= 1)
+    { self.error = ~"Invalid triangle count"; return false; }
+
+    log_debug!("Incoming triangles: {}", tris.len());
 
     /* Bounding box of vert dimensions. */
     let mut min = math::Vec3f::new( tris[0].verts[0].position.x,
@@ -73,20 +78,20 @@ impl Map
         max.z = cmp::max(max.z, vert.position.z);
       }
     }
-    log_debug!("Min: %s Max: %s", min.to_str(), max.to_str());
+    log_debug!("Min: {} Max: {}", min.to_str(), max.to_str());
     let center = math::Vec3f::new(max.x - ((max.x - min.x) / 2.0),
                                   max.y - ((max.y - min.y) / 2.0),
                                   max.z - ((max.z - min.z) / 2.0));
-    log_debug!("Center of mesh is %s", center.to_str());
+    log_debug!("Center of mesh is {}", center.to_str());
 
     /* Calculate, given resolution (how many states across), the dimensions of a voxel. */
     self.voxel_size = cmp::max( max.x - min.x,
                                 cmp::max(max.y - min.y, max.z - min.z)) / (self.resolution as f32);
-    log_debug!("Voxel size is %?", self.voxel_size);
+    log_debug!("Voxel size is {}", self.voxel_size);
 
     /* World space mid point of the grid. */
     let mid_offset = (((self.resolution as f32) / 2.0) * self.voxel_size); 
-    log_debug!("Midpoint offset is %?", mid_offset);
+    log_debug!("Midpoint offset is {}", mid_offset);
 
     /* Create 3D array of states. */
     self.states = Some(vec::with_capacity(((self.resolution + 1) as f32).pow(&3.0) as uint));
@@ -128,7 +133,7 @@ impl Map
       { vox_amount.y = 1; }
       if vox_amount.z < 1
       { vox_amount.z = 1; }
-      //log_debug!("[Per voxel] Checking %s surrounding states with SAT", vox_amount.to_str());
+      //log_debug!("[Per voxel] Checking {} surrounding states with SAT", vox_amount.to_str());
 
       /* Get the starting indices of the triangle's bounding box. */
       let start_voxels = math::Vec3i::new( ((min.x - -mid_offset) / self.voxel_size) as i32, 
@@ -189,7 +194,9 @@ impl Map
     //for x in voxels.iter()
     //{ self.voxels.push(*x); }
 
-    log_debug!("Enabled %? of %? voxels", self.voxels.len(), self.states.get_mut_ref().len());
+    log_debug!("Enabled {} of {} voxels", self.voxels.len(), self.states.get_mut_ref().len());
+
+    true
   }
 }
 

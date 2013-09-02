@@ -95,7 +95,7 @@ impl Camera
       c.fov = match f32::from_str(fov)
       {
         Some(x) => { x },
-        None => { error = fmt!("Invalid value for %s (use a floating point number)", p); c.fov }
+        None => { error = format!("Invalid value for {} (use a floating point number)", p); c.fov }
       };
 
       /* Rebuild the projection info. */
@@ -116,7 +116,7 @@ impl Camera
       else if x == "false"
       { c.show_fps = false; }
       else
-      { error = fmt!("Invalid value for %s (use 'true' or 'false')", p); }
+      { error = format!("Invalid value for {} (use 'true' or 'false')", p); }
 
       if error.len() == 0
       { None }
@@ -139,7 +139,7 @@ impl Camera
         glfw::set_swap_interval(0);
       }
       else
-      { error = fmt!("Invalid value for %s (use 'true' or 'false')", p); }
+      { error = format!("Invalid value for {} (use 'true' or 'false')", p); }
 
       if error.len() == 0
       { None }
@@ -243,6 +243,9 @@ impl Camera
     if self.move_to & MOVE_DOWN > 0
     { self.position.y = self.position.y - self.move_speed * dt; }
   }
+
+  pub fn reset(&mut self)
+  { self.position = math::Vec3f::zero(); }
 }
 
 impl ui::Input_Listener for Camera

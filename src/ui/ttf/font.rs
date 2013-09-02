@@ -67,7 +67,7 @@ impl Font
       let mut row_width = 0;
       let mut row_height = 0;
 
-      let chars = &" !\"#$%&'`()*+,-_./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^abcdefghijklmnopqrstuvwxyz{|}~";
+      let chars = &" !\"#$%&'`()*+,-_./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^abcdefghijklmnopqrstuvwxyz{|}~³";
 
       for curr in chars.iter()
       {
@@ -129,7 +129,7 @@ impl Font
         let glyph = match font.glyphs.find_mut(&(curr as u8))
         {
           Some(g) => g,
-          None => fail!(fmt!("Invalid char (%?) in font %?", curr, filename))
+          None => fail!(format!("Invalid char ({}) in font {}", curr, filename))
         };
 
         if offset.x + (glyph.dimensions.x as i32) + 1 >= max_width
