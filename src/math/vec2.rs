@@ -54,7 +54,7 @@ macro_rules! declare
         { ptr::to_unsafe_ptr(self) } 
 
         pub fn to_str(&self) -> ~str
-        { format!("({}, {})", self.x, self.y) }
+        { fmt!("(%f, %f)", self.x as float, self.y as float) }
       }
 
       /***** Operator Overloads *****/

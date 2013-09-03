@@ -156,7 +156,7 @@ impl Log
         logger.terminal.fg(color::BRIGHT_RED);
         print(" error => ");
       },
-      val => fail!("Invalid verbosity for logging: {}", val)
+      val => fail!(fmt!("Invalid verbosity for logging: %d", val as int))
     }
     logger.terminal.reset();
     println(message);

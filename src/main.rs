@@ -123,7 +123,7 @@ fn main(argc: int, argv: **u8, crate_map: *u8) -> int
 
       /* Console functions. */
       state::Console::get().add_accessor("q3.version", |_|
-      { format!("{}.{}", env!("VERSION"), env!("COMMIT")) });
+      { fmt!("%s.%s", env!("VERSION"), env!("COMMIT")) });
       state::Console::get().add_function(~"quit", |_, _| -> (bool, ~str)
       { window.set_should_close(true); (true, ~"")});
       state::Console::get().add_function(~"load_map", |_, map_name| -> (bool, ~str)
@@ -197,5 +197,5 @@ fn key_callback(window: &glfw::Window, key: libc::c_int, action: libc::c_int)
 }
 
 fn error_callback(error: libc::c_int, description: ~str)
-{ log_error!("GLFW {}: {}", error, description); }
+{ log_error!("GLFW %d: %s", error as int, description); }
 

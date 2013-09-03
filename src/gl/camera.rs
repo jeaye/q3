@@ -95,7 +95,7 @@ impl Camera
       c.fov = match f32::from_str(fov)
       {
         Some(x) => { x },
-        None => { error = format!("Invalid value for {} (use a floating point number)", p); c.fov }
+        None => { error = fmt!("Invalid value for %s (use a floating point number)", p); c.fov }
       };
 
       /* Rebuild the projection info. */
@@ -116,7 +116,7 @@ impl Camera
       else if x == "false"
       { c.show_fps = false; }
       else
-      { error = format!("Invalid value for {} (use 'true' or 'false')", p); }
+      { error = fmt!("Invalid value for %s (use 'true' or 'false')", p); }
 
       if error.len() == 0
       { None }
@@ -139,7 +139,7 @@ impl Camera
         glfw::set_swap_interval(0);
       }
       else
-      { error = format!("Invalid value for {} (use 'true' or 'false')", p); }
+      { error = fmt!("Invalid value for %s (use 'true' or 'false')", p); }
 
       if error.len() == 0
       { None }

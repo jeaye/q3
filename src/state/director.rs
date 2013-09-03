@@ -162,7 +162,7 @@ impl Director
         let state = self.states.remove(i);
         state.unload();
       }
-      None => { log_debug!("Invalid state to pull '{}'", key); }
+      None => { log_debug!("Invalid state to pull '%s'", key); }
     }
   }
 
@@ -182,7 +182,7 @@ impl Director
         state.load();
         self.states[i] = state;
       }
-      None => { log_debug!("Invalid state to swap '{}'", key); }
+      None => { log_debug!("Invalid state to swap '%s'", key); }
     }
   }
 

@@ -53,7 +53,7 @@ impl Map
 
     let fio = io::file_reader(@path::PosixPath(file));
     if fio.is_err()
-    { return Err(format!("Failed to read file: {}", file)); }
+    { return Err(fmt!("Failed to read file: %s", file)); }
     let fio = fio.unwrap();
     unsafe {  fio.read( cast::transmute((&map.header, sys::size_of::<lump::Header>())),
                         sys::size_of::<lump::Header>()); }
@@ -239,12 +239,12 @@ impl Map
           }
         }
         /* Something else. */
-        n => { log_info!("Invalid face: {}", n); }
+        n => { log_info!("Invalid face: %d", n as int); }
       }
     };
 
     self.verts = verts;
-    log_debug!("Trianglulated to {} faces", self.verts.len());
+    log_debug!("Trianglulated to %ud faces", self.verts.len());
   }
 }
 

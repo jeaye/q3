@@ -76,7 +76,7 @@ impl Model
   {
     let fior = io::file_reader(&path::Path(file));
     if fior.is_err()
-    { log_error!("Failed to open model file {}", file); return false; }
+    { log_error!("Failed to open model file %s", file); return false; }
 
     /* Clear existing data. */
     self.joints.clear();
@@ -116,7 +116,7 @@ impl Model
         if num.is_some()
         { $var = num.unwrap(); }
         else
-        { log_error!("Invalid {} in {}", name, file); }
+        { log_error!("Invalid %s in %s", name, file); }
       });
     )
 
@@ -132,7 +132,7 @@ impl Model
         {
           /* Read version. */
           read_type!(self.version);
-          log_debug!("Model version: {}", self.version);
+          log_debug!("Model version: %d", self.version as int);
         }
         ~"commandline" =>
         { ignore_line!(); }
@@ -140,13 +140,13 @@ impl Model
         {
           read_type!(self.num_joints);
           self.joints = vec::with_capacity(self.num_joints as uint);
-          log_debug!("Model joints: {}", self.num_joints);
+          log_debug!("Model joints: %d", self.num_joints as int);
         }
         ~"numMeshes" =>
         {
           read_type!(self.num_meshes);
           self.meshes = vec::with_capacity(self.num_meshes as uint);
-          log_debug!("Model meshes: {}", self.num_meshes);
+          log_debug!("Model meshes: %d", self.num_meshes as int);
         }
         ~"joints" =>
         {
@@ -230,7 +230,7 @@ impl Model
                 }
                 /* Remove quotes. */
                 mesh.texture = self.file_directory + "/" + str::replace(mesh.texture, "\"", "");
-                log_debug!("Mesh shader/texture: {}", mesh.texture);
+                log_debug!("Mesh shader/texture: %s", mesh.texture);
 
                 ignore_line!();
               }
@@ -239,7 +239,7 @@ impl Model
                 read_type!(num_verts);
                 ignore_line!();
 
-                log_debug!("Mesh verts: {}", num_verts);
+                log_debug!("Mesh verts: %d", num_verts);
 
                 for _ in range(0, num_verts)
                 {
@@ -262,7 +262,7 @@ impl Model
               {
                 read_type!(num_tris);
                 ignore_line!();
-                log_debug!("Mesh tris: {}", num_tris);
+                log_debug!("Mesh tris: %d", num_tris);
 
                 for _ in range(0, num_tris)
                 {
@@ -284,7 +284,7 @@ impl Model
               {
                 read_type!(num_weights);
                 ignore_line!();
-                log_debug!("Mesh weights: {}", num_weights);
+                log_debug!("Mesh weights: %d", num_weights);
 
                 for _ in range(0, num_weights)
                 {

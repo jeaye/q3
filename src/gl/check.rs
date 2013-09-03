@@ -32,9 +32,9 @@ macro_rules! check
 (
   ($func:expr) => 
   ({
-    //io::print(format!("{} -> ", stringify!($func)));
+    //io::print(fmt!("%s -> ", stringify!($func)));
     let ret = $func;
-    //io::println(format!("{}", ret));
+    //io::println(fmt!("%?", ret));
 
     check::check_gl(stringify!($func));
 

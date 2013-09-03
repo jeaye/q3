@@ -16,12 +16,12 @@ macro_rules! log_debug
   ($message:expr) => 
   ({
     let module = Log::get_module(file!());
-    Log::debug(format!("[{}]:{}", module, line!()), $message);
+    Log::debug(fmt!("[%s]:%ud", module, line!()), $message);
   });
   ($($message:expr),+) =>
   ({
     let module = Log::get_module(file!());
-    Log::debug(format!("[{}]:{}", module, line!()), format!($($message),+));
+    Log::debug(fmt!("[%s]:%ud", module, line!()), fmt!($($message),+));
   });
 )
 
@@ -30,12 +30,12 @@ macro_rules! log_info
   ($message:expr) => 
   ({
     let module = Log::get_module(file!());
-    Log::info(format!("[{}]:{}", module, line!()), $message);
+    Log::info(fmt!("[%s]:%ud", module, line!()), $message);
   });
   ($($message:expr),+) =>
   ({
     let module = Log::get_module(file!());
-    Log::info(format!("[{}]:{}", module, line!()), format!($($message),+));
+    Log::info(fmt!("[%s]:%ud", module, line!()), fmt!($($message),+));
   });
 )
 
@@ -44,12 +44,12 @@ macro_rules! log_error
   ($message:expr) => 
   ({
     let module = Log::get_module(file!());
-    Log::error(format!("[{}]:{}", module, line!()), $message);
+    Log::error(fmt!("[%s]:%ud", module, line!()), $message);
   });
   ($($message:expr),+) =>
   ({
     let module = Log::get_module(file!());
-    Log::error(format!("[{}]:{}", module, line!()), format!($($message),+));
+    Log::error(fmt!("[%s]:%ud", module, line!()), fmt!($($message),+));
   });
 )
 
