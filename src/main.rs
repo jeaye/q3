@@ -103,11 +103,11 @@ fn main(argc: int, argv: **u8, crate_map: *u8) -> int
       cam.init();
       gl::Camera::set_active(cam);
       do window.set_size_callback |_, width, height|
-      { cam.resize(width as i32, height as i32); }
+      { gl::Camera::get_active().resize(width as i32, height as i32); }
 
       /* Setup callbacks. */
-      do window.set_focus_callback |_, focused|
-      { if focused {window.set_cursor_mode(glfw::CURSOR_DISABLED); } }
+      do window.set_focus_callback |window, focused|
+      { if focused { window.set_cursor_mode(glfw::CURSOR_DISABLED); } }
       do window.set_cursor_pos_callback |_, x, y| 
       { state::Director::mouse_moved(x as f32, y as f32); }
       do window.set_char_callback |_, c|
