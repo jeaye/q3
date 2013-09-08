@@ -65,6 +65,7 @@ cd build
   pushd glfw-rs
     pushd $SWD/lib/glfw-rs
       ln -s $BWD/glfw_static/libglfw* ./
+      ln -s $SWD/lib/glfw/src/libglfw* ./
       rustpkg build glfw
 
       # Linux
