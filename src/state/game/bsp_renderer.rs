@@ -17,6 +17,7 @@ use super::{ State, Game_Renderer };
 use std::sys;
 use gl2 = opengles::gl2;
 use gl;
+use glfw;
 use ui;
 use math;
 use bsp;
@@ -151,7 +152,7 @@ impl State for BSP_Renderer
     false
   }
 
-  fn key_action(&mut self, key: i32, action: i32, _mods: i32) -> bool
+  fn key_action(&mut self, key: i32, action: i32, _mods: glfw::KeyMods) -> bool
   { (self.game_renderer.camera as @mut ui::Input_Listener).key_action(key, action, _mods) }
   fn mouse_moved(&mut self, x: f32, y: f32) -> bool
   { (self.game_renderer.camera as @mut ui::Input_Listener).mouse_moved(x, y) }

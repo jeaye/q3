@@ -212,19 +212,19 @@ impl Model
                 { if param[x] == '\\' as u8 { posix = false; } }
                 if posix
                 {
-                  mesh.texture =
-                    match path::PosixPath(param.clone()).normalize().filename()
+                  let path = path::PosixPath(param.clone()).normalize();
+                  mesh.texture = match path.filename()
                     {
-                      Some(file) => { file },
+                      Some(file) => { file.to_owned() },
                       None => { ~"" }
                     };
                 }
                 else
                 {
-                  mesh.texture =
-                    match path::WindowsPath(param.clone()).normalize().filename()
+                  let path =  path::WindowsPath(param.clone()).normalize();
+                  mesh.texture = match path.filename()
                     {
-                      Some(file) => { file },
+                      Some(file) => { file.to_owned() },
                       None => { ~"" }
                     };
                 }

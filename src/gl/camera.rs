@@ -250,7 +250,7 @@ impl Camera
 
 impl ui::Input_Listener for Camera
 {
-  fn key_action(&mut self, key: i32, action: i32, _mods: i32) -> bool
+  fn key_action(&mut self, key: i32, action: i32, _mods: glfw::KeyMods) -> bool
   {
     let mut captured = true;
 

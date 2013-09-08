@@ -76,7 +76,7 @@ fn main(argc: int, argv: **u8, crate_map: *u8) -> int
       };
 
       glfw::window_hint::visible(true);
-      let window_res = glfw::Window::create_shared(1024, 768, "Q³", glfw::Windowed, &worker_window);
+      let window_res = worker_window.create_shared(1024, 768, "Q³", glfw::Windowed);
       let window = match window_res
       {
         Ok(win) => { @win },

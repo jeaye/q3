@@ -11,6 +11,7 @@
 */
 
 use std::local_data;
+use glfw;
 use util::Log;
 
 static tls_key: local_data::Key<Director> = &local_data::Key;
@@ -39,7 +40,7 @@ pub trait State
   { false }
 
   /* TODO: Trait inheritance with Input_Listener. */
-  fn key_action(&mut self, _key: i32, _action: i32, _mods: i32) -> bool
+  fn key_action(&mut self, _key: i32, _action: i32, _mods: glfw::KeyMods) -> bool
   { false }
   fn key_char(&mut self, _ch: char) -> bool
   { false }
@@ -153,7 +154,7 @@ impl Director
   /* Removes the state with the specified key. */
   pub fn pull(&mut self, key: &str)
   {
-    let index = do self.states.rposition |state|
+    let index = do self.states.iter().rposition |state|
     { state.get_key() == key };
     match index
     {
@@ -170,7 +171,7 @@ impl Director
    * specified state. */
   pub fn swap(&mut self, key: &str, state: @mut State)
   {
-    let index = do self.states.rposition |st|
+    let index = do self.states.iter().rposition |st|
     { st.get_key() == key };
     match index
     {
@@ -227,7 +228,7 @@ impl Director
   }
 
   /** Input handling. **/
-  pub fn key_action(key: i32, action: i32, mods: i32)
+  pub fn key_action(key: i32, action: i32, mods: glfw::KeyMods)
   {
     let mut states = do Director::get |director|
     { do director.states.map |x| { *x } };

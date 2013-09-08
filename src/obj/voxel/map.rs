@@ -200,112 +200,6 @@ impl Map
   }
 }
 
-macro_rules! find_min_max
-(
-  ($x0:expr, $x1:expr, $x2:expr) =>
-  (
-    {
-      _min = $x0;
-      _max = $x0;
-
-      if($x1 < _min){ _min = $x1; }
-      if($x1 > _max){ _max = $x1; }
-      if($x2 < _min){ _min = $x2; }
-      if($x2 > _max){ _max = $x2; }
-    }
-  )
-)
-
-/*======================== X-tests ========================*/
-macro_rules! axis_test_x01
-(
-  ($a:expr, $b:expr, $fa:expr, $fb:expr) =>
-  (
-    {
-      _p0 = $a * _v0.y - $b * _v0.z;
-      _p2 = $a * _v2.y - $b * _v2.z;
-      if _p0 < _p2  { _min = _p0; _max = _p2; } else { _min = _p2; _max = _p0; }
-      _rad = $fa * box_size + $fb * box_size;
-      if _min > _rad || _max < -_rad  { return false; }
-    }
-  )
-)
-
-macro_rules! axis_test_x2
-(
-  ($a:expr, $b:expr, $fa:expr, $fb:expr) =>
-  (
-    {
-      _p0 = $a * _v0.y - $b * _v0.z;
-      _p1 = $a * _v1.y - $b * _v1.z;
-      if _p0 < _p1 { _min = _p0; _max = _p1; } else { _min = _p1; _max = _p0; }
-      _rad = $fa * box_size + $fb * box_size;
-      if _min > _rad || _max < -_rad { return false; }
-    }
-  )
-)
-
-/*======================== Y-tests ========================*/
-
-macro_rules! axis_test_y02
-(
-  ($a:expr, $b:expr, $fa:expr, $fb:expr) =>
-  (
-    {
-      _p0 = -$a * _v0.x + $b * _v0.z;
-      _p2 = -$a * _v2.x + $b * _v2.z;
-      if _p0 < _p2 { _min = _p0; _max = _p2; } else { _min = _p2; _max = _p0; }
-      _rad = $fa * box_size + $fb * box_size;
-      if _min > _rad || _max < -_rad { return false; }
-    }
-  )
-)
-
-macro_rules! axis_test_y1
-(
-  ($a:expr, $b:expr, $fa:expr, $fb:expr) =>
-  (
-    {
-      _p0 = -$a * _v0.x + $b * _v0.z;
-      _p1 = -$a * _v1.x + $b * _v1.z;
-      if _p0 < _p1 { _min = _p0; _max = _p1; } else { _min = _p1; _max = _p0; }
-      _rad = $fa * box_size + $fb * box_size;
-      if _min > _rad || _max < -_rad { return false; }
-    }
-  )
-)
-
-/*======================== Z-tests ========================*/
-
-macro_rules! axis_test_z12
-(
-  ($a:expr, $b:expr, $fa:expr, $fb:expr) =>
-  (
-    {
-      _p1 = $a * _v1.x - $b * _v1.y;
-      _p2 = $a * _v2.x - $b * _v2.y;
-      if _p2 < _p1 { _min = _p2; _max = _p1;} else { _min = _p1; _max = _p2; }
-      _rad = $fa * box_size + $fb * box_size;
-      if _min > _rad || _max < -_rad { return false; }
-    }
-  )
-)
-
-
-macro_rules! axis_test_z0
-(
-  ($a:expr, $b:expr, $fa:expr, $fb:expr) =>
-  (
-    {
-      _p0 = $a * _v0.x - $b * _v0.y;
-      _p1 = $a * _v1.x - $b * _v1.y;
-      if _p0 < _p1 { _min = _p0; _max = _p1; } else { _min = _p1; _max = _p0; }
-      _rad = $fa * box_size + $fb * box_size;
-      if _min > _rad || _max < -_rad { return false; }
-    }
-  )
-)
-
 fn tri_cube_intersect(box_center: math::Vec3f, box_size: f32, tri: &Triangle) -> bool
 {
   let _v0;
@@ -324,6 +218,112 @@ fn tri_cube_intersect(box_center: math::Vec3f, box_size: f32, tri: &Triangle) ->
   let _e0;
   let _e1;
   let _e2;
+
+  macro_rules! find_min_max
+  (
+    ($x0:expr, $x1:expr, $x2:expr) =>
+    (
+      {
+        _min = $x0;
+        _max = $x0;
+
+        if($x1 < _min){ _min = $x1; }
+        if($x1 > _max){ _max = $x1; }
+        if($x2 < _min){ _min = $x2; }
+        if($x2 > _max){ _max = $x2; }
+      }
+    )
+  )
+
+  /*======================== X-tests ========================*/
+  macro_rules! axis_test_x01
+  (
+    ($a:expr, $b:expr, $fa:expr, $fb:expr) =>
+    (
+      {
+        _p0 = $a * _v0.y - $b * _v0.z;
+        _p2 = $a * _v2.y - $b * _v2.z;
+        if _p0 < _p2  { _min = _p0; _max = _p2; } else { _min = _p2; _max = _p0; }
+        _rad = $fa * box_size + $fb * box_size;
+        if _min > _rad || _max < -_rad  { return false; }
+      }
+    )
+  )
+
+  macro_rules! axis_test_x2
+  (
+    ($a:expr, $b:expr, $fa:expr, $fb:expr) =>
+    (
+      {
+        _p0 = $a * _v0.y - $b * _v0.z;
+        _p1 = $a * _v1.y - $b * _v1.z;
+        if _p0 < _p1 { _min = _p0; _max = _p1; } else { _min = _p1; _max = _p0; }
+        _rad = $fa * box_size + $fb * box_size;
+        if _min > _rad || _max < -_rad { return false; }
+      }
+    )
+  )
+
+  /*======================== Y-tests ========================*/
+
+  macro_rules! axis_test_y02
+  (
+    ($a:expr, $b:expr, $fa:expr, $fb:expr) =>
+    (
+      {
+        _p0 = -$a * _v0.x + $b * _v0.z;
+        _p2 = -$a * _v2.x + $b * _v2.z;
+        if _p0 < _p2 { _min = _p0; _max = _p2; } else { _min = _p2; _max = _p0; }
+        _rad = $fa * box_size + $fb * box_size;
+        if _min > _rad || _max < -_rad { return false; }
+      }
+    )
+  )
+
+  macro_rules! axis_test_y1
+  (
+    ($a:expr, $b:expr, $fa:expr, $fb:expr) =>
+    (
+      {
+        _p0 = -$a * _v0.x + $b * _v0.z;
+        _p1 = -$a * _v1.x + $b * _v1.z;
+        if _p0 < _p1 { _min = _p0; _max = _p1; } else { _min = _p1; _max = _p0; }
+        _rad = $fa * box_size + $fb * box_size;
+        if _min > _rad || _max < -_rad { return false; }
+      }
+    )
+  )
+
+  /*======================== Z-tests ========================*/
+
+  macro_rules! axis_test_z12
+  (
+    ($a:expr, $b:expr, $fa:expr, $fb:expr) =>
+    (
+      {
+        _p1 = $a * _v1.x - $b * _v1.y;
+        _p2 = $a * _v2.x - $b * _v2.y;
+        if _p2 < _p1 { _min = _p2; _max = _p1;} else { _min = _p1; _max = _p2; }
+        _rad = $fa * box_size + $fb * box_size;
+        if _min > _rad || _max < -_rad { return false; }
+      }
+    )
+  )
+
+
+  macro_rules! axis_test_z0
+  (
+    ($a:expr, $b:expr, $fa:expr, $fb:expr) =>
+    (
+      {
+        _p0 = $a * _v0.x - $b * _v0.y;
+        _p1 = $a * _v1.x - $b * _v1.y;
+        if _p0 < _p1 { _min = _p0; _max = _p1; } else { _min = _p1; _max = _p0; }
+        _rad = $fa * box_size + $fb * box_size;
+        if _min > _rad || _max < -_rad { return false; }
+      }
+    )
+  )
 
   /* Move everything so that the box's center is in (0, 0, 0). */
   _v0 = tri.verts[0].position - box_center;

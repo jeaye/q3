@@ -13,6 +13,7 @@
 
 use super::{ State, Game };
 use gl;
+use glfw;
 use ui;
 use math;
 use self::map_renderer::Map_Renderer;
@@ -96,7 +97,7 @@ impl State for Game_Renderer
     false
   }
 
-  fn key_action(&mut self, key: i32, action: i32, _mods: i32) -> bool
+  fn key_action(&mut self, key: i32, action: i32, _mods: glfw::KeyMods) -> bool
   { (self.camera as @mut ui::Input_Listener).key_action(key, action, _mods) }
   fn mouse_moved(&mut self, x: f32, y: f32) -> bool
   { (self.camera as @mut ui::Input_Listener).mouse_moved(x, y) }

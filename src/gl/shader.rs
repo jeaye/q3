@@ -101,10 +101,10 @@ impl Debug_Shader
     };
 
     let fio = io::file_reader(&Path(new_vert_file)).unwrap();
-    let vert_src = str::from_bytes(fio.read_whole_stream());
+    let vert_src = str::from_utf8(fio.read_whole_stream());
 
     let fio = io::file_reader(&Path(new_frag_file)).unwrap();
-    let frag_src = str::from_bytes(fio.read_whole_stream());
+    let frag_src = str::from_utf8(fio.read_whole_stream());
 
     assert!(shared::load(shader, vert_src, frag_src));
     shader.valid = true;
@@ -134,10 +134,10 @@ impl Shader for Debug_Shader
     if vert_time > self.vert_file_time || frag_time > self.frag_file_time
     {
       let fio = io::file_reader(&Path(self.vert_file)).unwrap();
-      let vert_src = str::from_bytes(fio.read_whole_stream());
+      let vert_src = str::from_utf8(fio.read_whole_stream());
 
       let fio = io::file_reader(&Path(self.frag_file)).unwrap();
-      let frag_src = str::from_bytes(fio.read_whole_stream());
+      let frag_src = str::from_utf8(fio.read_whole_stream());
 
       self.valid = shared::load(self, vert_src, frag_src);
 
@@ -187,10 +187,10 @@ impl Release_Shader
     let shader = @mut Release_Shader{ prog: 0, vert_obj: 0, frag_obj: 0 };
 
     let fio = io::file_reader(&Path(vert_file)).unwrap();
-    let vert_src = str::from_bytes(fio.read_whole_stream());
+    let vert_src = str::from_utf8(fio.read_whole_stream());
 
     let fio = io::file_reader(&Path(frag_file)).unwrap();
-    let frag_src = str::from_bytes(fio.read_whole_stream());
+    let frag_src = str::from_utf8(fio.read_whole_stream());
 
     assert!(shared::load(shader, vert_src, frag_src));
 

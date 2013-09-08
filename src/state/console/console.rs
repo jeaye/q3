@@ -231,7 +231,7 @@ impl State for Console
   fn render(&mut self) -> bool
   { false }
 
-  fn key_action(&mut self, key: i32, action: i32, _mods: i32) -> bool
+  fn key_action(&mut self, key: i32, action: i32, _mods: glfw::KeyMods) -> bool
   {
     if action == glfw::PRESS || action == glfw::REPEAT
     {
@@ -281,7 +281,7 @@ impl State for Console
     if self.velocity > 0.0
     {
       /* Non-whitespace and not ` or ~ */
-      if ch >= 0x20 as char && ch <= 0x7D as char && ch != 0x60 as char
+      if ch >= 0x20u8 as char && ch <= 0x7Du8 as char && ch != 0x60u8 as char
       {
         self.input.push_char(ch);
         return true;
