@@ -124,7 +124,7 @@ impl Renderer
         let glyph = match font.glyphs.find(&(curr as u8))
         {
           Some(g) => g,
-          None => fail!(fmt!("Invalid char (%c) in font %s len %ud", curr, font.file, font.glyphs.len()))
+          None => fail!(fmt!("Invalid char (%c) in font %s len %u", curr, font.file, font.glyphs.len()))
         };
 
         /* Parse color. */

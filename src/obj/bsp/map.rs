@@ -244,7 +244,7 @@ impl Map
     };
 
     self.verts = verts;
-    log_debug!("Trianglulated to %ud faces", self.verts.len());
+    log_debug!("Trianglulated to %u faces", self.verts.len());
   }
 }
 

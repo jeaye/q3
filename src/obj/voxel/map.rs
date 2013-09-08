@@ -56,7 +56,7 @@ impl Map
     if !(tris.len() >= 1)
     { self.error = ~"Invalid triangle count"; return false; }
 
-    log_debug!("Incoming triangles: %ud", tris.len());
+    log_debug!("Incoming triangles: %u", tris.len());
 
     /* Bounding box of vert dimensions. */
     let mut min = math::Vec3f::new( tris[0].verts[0].position.x,
@@ -194,7 +194,7 @@ impl Map
     //for x in voxels.iter()
     //{ self.voxels.push(*x); }
 
-    log_debug!("Enabled %ud of %ud voxels", self.voxels.len(), self.states.get_mut_ref().len());
+    log_debug!("Enabled %u of %u voxels", self.voxels.len(), self.states.get_mut_ref().len());
 
     true
   }
