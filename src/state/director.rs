@@ -79,7 +79,7 @@ impl Director
       match opt
       {
         Some(x) => handler(&mut *x),
-        None => fail!("Singleton not available: Director")
+        None => log_fail!("Singleton not available")
       }
     })
   }
@@ -91,7 +91,7 @@ impl Director
       match opt
       {
         Some(x) => handler(&*x),
-        None => fail!("Singleton not available: Director")
+        None => log_fail!("Singleton not available")
       }
     })
   }
@@ -199,7 +199,7 @@ impl Director
   {
     let mut states = do Director::get |director|
     { do director.states.map |x| { *x } };
-    assert!(states.len() > 0);
+    log_assert!(states.len() > 0);
 
     for x in states.mut_iter()
     {
@@ -215,7 +215,7 @@ impl Director
   {
     let mut states = do Director::get |director|
     { do director.states.map |x| { *x } };
-    assert!(states.len() > 0);
+    log_assert!(states.len() > 0);
 
     for x in states.mut_iter()
     {
@@ -232,7 +232,7 @@ impl Director
   {
     let mut states = do Director::get |director|
     { do director.states.map |x| { *x } };
-    assert!(states.len() > 0);
+    log_assert!(states.len() > 0);
 
     for x in states.mut_rev_iter()
     {
@@ -248,7 +248,7 @@ impl Director
   {
     let mut states = do Director::get |director|
     { do director.states.map |x| { *x } };
-    assert!(states.len() > 0);
+    log_assert!(states.len() > 0);
 
     for x in states.mut_rev_iter()
     {
@@ -264,7 +264,7 @@ impl Director
   {
     let mut states = do Director::get |director|
     { do director.states.map |x| { *x } };
-    assert!(states.len() > 0);
+    log_assert!(states.len() > 0);
 
     for x in states.mut_rev_iter()
     {
@@ -280,7 +280,7 @@ impl Director
   {
     let mut states = do Director::get |director|
     { do director.states.map |x| { *x } };
-    assert!(states.len() > 0);
+    log_assert!(states.len() > 0);
 
     for state in states.mut_rev_iter()
     {

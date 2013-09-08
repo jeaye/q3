@@ -19,7 +19,9 @@
       by means of the macros: log_debug!() and
       log_error!(). Logs can be owned/indented
       using a log_push!(), which must have an
-      associated log_pop!().
+      associated log_pop!(). Assertions and
+      program halting can be accomplished with
+      log_assert!() and log_fail!().
 */
 
 use std::{ io, local_data, os };
@@ -80,7 +82,7 @@ impl Log
       match opt
       {
         Some(x) => *x,
-        None => fail!("Singleton not available")
+        None => log_fail!("Singleton not available")
       }
     })
   }
@@ -122,7 +124,7 @@ impl Log
   {
     let logger = Log::get();
 
-    assert!(logger.push_level > 0);
+    log_assert!(logger.push_level > 0);
     logger.push_level -= 1;
   }
 
@@ -156,7 +158,7 @@ impl Log
         logger.terminal.fg(color::BRIGHT_RED);
         print(" error => ");
       },
-      val => fail!(fmt!("Invalid verbosity for logging: %d", val as int))
+      val => log_fail!("Invalid verbosity for logging: %d", val as int)
     }
     logger.terminal.reset();
     println(message);

@@ -17,6 +17,8 @@
 use std::{ str, io };
 use gl2 = opengles::gl2;
 use math;
+use util::Log;
+
 pub use Shader = self::Shaderable;
 
 /* TODO: Type for uniform location that is GLint on release,
@@ -30,6 +32,10 @@ use std::libc;
 
 #[cfg(release_shader)]
 pub use Shader_Builder = self::Release_Shader;
+
+#[macro_escape]
+#[path = "../util/log_macros.rs"]
+mod log_macros;
 
 pub trait Shaderable
 {
@@ -70,7 +76,7 @@ impl Debug_Shader
       valid: false,
     };
 
-    assert!(shared::load(shader, vert_src, frag_src));
+    log_assert!(shared::load(shader, vert_src, frag_src));
     shader.valid = true;
 
     shader as @mut Shaderable
@@ -106,7 +112,7 @@ impl Debug_Shader
     let fio = io::file_reader(&Path(new_frag_file)).unwrap();
     let frag_src = str::from_utf8(fio.read_whole_stream());
 
-    assert!(shared::load(shader, vert_src, frag_src));
+    log_assert!(shared::load(shader, vert_src, frag_src));
     shader.valid = true;
 
     shader as @mut Shaderable
@@ -177,7 +183,7 @@ impl Release_Shader
   {
     let shader = @mut Release_Shader{ prog: 0, vert_obj: 0, frag_obj: 0 };
 
-    assert!(shared::load(shader, vert_src, frag_src));
+    log_assert!(shared::load(shader, vert_src, frag_src));
 
     shader as @mut Shaderable
   }
@@ -192,7 +198,7 @@ impl Release_Shader
     let fio = io::file_reader(&Path(frag_file)).unwrap();
     let frag_src = str::from_utf8(fio.read_whole_stream());
 
-    assert!(shared::load(shader, vert_src, frag_src));
+    log_assert!(shared::load(shader, vert_src, frag_src));
 
     shader as @mut Shaderable
   }
@@ -222,10 +228,15 @@ mod shared
   use gl2 = opengles::gl2;
   use std::cast;
   use math;
+  use util::Log;
 
   #[macro_escape]
   #[path = "../check.rs"]
   mod check;
+
+  #[macro_escape]
+  #[path = "../../util/log_macros.rs"]
+  mod log_macros;
 
   pub fn load(shader: &mut super::Shader_Builder, vert_src: &str, frag_src: &str) -> bool
   {
@@ -241,7 +252,7 @@ mod shared
       if result == 0 as gl2::GLint
       {
         let err = check!(gl2::get_shader_info_log(obj));
-        error!(err);
+        log_error!(err);
       }
       result != 0
     };
@@ -250,7 +261,7 @@ mod shared
     if vert_src.len() > 0
     {
       shader.vert_obj = check!(gl2::create_shader(gl2::VERTEX_SHADER));
-      assert!(shader.vert_obj != 0);
+      log_assert!(shader.vert_obj != 0);
 
       let src = [vert_src];
       check!(gl2::shader_source(shader.vert_obj, src.map(|x| (*x).as_bytes().to_owned())));
@@ -263,7 +274,7 @@ mod shared
     if frag_src.len() > 0
     {
       shader.frag_obj = check!(gl2::create_shader(gl2::FRAGMENT_SHADER));
-      assert!(shader.frag_obj != 0);
+      log_assert!(shader.frag_obj != 0);
 
       let src = [frag_src];
       check!(gl2::shader_source(shader.frag_obj, src.map(|x| (*x).as_bytes().to_owned())));
@@ -287,7 +298,7 @@ mod shared
     if result == 0 as gl2::GLint
     {
       let err = check!(gl2::get_program_info_log(shader.prog));
-      error!(err);
+      log_error!(err);
 
       /* Delete shaders. */
       check!(gl2::detach_shader(shader.prog, shader.vert_obj));
@@ -312,7 +323,7 @@ mod shared
     let name = check!(gl2::get_uniform_location(shader.prog, uniform.to_owned()));
     match name
     {
-      -1 => { error!(fmt!("Uniform '%s' not found!", uniform)); name }
+      -1 => { log_error!("Uniform '%s' not found!", uniform); name }
       _ => { name }
     }
   }

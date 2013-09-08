@@ -15,9 +15,14 @@ use std::libc::{ c_uint };
 use math;
 use self::glyph::Glyph;
 use gl2 = opengles::gl2;
+use util::Log;
 
 #[path = "../../gl/check.rs"]
 mod check;
+
+#[macro_escape]
+#[path = "../../util/log_macros.rs"]
+mod log_macros;
 
 mod glyph;
 mod ft;
@@ -56,7 +61,7 @@ impl Font
       do filename.to_c_str().with_ref() |c_str|
       {
         if ft::FT_New_Face(font.library, c_str, 0, &font.face) != 0
-        { fail!(~"Failed to create TTF face."); }
+        { log_fail!("Failed to create TTF face."); }
       }
    
       ft::FT_Set_Pixel_Sizes(font.face, 0, size as c_uint);
@@ -106,7 +111,7 @@ impl Font
       check!(gl2::pixel_store_i(gl2::UNPACK_ALIGNMENT, 1));
       
       let name = check!(gl2::gen_textures(1));
-      assert!(name.len() == 1);
+      log_assert!(name.len() == 1);
       font.texture_atlas = name[0];
       check!(gl2::bind_texture(gl2::TEXTURE_2D, font.texture_atlas));
       check!(gl2::tex_image_2d(gl2::TEXTURE_2D, 0, gl2::RGB as gl2::GLint,
@@ -129,7 +134,7 @@ impl Font
         let glyph = match font.glyphs.find_mut(&(curr as u8))
         {
           Some(g) => g,
-          None => fail!(fmt!("Invalid char (%c) in font %s", curr, filename))
+          None => log_fail!("Invalid char (%c) in font %s", curr, filename)
         };
 
         if offset.x + (glyph.dimensions.x as i32) + 1 >= max_width
@@ -158,7 +163,7 @@ impl Font
     /* Reset the state. */
     check!(gl2::pixel_store_i(gl2::UNPACK_ALIGNMENT, 4));
 
-    assert!(font.height > 0);
+    log_assert!(font.height > 0);
 
     font
   }

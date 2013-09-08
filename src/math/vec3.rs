@@ -21,6 +21,11 @@ macro_rules! declare
     mod $Mod
     {
       use std::{ cmp, ptr, clone };
+      use util::Log;
+
+      #[macro_escape]
+      #[path = "../../util/log_macros.rs"]
+      mod log_macros;
 
       pub struct $Type
       {
@@ -129,7 +134,7 @@ macro_rules! declare
             &0 => { self.x }
             &1 => { self.y }
             &2 => { self.z }
-            _ => { fail!(~"Invalid index to Vec3"); }
+            _ => { log_fail!("Invalid index to Vec3"); }
           }
         }
       }

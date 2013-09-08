@@ -14,9 +14,14 @@ use std::{ comm, task, local_data };
 use glfw;
 use gl2 = opengles::gl2;
 use util;
+use util::Log;
 
 #[macro_escape]
 mod check;
+
+#[macro_escape]
+#[path = "../util/log_macros.rs"]
+mod log_macros;
 
 static tls_key: local_data::Key<@Worker> = &local_data::Key;
 
@@ -64,7 +69,7 @@ impl Worker
       match opt
       {
         Some(x) => *x,
-        None => fail!("Singleton not available")
+        None => log_fail!("Singleton not available")
       }
     })
   }

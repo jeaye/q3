@@ -58,7 +58,7 @@ impl Map
     unsafe {  fio.read( cast::transmute((&map.header, sys::size_of::<lump::Header>())),
                         sys::size_of::<lump::Header>()); }
 
-    assert!( map.header.magic[0] == 'I' as i8 &&
+    log_assert!( map.header.magic[0] == 'I' as i8 &&
              map.header.magic[1] == 'B' as i8 &&
              map.header.magic[2] == 'S' as i8 &&
              map.header.magic[3] == 'P' as i8);

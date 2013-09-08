@@ -44,7 +44,7 @@ impl Texture
     };
 
     let name = check!(gl2::gen_textures(1));
-    assert!(name.len() == 1);
+    log_assert!(name.len() == 1);
     tex.obj = name[0];
     tex.bind(0);
 
@@ -84,7 +84,7 @@ impl Texture
           ));
         }
       }
-      _ => fail!(fmt!("Failed to load texture %s", tex.filename))
+      _ => log_fail!("Failed to load texture %s", tex.filename)
     }
 
     tex

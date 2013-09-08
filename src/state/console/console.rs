@@ -170,7 +170,7 @@ impl Console
       match opt
       {
         Some(x) => *x,
-        None => fail!("Singleton not available")
+        None => log_fail!("Singleton not available")
       }
     })
   }

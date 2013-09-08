@@ -66,11 +66,11 @@ impl BSP_Renderer
   fn upload(&mut self)
   {
     let name = check!(gl2::gen_vertex_arrays(1));
-    assert!(name.len() == 1);
+    log_assert!(name.len() == 1);
     self.vao = name[0];
 
     let name = check!(gl2::gen_buffers(1));
-    assert!(name.len() == 1);
+    log_assert!(name.len() == 1);
     self.vbo = name[0];
 
     check!(gl2::bind_vertex_array(self.vao));

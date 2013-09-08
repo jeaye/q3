@@ -14,9 +14,14 @@ use gl;
 use super::Font;
 use math;
 use gl2 = opengles::gl2;
+use util::Log;
 
 #[path = "../../gl/check.rs"]
 mod check;
+
+#[macro_escape]
+#[path = "../../util/log_macros.rs"]
+mod log_macros;
 
 struct Renderer
 {
@@ -43,12 +48,12 @@ impl Renderer
     renderer.shader.update_uniform_i32(tex_loc, 0);
 
     let name = check!(gl2::gen_vertex_arrays(1));
-    assert!(name.len() == 1);
+    log_assert!(name.len() == 1);
     renderer.vao = name[0];
     check!(gl2::bind_vertex_array(renderer.vao));
 
     let name = check!(gl2::gen_buffers(1));
-    assert!(name.len() == 1);
+    log_assert!(name.len() == 1);
     renderer.vbo = name[0];
     check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, renderer.vbo));
 
@@ -124,7 +129,7 @@ impl Renderer
         let glyph = match font.glyphs.find(&(curr as u8))
         {
           Some(g) => g,
-          None => fail!(fmt!("Invalid char (%c) in font %s len %u", curr, font.file, font.glyphs.len()))
+          None => log_fail!("Invalid char (%c) in font %s len %u", curr, font.file, font.glyphs.len())
         };
 
         /* Parse color. */

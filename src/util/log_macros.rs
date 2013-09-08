@@ -69,3 +69,40 @@ macro_rules! log_pop
   });
 )
 
+macro_rules! log_fail
+(
+  ($message:expr) => 
+  ({
+    let module = Log::get_module(file!());
+    Log::error(fmt!("[%s]:%u", module, line!()), $message);
+    Log::error(fmt!("[%s]:%u", module, line!()), "Failing");
+    fail!("Exiting");
+  });
+  ($($message:expr),+) =>
+  ({
+    let module = Log::get_module(file!());
+    Log::error(fmt!("[%s]:%u", module, line!()), fmt!($($message),+));
+    Log::error(fmt!("[%s]:%u", module, line!()), "Failing");
+    fail!("Exiting");
+  });
+)
+
+macro_rules! log_assert
+(
+  ($val:expr) => 
+  ({
+    if !$val
+    { log_fail!(fmt!("Assertion failed: (%s)", stringify!($val))); }
+  });
+  ($val:expr, $message:expr) => 
+  ({
+    if !$val
+    { log_fail!($message); }
+  });
+  ($val:expr, $($message:expr),+) =>
+  ({
+    if !$val
+    { log_fail!(fmt!($($message),+)); }
+  });
+)
+

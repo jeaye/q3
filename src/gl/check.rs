@@ -10,8 +10,10 @@
       of an OpenGL call for errors -- use it everywhere.
 */
 
+#[cfg(check_gl)]
 use util::Log;
 
+#[cfg(check_gl)]
 #[macro_escape]
 #[path = "../util/log_macros.rs"]
 mod log_macros;
@@ -26,7 +28,7 @@ pub fn check_gl(func: &str)
   if err != gl2::NO_ERROR
   {
     log_error!(func);
-    fail!(get_err_str(err)); 
+    log_fail!(get_err_str(err)); 
   }
 }
 
@@ -38,9 +40,9 @@ macro_rules! check
 (
   ($func:expr) => 
   ({
-    //io::print(fmt!("%s -> ", stringify!($func)));
+    //log_debug!("%s -> ", stringify!($func));
     let ret = $func;
-    //io::println(fmt!("%?", ret));
+    //log_debug!("%?", ret);
 
     check::check_gl(stringify!($func));
 

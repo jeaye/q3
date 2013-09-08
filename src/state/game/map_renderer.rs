@@ -107,11 +107,11 @@ impl Map_Renderer
     ];
 
     let names = check!(gl2::gen_vertex_arrays(1));
-    assert!(names.len() == 1);
+    log_assert!(names.len() == 1);
     mr.vao = names[0];
 
     let names = check!(gl2::gen_buffers(4));
-    assert!(names.len() == 4);
+    log_assert!(names.len() == 4);
     mr.vox_vbo = names[0];
     mr.offset_tex_vbo = names[1];
     mr.ibos[0] = names[2];
@@ -132,7 +132,7 @@ impl Map_Renderer
     check!(gl2::buffer_data(gl2::TEXTURE_BUFFER, mr.map.voxels, gl2::STATIC_DRAW));
 
     let name = check!(gl2::gen_textures(1));
-    assert!(name.len() == 1);
+    log_assert!(name.len() == 1);
     mr.offset_tex = name[0];
     check!(gl2::bind_texture(gl2::TEXTURE_BUFFER, mr.offset_tex));
     check!(gl2::tex_buffer(gl2::TEXTURE_BUFFER, 0x8815 /* RGB32F */, mr.offset_tex_vbo));

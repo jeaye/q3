@@ -14,9 +14,14 @@ use gl2 = opengles::gl2;
 use gl;
 use math;
 use super::{ Mesh };
+use util::Log;
 
 #[path = "../../gl/check.rs"]
 mod check;
+
+#[macro_escape]
+#[path = "../../util/log_macros.rs"]
+mod log_macros;
 
 struct Mesh_Renderer<'self>
 {
@@ -65,11 +70,11 @@ impl<'self> Mesh_Renderer<'self>
   fn upload(&mut self)
   {
     let name = check!(gl2::gen_vertex_arrays(1));
-    assert!(name.len() == 1);
+    log_assert!(name.len() == 1);
     self.vao = name[0];
 
     let name = check!(gl2::gen_buffers(3));
-    assert!(name.len() == 3);
+    log_assert!(name.len() == 3);
     self.position_vbo = name[0];
     self.tex_vbo = name[1];
     self.ibo = name[2];

@@ -16,9 +16,14 @@ use math;
 use TTF_Renderer = super::ttf::Renderer;
 use TTF_Font = super::ttf::Font;
 use gl2 = opengles::gl2;
+use util::Log;
 
 #[path = "../gl/check.rs"]
 mod check;
+
+#[macro_escape]
+#[path = "../util/log_macros.rs"]
+mod log_macros;
 
 static tls_key: local_data::Key<@mut Renderer> = &local_data::Key;
 
@@ -83,13 +88,13 @@ impl Renderer
 
     /* VAO */
     let name = check!(gl2::gen_vertex_arrays(1));
-    assert!(name.len() == 1);
+    log_assert!(name.len() == 1);
     renderer.vao = name[0];
     check!(gl2::bind_vertex_array(renderer.vao));
 
     /* VBO */
     let name = check!(gl2::gen_buffers(1));
-    assert!(name.len() == 1);
+    log_assert!(name.len() == 1);
     renderer.vbo = name[0];
     check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, renderer.vbo));
 
@@ -126,7 +131,7 @@ impl Renderer
       match opt
       {
         Some(x) => *x,
-        None => fail!("Singleton not available")
+        None => log_fail!("Singleton not available")
       }
     })
   }

@@ -17,9 +17,14 @@ use std::f32;
 use math;
 use ui;
 use state;
+use util::Log;
 
 #[macro_escape]
 mod check;
+
+#[macro_escape]
+#[path = "../util/log_macros.rs"]
+mod log_macros;
 
 static MOVE_LEFT: u8 = 1;
 static MOVE_RIGHT: u8 = 2;
@@ -164,7 +169,7 @@ impl Camera
       match opt
       {
         Some(x) => *x,
-        None => fail!("Singleton not available")
+        None => log_fail!("Singleton not available")
       }
     })
   }

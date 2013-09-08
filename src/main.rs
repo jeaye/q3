@@ -72,7 +72,7 @@ fn main(argc: int, argv: **u8, crate_map: *u8) -> int
       let worker_window = match window_res
       {
         Ok(win) => { win },
-        Err(()) => { fail!("Failed to create worker window!") }
+        Err(()) => { log_fail!("Failed to create worker window") }
       };
 
       glfw::window_hint::visible(true);
@@ -80,7 +80,7 @@ fn main(argc: int, argv: **u8, crate_map: *u8) -> int
       let window = match window_res
       {
         Ok(win) => { @win },
-        Err(()) => { fail!("Failed to create main window!") }
+        Err(()) => { log_fail!("Failed to create main window") }
       };
       window.make_context_current();
 
