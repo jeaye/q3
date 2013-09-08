@@ -64,16 +64,16 @@ cd build
   mkdir -p glfw-rs
   pushd glfw-rs
     pushd $SWD/lib/glfw-rs
-      make clean
-      make -B
+      ln -s $BWD/glfw_static/libglfw* ./
+      rustpkg build glfw
 
       # Linux
       rm $BWD/../*.so
-      cp lib/*.so $BWD/../
+      cp build/glfw/*.so $BWD/../
 
       # Mac
       rm $BWD/../*.dylib
-      cp lib/*.dylib $BWD/../
+      cp build/glfw/*.dylib $BWD/../
     popd
   popd
 
