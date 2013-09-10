@@ -3,7 +3,7 @@
     See licensing in LICENSE file, or at:
         http://www.opensource.org/licenses/BSD-3-Clause
 
-    File: obj/md5/vertex.rs
+    File: obj/md5/model/vertex.rs
     Author: Jesse 'Jeaye' Wilkerson
     Description:
       Represents a 3D point.

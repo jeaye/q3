@@ -3,7 +3,7 @@
     See licensing in LICENSE file, or at:
         http://www.opensource.org/licenses/BSD-3-Clause
 
-    File: obj/md5/weight.rs
+    File: obj/md5/model/weight.rs
     Author: Jesse 'Jeaye' Wilkerson
     Description:
       A biased attraction to a bone.

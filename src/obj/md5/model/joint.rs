@@ -3,7 +3,7 @@
     See licensing in LICENSE file, or at:
         http://www.opensource.org/licenses/BSD-3-Clause
 
-    File: obj/md5/joint.rs
+    File: obj/md5/model/joint.rs
     Author: Jesse 'Jeaye' Wilkerson
     Description:
       Represents the intersection

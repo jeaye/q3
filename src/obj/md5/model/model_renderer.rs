@@ -3,7 +3,7 @@
     See licensing in LICENSE file, or at:
         http://www.opensource.org/licenses/BSD-3-Clause
 
-    File: obj/md5/model_renderer.rs
+    File: obj/md5/model/model_renderer.rs
     Author: Jesse 'Jeaye' Wilkerson
     Description:
       Renders an MD5 model (which contains
@@ -14,7 +14,7 @@ use gl2 = opengles::gl2;
 use gl;
 use super::{ Model, Mesh_Renderer };
 
-#[path = "../../gl/check.rs"]
+#[path = "../../../gl/check.rs"]
 mod check;
 
 struct Model_Renderer<'self>

@@ -3,7 +3,7 @@
     See licensing in LICENSE file, or at:
         http://www.opensource.org/licenses/BSD-3-Clause
 
-    File: obj/md5/model.rs
+    File: obj/md5/model/model.rs
     Author: Jesse 'Jeaye' Wilkerson
     Description:
       Loads, parses, and represents
@@ -17,7 +17,7 @@ use math;
 use util::Log;
 
 #[macro_escape]
-#[path = "../../util/log_macros.rs"]
+#[path = "../../../util/log_macros.rs"]
 mod log_macros;
 
 struct Model
@@ -88,7 +88,7 @@ impl Model
     (
       () =>
       ({
-        param = ~""; /* TODO: clear? */
+        param = ~"";
         let mut ch = fio.read_char();
         while ch.is_whitespace() && !fio.eof() /* Find the next word. */
         { ch = fio.read_char(); }
@@ -121,7 +121,7 @@ impl Model
     )
 
     /* Read the first param and jump into the parsing. */
-    log_debug!("Parsing model");
+    log_debug!("Parsing model %s", file);
     log_push!();
     read_param!();
     while !fio.eof()

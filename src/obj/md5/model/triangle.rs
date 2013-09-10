@@ -3,7 +3,7 @@
     See licensing in LICENSE file, or at:
         http://www.opensource.org/licenses/BSD-3-Clause
 
-    File: obj/md5/triangle.rs
+    File: obj/md5/model/triangle.rs
     Author: Jesse 'Jeaye' Wilkerson
     Description:
       A three-sided polygon that

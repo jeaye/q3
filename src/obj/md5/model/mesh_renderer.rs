@@ -3,7 +3,7 @@
     See licensing in LICENSE file, or at:
         http://www.opensource.org/licenses/BSD-3-Clause
 
-    File: obj/md5/mesh_renderer.rs
+    File: obj/md5/model/mesh_renderer.rs
     Author: Jesse 'Jeaye' Wilkerson
     Description:
       Renders an MD5 mesh.
@@ -16,11 +16,11 @@ use math;
 use super::{ Mesh };
 use util::Log;
 
-#[path = "../../gl/check.rs"]
+#[path = "../../../gl/check.rs"]
 mod check;
 
 #[macro_escape]
-#[path = "../../util/log_macros.rs"]
+#[path = "../../../util/log_macros.rs"]
 mod log_macros;
 
 struct Mesh_Renderer<'self>

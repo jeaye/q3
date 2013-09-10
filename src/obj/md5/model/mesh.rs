@@ -3,7 +3,7 @@
     See licensing in LICENSE file, or at:
         http://www.opensource.org/licenses/BSD-3-Clause
 
-    File: obj/md5/mesh.rs
+    File: obj/md5/model/mesh.rs
     Author: Jesse 'Jeaye' Wilkerson
     Description:
       A collection of vertices, weights, and
