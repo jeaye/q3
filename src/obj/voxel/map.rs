@@ -56,6 +56,10 @@ impl Map
     if !(tris.len() >= 1)
     { self.error = ~"Invalid triangle count"; return false; }
 
+    log_info!("Voxelizing in %dx%dx%d grid",
+              self.resolution as int,
+              self.resolution as int,
+              self.resolution as int);
     log_debug!("Incoming triangles: %u", tris.len());
 
     /* Bounding box of vert dimensions. */

@@ -19,6 +19,13 @@ pub use self::mesh_renderer::Mesh_Renderer;
 pub use self::triangle::Triangle;
 pub use self::vertex::Vertex;
 
+/* Animation */
+pub use self::joint_info::Joint_Info;
+pub use self::bound::Bound;
+pub use self::frame::{ Base_Frame, Frame_Data };
+pub use self::skeleton::{ Skeleton_Joint, Frame_Skeleton };
+pub use self::animation::Animation;
+
 /* Model */
 #[path = "model/model.rs"]
 mod model;
@@ -36,4 +43,16 @@ mod mesh_renderer;
 mod vertex;
 #[path = "model/triangle.rs"]
 mod triangle;
+
+/* Animation */
+#[path = "animation/joint_info.rs"]
+mod joint_info;
+#[path = "animation/bound.rs"]
+mod bound;
+#[path = "animation/frame.rs"]
+mod frame;
+#[path = "animation/skeleton.rs"]
+mod skeleton;
+#[path = "animation/animation.rs"]
+mod animation;
 

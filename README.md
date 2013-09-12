@@ -5,7 +5,7 @@ Q³
 ### What is Q³?
 Q^3 is a project using Mozilla's Rust language and OpenGL to create a Quake 3 like game that takes 
 Quake 3 and QuakeLive maps, voxelizes them, and allows groups of players to blow the shit out 
-of everything in a fast-paced Quake-esque first person shooter with 100% destructible maps.
+of everything in a fast-paced Quake-esque first person shooter with 100% destructible environments.
 
 ### What's the current state of Q³?
 Q³ is not a game yet! It's still a side project that I'm working on in my spare time.  
@@ -41,7 +41,7 @@ request!
 
 
 ### Who're you?
-Hi! I'm Jeaye, a professional C++ game developer.  
+Hi! I'm Jeaye, a C++ software engineer.  
 * **Email:**
   * jeaye (at) arrownext (dot) com  
 * **LinkedIn:**

@@ -12,7 +12,7 @@
 */
 
 use std::{ io, path, vec, str };
-use super::{ Joint, Vertex, Triangle, Weight, Mesh };
+use super::{ Joint, Vertex, Triangle, Weight, Mesh, Animation };
 use math;
 use util::Log;
 
@@ -32,13 +32,14 @@ struct Model
   joints: ~[Joint],
   meshes: ~[Mesh],
 
-  //animation: Option<Animation>,
+  animation: Option<Animation>,
   
   local_to_world: math::Mat4x4,
 }
 
 impl Model
 {
+  /* TODO: Return Option. */
   pub fn new(mesh_file: ~str) -> Model
   {
     /* TODO: Custom Path type to handle this. */
@@ -62,7 +63,7 @@ impl Model
       joints: ~[],
       meshes: ~[],
 
-      //animation: None,
+      animation: None,
 
       local_to_world: math::Mat4x4::new(),
     };
@@ -153,11 +154,13 @@ impl Model
           let mut joint = Joint::new();
           read_junk!();
           log_debug!("Reading model joints");
+          log_push!();
           
           for _ in range(0, self.num_joints)
           {
             read_param!();
             joint.name = param.clone();
+            log_debug!("Joint: %s", joint.name);
 
             read_type!(joint.parent);
 
@@ -178,6 +181,7 @@ impl Model
             /* Ignore the rest of the line. */
             ignore_line!();
           }
+          log_pop!();
 
           read_junk!();
         }
