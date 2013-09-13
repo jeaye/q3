@@ -129,6 +129,15 @@ impl Quaternion
     self.w *= scalar;
   }
 
+  pub fn to_str(&self) -> ~str
+  {
+    fmt!("(%f, %f, %f, %f)",
+          self.x as float,
+          self.y as float,
+          self.z as float,
+          self.w as float)
+  }
+
   pub fn to_vec(&self) -> math::Vec3f
   { math::Vec3f::new(self.x, self.y, self.z) }
 

@@ -120,6 +120,8 @@ fn main(argc: int, argv: **u8, crate_map: *u8) -> int
 
       let _model = md5::Model::new(~"data/models/bob/bob.md5mesh");
       let _model_renderer = md5::Model_Renderer::new(&_model);
+      let _animation = md5::Animation::new(~"data/models/bob/bob.md5anim");
+      log_assert!(_animation.is_some());
 
       /* Console functions. */
       state::Console::get().add_accessor("q3.version", |_|

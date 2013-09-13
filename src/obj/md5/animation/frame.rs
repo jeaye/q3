@@ -19,8 +19,8 @@ struct Base_Frame
 
 struct Frame_Data
 {
-  frame_id: i32,
-  frame_data: ~[f32],
+  id: i32,
+  data: ~[f32],
 }
 
 impl Base_Frame
@@ -41,8 +41,8 @@ impl Frame_Data
   {
     Frame_Data
     {
-      frame_id: 0,
-      frame_data: ~[],
+      id: 0,
+      data: ~[],
     }
   }
 }

@@ -10,6 +10,7 @@
 */
 
 use math;
+use super::Base_Frame;
 
 struct Skeleton_Joint
 {
@@ -32,6 +33,16 @@ impl Skeleton_Joint
       parent: -1,
       position: math::Vec3f::zero(),
       orientation: math::Quaternion::zero(),
+    }
+  }
+
+  pub fn new_from_base_frame(base_frame: &Base_Frame) -> Skeleton_Joint
+  {
+    Skeleton_Joint
+    {
+      parent: -1,
+      position: base_frame.position,
+      orientation: base_frame.orientation,
     }
   }
 }
