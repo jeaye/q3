@@ -83,7 +83,7 @@ impl State for Game_Renderer
 
   fn render(&mut self) -> bool
   {
-    (self.map_renderer as @mut State).render();
+    //(self.map_renderer as @mut State).render();
 
     let fps = self.camera.frame_rate;
 

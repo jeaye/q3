@@ -155,19 +155,19 @@ impl Animation
         {
           read_type!(self.num_joints);
           ignore_line!();
-          log_debug!("Num joints: %d", self.num_frames as int);
+          log_debug!("Num joints: %d", self.num_joints as int);
         }
         ~"frameRate" =>
         {
           read_type!(self.frame_rate);
           ignore_line!();
-          log_debug!("Framerate: %d", self.num_frames as int);
+          log_debug!("Framerate: %d", self.frame_rate as int);
         }
         ~"numAnimatedComponents" =>
         {
           read_type!(self.num_animated_components);
           ignore_line!();
-          log_debug!("Num animated components: %d", self.num_frames as int);
+          log_debug!("Num animated components: %d", self.num_animated_components as int);
         }
         ~"hierarchy" =>
         {

@@ -69,6 +69,7 @@ impl Frame_Skeleton
       final.parent = joint0.parent;
 
       final.position = math::Vec3f::new_lerp(&joint0.position, &joint1.position, interp);
+
       final.orientation = math::Quaternion::new_slerp(&joint0.orientation, &joint1.orientation, interp);
     }
   }
