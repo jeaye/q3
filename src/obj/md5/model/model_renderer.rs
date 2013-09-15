@@ -10,6 +10,7 @@
       multiple meshes).
 */
 
+use std::cast;
 use gl2 = opengles::gl2;
 use gl;
 use super::{ Model, Mesh_Renderer };
@@ -29,11 +30,11 @@ struct Model_Renderer<'self>
 
 impl<'self> Model_Renderer<'self>
 {
-  pub fn new(m: &'self Model) -> Model_Renderer<'self>
+  pub fn new(model: &'self Model) -> Model_Renderer<'self>
   {
     let mut mr = Model_Renderer
     {
-      model: m,
+      model: model,
       mesh_renderers: ~[],
 
       shader: gl::Shader_Builder::new_with_files("data/shaders/md5.vert", "data/shaders/md5.frag"),
@@ -49,6 +50,15 @@ impl<'self> Model_Renderer<'self>
     { mr.mesh_renderers.push(Mesh_Renderer::new(x, mr.shader)); }
 
     mr
+  }
+
+  pub fn update(&mut self, dt: f32)
+  {
+    unsafe { cast::transmute_mut(self.model) }.update(dt);
+
+    self.mesh_renderers.clear();
+    for x in self.model.meshes.iter()
+    { self.mesh_renderers.push(Mesh_Renderer::new(x, self.shader)); }
   }
 
   pub fn render(&mut self)

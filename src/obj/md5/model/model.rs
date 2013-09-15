@@ -355,5 +355,74 @@ impl Model
       mesh.tex_coords.push(vert.tex_coord);
     }
   }
+
+  fn prepare_mesh_with_skeleton(&mut self, mesh_index: i32)
+  {
+    let skel = &self.animation.get_mut_ref().animated_skeleton;
+    let mesh = &mut self.meshes[mesh_index];
+
+    for i in range(0, mesh.verts.len())
+    {
+      let vert = &mesh.verts[i];
+      let position = &mut mesh.positions[i];
+      //let normal = &mut mesh.normals[i];
+
+      *position = math::Vec3f::zero();
+      //*normal = math::Vec3f::zero();
+
+      for m in range(0, vert.weight_count)
+      {
+        let weight = &mesh.weights[vert.start_weight + m];
+        let joint = &skel.joints[weight.joint_id];
+
+        let rot_pos = joint.orientation.rotate_vec(&weight.position);
+        *position = *position + ((joint.position + rot_pos) * weight.bias);
+        //*normal = *normal + (joint.orientation.rotate_vec(&vert.normal) * weight.bias);
+      }
+    }
+  }
+
+  pub fn update(&mut self, dt: f32)
+  {
+    if self.animation.is_some()
+    {
+      self.animation.get_mut_ref().update(dt);
+
+      for i in range(0, self.meshes.len())
+      { self.prepare_mesh_with_skeleton(i as i32); }
+    }
+  }
+
+  pub fn load_animation(&mut self, file: ~str) -> bool
+  {
+    self.animation = Animation::new(file);
+    if self.animation.is_some()
+    {
+      let valid = self.check_animation(self.animation.get_ref());
+      if !valid
+      { self.animation = None; }
+    }
+
+    self.animation.is_some()
+  }
+
+  fn check_animation(&self, animation: &Animation) -> bool
+  {
+    if self.num_joints != animation.num_joints
+    { return false; }
+
+    for i in range(0, self.joints.len())
+    {
+      let mesh_joint = &self.joints[i];
+      let anim_joint = &animation.joint_infos[i];
+
+      if  mesh_joint.name != anim_joint.name ||
+          mesh_joint.parent != anim_joint.parent_id
+      { return false; }
+    }
+
+    log_debug!("Animation check passed");
+    true
+  }
 }
 

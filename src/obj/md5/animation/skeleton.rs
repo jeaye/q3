@@ -56,5 +56,21 @@ impl Frame_Skeleton
       joints: ~[],
     }
   }
+
+  pub fn interpolate(&mut self, skele0: &Frame_Skeleton, skele1: &Frame_Skeleton, interp: f32)
+  {
+    /* Assumes all skeletons have the same number of joints. */
+    for i in range(0, self.joints.len())
+    {
+      let final = &mut self.joints[i];
+      let joint0 = &skele0.joints[i];
+      let joint1 = &skele1.joints[i];
+
+      final.parent = joint0.parent;
+
+      final.position = math::Vec3f::new_lerp(&joint0.position, &joint1.position, interp);
+      final.orientation = math::Quaternion::new_slerp(&joint0.orientation, &joint1.orientation, interp);
+    }
+  }
 }
 

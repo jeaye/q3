@@ -71,6 +71,9 @@ impl Quaternion
     q
   }
 
+  pub fn new_slerp(lhs: &Quaternion, rhs: &Quaternion, interp: f32) -> Quaternion
+  { lhs.slerp(rhs, interp) }
+
   pub fn get_conjugate(&self) -> Quaternion
   { Quaternion { x: -self.x, y: -self.y, z: -self.z, w: -self.w } }
 
@@ -88,6 +91,50 @@ impl Quaternion
       self.z *= one_over;
       self.w *= one_over;
     }
+  }
+
+  pub fn dot(&self, rhs: &Quaternion) -> f32
+  { (self.x * rhs.x) + (self.y * rhs.y) + (self.z * rhs.z) + (self.w * rhs.w) }
+
+  pub fn slerp(&self, _rhs: &Quaternion, interp: f32) -> Quaternion
+  {
+    let mut rhs = *_rhs;
+    let mut dp = self.dot(_rhs);
+    let scale0;
+    let scale1;
+
+    /* Adjust signs if needed. */
+    if dp.abs() < 0.0
+    {
+      dp *= -1.0;
+      rhs.scale(-1.0);
+    }
+
+    /* Calculate coefficients. */
+    if (1.0 - dp) > 0.01
+    {
+      /* Normal slerp case. */
+      let omega = dp.acos();
+      let sine_omega = omega.sin();
+
+      scale0 = ((1.0 - interp) * omega).sin() / sine_omega;
+      scale1 = (interp * omega).sin() / sine_omega;
+    }
+    else
+    {
+      /* Quats are too close from comfort.
+       * Standard linear interpolation will suffice. */
+      scale0 = 1.0 - interp;
+      scale1 = interp;
+    }
+
+    Quaternion::new
+    (
+      (scale0 * self.x) + (scale1 * rhs.x),
+      (scale0 * self.y) + (scale1 * rhs.y),
+      (scale0 * self.z) + (scale1 * rhs.z),
+      (scale0 * self.w) + (scale1 * rhs.w)
+    )
   }
 
   pub fn compute_w(&mut self)

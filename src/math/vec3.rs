@@ -39,6 +39,9 @@ macro_rules! declare
         pub fn new(nx: $Component, ny: $Component, nz: $Component) -> $Type
         { $Type{ x: nx, y: ny, z: nz } }
 
+        pub fn new_lerp(lhs: &$Type, rhs: &$Type, interp: $Component) -> $Type
+        { lhs.lerp(rhs, interp) }
+
         pub fn zero() -> $Type
         { $Type{ x: 0 as $Component, y: 0 as $Component, z: 0 as $Component } }
 
@@ -76,6 +79,16 @@ macro_rules! declare
 
         pub fn dot(&self, rhs: &$Type) -> $Component
         { (self.x * rhs.x) + (self.y * rhs.y) + (self.z * rhs.z) }
+
+        pub fn lerp(&self, rhs: &$Type, interp: $Component) -> $Type
+        {
+          $Type
+          {
+            x: self.x + ((rhs.x - self.x) * interp),
+            y: self.y + ((rhs.y - self.y) * interp),
+            z: self.z + ((rhs.z - self.z) * interp),
+          }
+        }
 
         pub unsafe fn to_ptr(&self) -> *$Type
         { ptr::to_unsafe_ptr(self) } 

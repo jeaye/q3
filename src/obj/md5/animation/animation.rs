@@ -362,5 +362,36 @@ impl Animation
 
     self.skeletons.push(skeleton);
   }
+
+  pub fn update(&mut self, dt: f32)
+  {
+    if self.num_frames < 1
+    { return; }
+
+    /* Progress time. */
+    self.time += dt;
+
+    /* Keep it within bounds. */
+    while self.time > self.total_duration
+    { self.time -= self.total_duration; }
+    while self.time < 0.0
+    { self.time += self.total_duration; }
+
+    /* Determine which frame we're on. */
+    let frame_num = (self.time * (self.frame_rate as f32));
+    let mut frame0 = frame_num.floor() as i32;
+    let mut frame1 = frame_num.ceil() as i32;
+    frame0 = frame0 % self.num_frames;
+    frame1 = frame1 % self.num_frames;
+
+    let interpolate = if self.frame_duration.approx_eq(&0.0)
+    { 0.0 } /* Avoid division by zero. */
+    else
+    { (self.time % self.frame_duration) / self.frame_duration };
+
+    self.animated_skeleton.interpolate( &self.skeletons[frame0],
+                                        &self.skeletons[frame1],
+                                        interpolate);
+  }
 }
 

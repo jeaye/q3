@@ -118,10 +118,24 @@ fn main(argc: int, argv: **u8, crate_map: *u8) -> int
         key_callback(window, key, action);
       }
 
-      let _model = md5::Model::new(~"data/models/bob/bob.md5mesh");
-      let _model_renderer = md5::Model_Renderer::new(&_model);
-      let _animation = md5::Animation::new(~"data/models/bob/bob.md5anim");
-      log_assert!(_animation.is_some());
+      //let q1 = math::Quaternion::new(76.0, 3.0, 400.0, 0.0);
+      //let q2 = math::Quaternion::new(1.0, 2.0, 3.0, 0.0);
+      //let m1 = math::Quaternion::new_slerp(&q1, &q2, 0.5);
+      //let m2 = math::Quaternion::new_slerp(&q2, &q1, 0.5);
+      //log_info!("%s", m1.to_str());
+      //log_info!("%s", m2.to_str());
+
+      //log_info!("");
+      //let q1 = math::Quaternion::new(1.0, 1.0, 1.0, 1.0);
+      //let q2 = math::Quaternion::new(1.0, 1.0, 1.0, 1.0);
+      //let m1 = math::Quaternion::new_slerp(&q1, &q2, 0.5);
+      //let m2 = math::Quaternion::new_slerp(&q2, &q1, 0.5);
+      //log_info!("%s", m1.to_str());
+      //log_info!("%s", m2.to_str());
+
+      let mut _model = md5::Model::new(~"data/models/bob/bob.md5mesh");
+      log_assert!(_model.load_animation(~"data/models/bob/bob.md5anim"));
+      let mut _model_renderer = md5::Model_Renderer::new(&_model);
 
       /* Console functions. */
       state::Console::get().add_accessor("q3.version", |_|
@@ -178,8 +192,11 @@ fn main(argc: int, argv: **u8, crate_map: *u8) -> int
 
         state::Director::update(delta);
 
+        _model_renderer.update(delta);
+
         check!(gl2::clear(gl2::COLOR_BUFFER_BIT | gl2::DEPTH_BUFFER_BIT));
         {
+          _model_renderer.render();
           state::Director::render();
         } window.swap_buffers();
       }
