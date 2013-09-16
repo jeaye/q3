@@ -56,9 +56,8 @@ impl<'self> Model_Renderer<'self>
   {
     unsafe { cast::transmute_mut(self.model) }.update(dt);
 
-    self.mesh_renderers.clear();
-    for x in self.model.meshes.iter()
-    { self.mesh_renderers.push(Mesh_Renderer::new(x, self.shader)); }
+    for x in self.mesh_renderers.mut_iter()
+    { x.update(dt); }
   }
 
   pub fn render(&mut self)

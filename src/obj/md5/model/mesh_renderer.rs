@@ -82,13 +82,21 @@ impl<'self> Mesh_Renderer<'self>
     check!(gl2::bind_vertex_array(self.vao));
 
     check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.position_vbo));
-    check!(gl2::buffer_data(gl2::ARRAY_BUFFER, self.mesh.positions, gl2::STATIC_DRAW));
+    check!(gl2::buffer_data(gl2::ARRAY_BUFFER, self.mesh.positions, gl2::DYNAMIC_DRAW));
 
     check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.tex_vbo));
     check!(gl2::buffer_data(gl2::ARRAY_BUFFER, self.mesh.tex_coords, gl2::STATIC_DRAW));
 
     check!(gl2::bind_buffer(gl2::ELEMENT_ARRAY_BUFFER, self.ibo));
     check!(gl2::buffer_data(gl2::ELEMENT_ARRAY_BUFFER, self.mesh.indices, gl2::STATIC_DRAW));
+  }
+
+  pub fn update(&mut self, _dt: f32)
+  {
+    check!(gl2::bind_vertex_array(self.vao));
+
+    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.position_vbo));
+    check!(gl2::buffer_sub_data(gl2::ARRAY_BUFFER, 0, self.mesh.positions));
   }
 
   pub fn render(&self)
