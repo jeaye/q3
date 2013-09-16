@@ -98,43 +98,90 @@ impl Quaternion
 
   pub fn slerp(&self, _rhs: &Quaternion, interp: f32) -> Quaternion
   {
-    let mut rhs = *_rhs;
-    let mut dp = self.dot(_rhs);
+    /* Return edge points for out-of-range interps. */
+    if interp < 0.0
+    { return *self; }
+    else if interp >= 1.0
+    { return *_rhs };
+
+    let mut cos_omega = self.dot(_rhs);
+    let scale = if cos_omega < 0.0
+    { -1.0 } /* In the case of a negative dot, negate the quat. */
+    else
+    { 1.0 };
+    cos_omega *= scale;
+
+    let mut ret = *_rhs;
+    ret.scale(scale);
+
+    /* We should have to unit quaternions. */
+    assert!(cos_omega < 1.1);
+
     let scale0;
     let scale1;
 
-    /* Adjust signs if needed. */
-    if dp.abs() < 0.0
+    if cos_omega > 0.9999
     {
-      dp *= -1.0;
-      rhs.scale(-1.0);
-    }
-
-    /* Calculate coefficients. */
-    if (1.0 - dp) > 0.01
-    {
-      /* Normal slerp case. */
-      let omega = dp.acos();
-      let sine_omega = omega.sin();
-
-      scale0 = ((1.0 - interp) * omega).sin() / sine_omega;
-      scale1 = (interp * omega).sin() / sine_omega;
+      /* Very close - just use linear interpolation
+       * which will protect against division by zero. */
+      scale0 = 1.0 - interp;
+      scale1 = interp;
     }
     else
     {
-      /* Quats are too close from comfort.
-       * Standard linear interpolation will suffice. */
-      scale0 = 1.0 - interp;
-      scale1 = interp;
+      let sin_omega = (1.0 - (cos_omega * cos_omega)).sqrt();
+      let omega = sin_omega.atan2(&cos_omega);
+      let one_over_sin_omega = 1.0 / sin_omega;
+
+      scale0 = ((1.0 - interp) * omega).sin() * one_over_sin_omega;
+      scale1 = (interp * omega).sin() * one_over_sin_omega;
     }
 
     Quaternion::new
     (
-      (scale0 * self.x) + (scale1 * rhs.x),
-      (scale0 * self.y) + (scale1 * rhs.y),
-      (scale0 * self.z) + (scale1 * rhs.z),
-      (scale0 * self.w) + (scale1 * rhs.w)
+      (scale0 * self.x) + (scale1 * (_rhs.x * scale)),
+      (scale0 * self.y) + (scale1 * (_rhs.y * scale)),
+      (scale0 * self.z) + (scale1 * (_rhs.z * scale)),
+      (scale0 * self.w) + (scale1 * (_rhs.w * scale))
     )
+
+  //  let mut rhs = *_rhs;
+  //  let mut dp = self.dot(_rhs);
+  //  let scale0;
+  //  let scale1;
+
+  //  /* Adjust signs if needed. */
+  //  if dp.abs() < 0.0
+  //  {
+  //    dp *= -1.0;
+  //    rhs.scale(-1.0);
+  //  }
+
+  //  /* Calculate coefficients. */
+  //  if (1.0 - dp) > 0.01
+  //  {
+  //    /* Normal slerp case. */
+  //    let omega = dp.acos();
+  //    let sine_omega = omega.sin();
+
+  //    scale0 = ((1.0 - interp) * omega).sin() / sine_omega;
+  //    scale1 = (interp * omega).sin() / sine_omega;
+  //  }
+  //  else
+  //  {
+  //    /* Quats are too close from comfort.
+  //     * Standard linear interpolation will suffice. */
+  //    scale0 = 1.0 - interp;
+  //    scale1 = interp;
+  //  }
+
+  //  Quaternion::new
+  //  (
+  //    (scale0 * self.x) + (scale1 * rhs.x),
+  //    (scale0 * self.y) + (scale1 * rhs.y),
+  //    (scale0 * self.z) + (scale1 * rhs.z),
+  //    (scale0 * self.w) + (scale1 * rhs.w)
+  //  )
   }
 
   pub fn compute_w(&mut self)

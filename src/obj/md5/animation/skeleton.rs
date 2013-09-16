@@ -71,6 +71,13 @@ impl Frame_Skeleton
       final.position = math::Vec3f::new_lerp(&joint0.position, &joint1.position, interp);
 
       final.orientation = math::Quaternion::new_slerp(&joint0.orientation, &joint1.orientation, interp);
+
+      printfln!("%s", joint0.position.to_str());
+      printfln!("%s", joint1.position.to_str());
+        printfln!("\t%s", final.position.to_str());
+      printfln!("%s", joint0.orientation.to_str());
+      printfln!("%s", joint1.orientation.to_str());
+        printfln!("\t%s\n", final.orientation.to_str());
     }
   }
 }

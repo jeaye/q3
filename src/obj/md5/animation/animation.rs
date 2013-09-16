@@ -36,10 +36,12 @@ struct Animation
   frame_rate: i32,
   num_animated_components: i32,
 
-  /* Time data. */
+  /* Frame/Time data. */
   total_duration: f32,
   frame_duration: f32,
   time: f32,
+  curr_frame: i32,
+  next_frame: i32,
 }
 
 impl Animation
@@ -71,6 +73,8 @@ impl Animation
       total_duration: 0.0,
       frame_duration: 0.0,
       time: 0.0,
+      curr_frame: 0,
+      next_frame: 0,
     };
 
     if anim.load(filename)
@@ -186,6 +190,7 @@ impl Animation
             read_type!(joint.flags);
             read_type!(joint.start_index);
 
+            printfln!("%s %d %d %d", joint.name, joint.parent_id as int, joint.flags as int, joint.start_index as int);
             log_debug!("Joint: %s", joint.name);
             self.joint_infos.push(joint);
 
@@ -246,6 +251,11 @@ impl Animation
             read_type!(base_frame.orientation.z);
             ignore_line!();
 
+            base_frame.orientation.compute_w();
+
+            printfln!("%s", base_frame.position.to_str());
+            printfln!("%s\n", base_frame.orientation.to_str());
+
             log_debug!("Base frame %s %s",
                         base_frame.position.to_str(),
                         base_frame.orientation.to_str());
@@ -263,10 +273,12 @@ impl Animation
           read_junk!(); /* { */
           ignore_line!();
 
+          printfln!("frame: %d", frame.id as int);
           for _ in range(0, self.num_animated_components)
           {
             let mut frameData: f32 = 0.0;
             read_type!(frameData);
+            printfln!("%f", frameData as float);
             frame.data.push(frameData);
           }
 
@@ -293,6 +305,8 @@ impl Animation
     self.frame_duration = 1.0 / (self.frame_rate as f32);
     self.total_duration = (self.frame_duration * (self.num_frames as f32));
     self.time = 0.0;
+    self.curr_frame = 1;
+    self.next_frame = 2;
 
     /* Ensure everything went well. */
     self.joint_infos.len() as i32 == self.num_joints &&
@@ -314,37 +328,48 @@ impl Animation
 
       joint.parent = joint_info.parent_id;
 
-      if (joint_info.flags & 1) == 1 /* position.x */
+      printfln!("top p: %d", joint.parent as int);
+      printfln!("top jp: %s", joint.position.to_str());
+      printfln!("top jo: %s\n", joint.orientation.to_str());
+
+      if (joint_info.flags & 1) != 0 /* position.x */
       {
         joint.position.x = frame.data[joint_info.start_index + j];
+        printfln!("p.x %f", joint.position.x as float);
         j += 1;
       }
-      if (joint_info.flags & 2) == 1 /* position.y */
+      if (joint_info.flags & 2) != 0 /* position.y */
       {
         joint.position.y = frame.data[joint_info.start_index + j];
+        printfln!("p.y %f", joint.position.y as float);
         j += 1;
       }
-      if (joint_info.flags & 4) == 1 /* position.z */
+      if (joint_info.flags & 4) != 0 /* position.z */
       {
         joint.position.z = frame.data[joint_info.start_index + j];
+        printfln!("p.z %f", joint.position.z as float);
         j += 1;
       }
-      if (joint_info.flags & 8) == 1 /* orientation.x */
+      if (joint_info.flags & 8) != 0 /* orientation.x */
       {
         joint.orientation.x = frame.data[joint_info.start_index + j];
+        printfln!("o.x %f", joint.orientation.x as float);
         j += 1;
       }
-      if (joint_info.flags & 16) == 1 /* orientation.y */
+      if (joint_info.flags & 16) != 0 /* orientation.y */
       {
         joint.orientation.y = frame.data[joint_info.start_index + j];
+        printfln!("o.y %f", joint.orientation.y as float);
         j += 1;
       }
-      if (joint_info.flags & 32) == 1 /* orientation.z */
+      if (joint_info.flags & 32) != 0 /* orientation.z */
       {
         joint.orientation.z = frame.data[joint_info.start_index + j];
+        printfln!("o.z %f", joint.orientation.z as float);
       }
 
       joint.orientation.compute_w();
+      printfln!("o.w %f", joint.orientation.w as float);
 
       /* If the joint has a parent. */
       if joint.parent >= 0 
@@ -352,10 +377,18 @@ impl Animation
         let parent = &skeleton.joints[joint.parent];
         let rot_pos = parent.orientation.rotate_vec(&joint.position);
 
+        printfln!("po: %s", parent.orientation.to_str());
+        printfln!("jp: %s", joint.position.to_str());
+        printfln!("rp: %s", rot_pos.to_str());
+
         joint.position = parent.position + rot_pos;
         joint.orientation = parent.orientation * joint.orientation;
         joint.orientation.normalize();
       }
+
+      printfln!("p: %d", joint.parent as int);
+      printfln!("%s", joint.position.to_str());
+      printfln!("%s\n", joint.orientation.to_str());
 
       skeleton.joints.push(joint);
     }
@@ -371,27 +404,44 @@ impl Animation
     /* Progress time. */
     self.time += dt;
 
+    if self.time >= self.frame_duration
+    {
+      self.curr_frame += 1;
+      self.next_frame += 1;
+      self.time = 0.0;
+
+      if self.curr_frame > (self.num_frames - 1)
+      { self.curr_frame = 0; }
+      if self.next_frame > (self.num_frames - 1)
+      { self.next_frame = 0; }
+    }
+
     /* Keep it within bounds. */
-    while self.time > self.total_duration
-    { self.time -= self.total_duration; }
-    while self.time < 0.0
-    { self.time += self.total_duration; }
+ //   while self.time > self.total_duration
+ //   { self.time -= self.total_duration; }
+ //   while self.time < 0.0
+ //   { self.time += self.total_duration; }
 
-    /* Determine which frame we're on. */
-    let frame_num = (self.time * (self.frame_rate as f32));
-    let mut frame0 = frame_num.floor() as i32;
-    let mut frame1 = frame_num.ceil() as i32;
-    frame0 = frame0 % self.num_frames;
-    frame1 = frame1 % self.num_frames;
+ //   /* Determine which frame we're on. */
+ //   let frame_num = (self.time * (self.frame_rate as f32));
+ //   let mut frame0 = frame_num.floor() as i32;
+ //   let mut frame1 = frame_num.ceil() as i32;
+ //   frame0 = frame0 % self.num_frames;
+ //   frame1 = frame1 % self.num_frames;
 
-    let interpolate = if self.frame_duration.approx_eq(&0.0)
-    { 0.0 } /* Avoid division by zero. */
-    else
-    { (self.time % self.frame_duration) / self.frame_duration };
+ //   //log_assert!(frame0 != frame1);
 
-    self.animated_skeleton.interpolate( &self.skeletons[frame0],
-                                        &self.skeletons[frame1],
-                                        interpolate);
+ //   let interpolate = if self.frame_duration.approx_eq(&0.0)
+ //   { 0.0 } /* Avoid division by zero. */
+ //   else
+ //   { (self.time % self.frame_duration) / self.frame_duration };
+
+    printfln!("CF: %d", self.curr_frame as int);
+    printfln!("NF: %d", self.next_frame as int);
+
+    self.animated_skeleton.interpolate( &self.skeletons[self.curr_frame],
+                                        &self.skeletons[self.next_frame],
+                                        self.time * (self.frame_rate as f32));
   }
 }
 
