@@ -120,7 +120,7 @@ fn main(argc: int, argv: **u8, crate_map: *u8) -> int
 
       let mut _model = md5::Model::new(~"data/models/berserker/berserker.md5mesh");
       log_assert!(_model.load_animation(~"data/models/berserker/idle.md5anim"));
-      let mut _model_renderer = md5::Model_Renderer::new(&_model);
+      let _model_renderer = md5::Model_Renderer::new(&_model);
 
       /* Console functions. */
       state::Console::get().add_accessor("q3.version", |_|
@@ -177,11 +177,8 @@ fn main(argc: int, argv: **u8, crate_map: *u8) -> int
 
         state::Director::update(delta);
 
-        _model_renderer.update(delta);
-
         check!(gl2::clear(gl2::COLOR_BUFFER_BIT | gl2::DEPTH_BUFFER_BIT));
         {
-          _model_renderer.render();
           state::Director::render();
         } window.swap_buffers();
       }
