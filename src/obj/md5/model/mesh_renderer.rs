@@ -93,8 +93,6 @@ impl<'self> Mesh_Renderer<'self>
 
   pub fn update(&mut self, _dt: f32)
   {
-    check!(gl2::bind_vertex_array(self.vao));
-
     check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.position_vbo));
     check!(gl2::buffer_sub_data(gl2::ARRAY_BUFFER, 0, self.mesh.positions));
   }

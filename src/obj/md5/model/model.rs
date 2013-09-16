@@ -421,7 +421,6 @@ impl Model
       { return false; }
     }
 
-    log_debug!("Animation check passed");
     true
   }
 }

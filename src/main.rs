@@ -118,23 +118,8 @@ fn main(argc: int, argv: **u8, crate_map: *u8) -> int
         key_callback(window, key, action);
       }
 
-      //let q1 = math::Quaternion::new(76.0, 3.0, 400.0, 0.0);
-      //let q2 = math::Quaternion::new(1.0, 2.0, 3.0, 0.0);
-      //let m1 = math::Quaternion::new_slerp(&q1, &q2, 0.5);
-      //let m2 = math::Quaternion::new_slerp(&q2, &q1, 0.5);
-      //log_info!("%s", m1.to_str());
-      //log_info!("%s", m2.to_str());
-
-      //log_info!("");
-      //let q1 = math::Quaternion::new(1.0, 1.0, 1.0, 1.0);
-      //let q2 = math::Quaternion::new(1.0, 1.0, 1.0, 1.0);
-      //let m1 = math::Quaternion::new_slerp(&q1, &q2, 0.5);
-      //let m2 = math::Quaternion::new_slerp(&q2, &q1, 0.5);
-      //log_info!("%s", m1.to_str());
-      //log_info!("%s", m2.to_str());
-
-      let mut _model = md5::Model::new(~"data/models/bob/bob.md5mesh");
-      log_assert!(_model.load_animation(~"data/models/bob/bob.md5anim"));
+      let mut _model = md5::Model::new(~"data/models/berserker/berserker.md5mesh");
+      log_assert!(_model.load_animation(~"data/models/berserker/idle.md5anim"));
       let mut _model_renderer = md5::Model_Renderer::new(&_model);
 
       /* Console functions. */

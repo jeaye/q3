@@ -13,6 +13,7 @@
 use std::cast;
 use gl2 = opengles::gl2;
 use gl;
+use math;
 use super::{ Model, Mesh_Renderer };
 
 #[path = "../../../gl/check.rs"]
@@ -64,10 +65,14 @@ impl<'self> Model_Renderer<'self>
   {
     check!(gl2::front_face(gl2::CW));
 
+    let world = math::Mat4x4::new_rotation_x(-90.0);
+    let world = world * math::Mat4x4::new_rotation_z(180.0);
+    let world = world * math::Mat4x4::new_scale(0.1, 0.1, 0.1);
+
     let camera = gl::Camera::get_active();
     self.shader.bind();
     self.shader.update_uniform_mat(self.proj_loc, &camera.projection);
-    self.shader.update_uniform_mat(self.world_loc, &camera.view);
+    self.shader.update_uniform_mat(self.world_loc, &(world * camera.view));
 
     for x in self.mesh_renderers.iter()
     { x.render(); }

@@ -12,6 +12,8 @@ Q³ is not a game yet! It's still a side project that I'm working on in my spare
 * Multithreaded OpenGL rendering
 * Half-baked BSP renderer (Quake 3 and Quake Live)
   * Quake Live map rendering is... buggy
+* Skeletal animation
+  * Using Quake/Doom's MD5 format
 * TTF renderer
 * Arbitrary mesh voxelizer (for BSP maps)
   * Using Separating Axis Theorem and instance rendering (it's not that fast)
