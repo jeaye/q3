@@ -342,3 +342,14 @@ impl State for Map_Renderer
   }
 }
 
+#[unsafe_destructor]
+impl Drop for Map_Renderer
+{
+  fn drop(&self)
+  {
+    check!(gl2::delete_vertex_arrays(&[self.vao]));
+    check!(gl2::delete_buffers(&[self.vox_vbo, self.offset_tex_vbo,
+                                 self.ibos[0], self.ibos[1]]));
+  }
+}
+

@@ -101,7 +101,7 @@ impl<'self> Mesh_Renderer<'self>
   {
     match self.texture
     {
-      Some(tex) => { tex.bind(gl2::TEXTURE_2D); },
+      Some(ref tex) => { tex.bind(gl2::TEXTURE_2D); },
       None => { }
     }
 
@@ -123,6 +123,16 @@ impl<'self> Mesh_Renderer<'self>
     check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, 0));
     check!(gl2::bind_buffer(gl2::ELEMENT_ARRAY_BUFFER, 0));
     check!(gl2::bind_vertex_array(0));
+  }
+}
+
+#[unsafe_destructor]
+impl<'self> Drop for Mesh_Renderer<'self>
+{
+  fn drop(&self)
+  {
+    check!(gl2::delete_vertex_arrays(&[self.vao]));
+    check!(gl2::delete_buffers(&[self.position_vbo, self.tex_vbo, self.ibo]));
   }
 }
 

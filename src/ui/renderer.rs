@@ -211,3 +211,13 @@ impl Renderer
   }
 }
 
+#[unsafe_destructor]
+impl Drop for Renderer
+{
+  fn drop(&self)
+  {
+    check!(gl2::delete_vertex_arrays(&[self.vao]));
+    check!(gl2::delete_buffers(&[self.vbo]));
+  }
+}
+

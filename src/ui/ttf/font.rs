@@ -176,6 +176,8 @@ impl Drop for Font
   {
     unsafe
     { ft::FT_Done_FreeType(self.library); }
+
+    check!(gl2::delete_textures(&[self.texture_atlas]));
   }
 }
 

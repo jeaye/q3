@@ -34,6 +34,9 @@ use std::libc;
 pub use Shader_Builder = self::Release_Shader;
 
 #[macro_escape]
+mod check;
+
+#[macro_escape]
 #[path = "../util/log_macros.rs"]
 mod log_macros;
 
@@ -167,6 +170,17 @@ impl Shader for Debug_Shader
   fn update_uniform_mat(&self, location: gl2::GLint, mat: &math::Mat4x4)
   { if self.valid { shared::update_uniform_mat(location, mat); } }
 }
+
+#[cfg(debug_shader)]
+impl Drop for Debug_Shader
+{
+  fn drop(&self)
+  {
+    check!(gl2::delete_shader(self.vert_obj));
+    check!(gl2::delete_shader(self.frag_obj));
+    check!(gl2::delete_program(self.prog));
+  }
+}
  
 #[cfg(release_shader)]
 struct Release_Shader
@@ -221,6 +235,17 @@ impl Shader for Release_Shader
 
   fn update_uniform_mat(&self, location: gl2::GLint, mat: &math::Mat4x4)
   { shared::update_uniform_mat(location, mat) }
+}
+
+#[cfg(release_shader)]
+impl Drop for Release_Shader
+{
+  fn drop(&self)
+  {
+    check!(gl2::delete_shader(self.vert_obj));
+    check!(gl2::delete_shader(self.frag_obj));
+    check!(gl2::delete_program(self.prog));
+  }
 }
 
 mod shared

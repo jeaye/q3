@@ -99,5 +99,13 @@ impl Texture
   pub fn unbind(&self)
   { check!(gl2::bind_texture(gl2::TEXTURE_2D, 0)); }
 }
- 
+
+#[unsafe_destructor]
+impl Drop for Texture
+{
+  fn drop(&self)
+  {
+    check!(gl2::delete_textures(&[self.obj]));
+  }
+}
 

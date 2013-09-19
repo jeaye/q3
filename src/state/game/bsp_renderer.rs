@@ -158,3 +158,13 @@ impl State for BSP_Renderer
   { (self.game_renderer.camera as @mut ui::Input_Listener).mouse_moved(x, y) }
 }
 
+#[unsafe_destructor]
+impl Drop for BSP_Renderer
+{
+  fn drop(&self)
+  {
+    check!(gl2::delete_vertex_arrays(&[self.vao]));
+    check!(gl2::delete_buffers(&[self.vbo]));
+  }
+}
+
