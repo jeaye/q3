@@ -16,7 +16,7 @@ Q³ is not a game yet! It's still a side project that I'm working on in my spare
   * Using Quake/Doom's MD5 format
 * TTF renderer
 * Arbitrary mesh voxelizer (for BSP maps)
-  * Using Separating Axis Theorem and instance rendering (it's not that fast)
+  * Using Separating Axis Theorem and instance rendering
 * Basic UI with drop-down console that provides in-game tweaking/debugging
   * See [Console](https://github.com/Jeaye/q3/wiki/Console)
 * Tested on Linux and Mac OS X
