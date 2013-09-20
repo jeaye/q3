@@ -9,7 +9,7 @@
       A TTF font renderer.
 */
 
-use std::{ u32, vec, sys };
+use std::{ vec, sys };
 use gl;
 use super::Font;
 use math;
@@ -145,7 +145,7 @@ impl Renderer
           expecting_color = false;
 
           /* Convert char to int. */
-          let num = color_str.from_str();
+          let num = FromStr::from_str(color_str);
           match num
           {
             Some(val) => { color = self.get_color(val); },

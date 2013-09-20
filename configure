@@ -70,11 +70,15 @@ cd build
 
       # Linux
       rm $BWD/../*.so
-      cp build/glfw/*.so $BWD/../
+      for file in `find build -name '*.so'`; do
+        cp -v $file $BWD/../
+      done
 
       # Mac
       rm $BWD/../*.dylib
-      cp build/glfw/*.dylib $BWD/../
+      for file in `find build -name '*.dylib'`; do
+        cp -v $file $BWD/../
+      done
     popd
   popd
 
