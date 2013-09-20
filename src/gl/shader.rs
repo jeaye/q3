@@ -174,7 +174,7 @@ impl Shader for Debug_Shader
 #[cfg(debug_shader)]
 impl Drop for Debug_Shader
 {
-  fn drop(&self)
+  fn drop(&mut self)
   {
     check!(gl2::delete_shader(self.vert_obj));
     check!(gl2::delete_shader(self.frag_obj));
@@ -240,7 +240,7 @@ impl Shader for Release_Shader
 #[cfg(release_shader)]
 impl Drop for Release_Shader
 {
-  fn drop(&self)
+  fn drop(&mut self)
   {
     check!(gl2::delete_shader(self.vert_obj));
     check!(gl2::delete_shader(self.frag_obj));

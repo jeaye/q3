@@ -172,7 +172,7 @@ impl Font
 impl Drop for Font
 {
   #[fixed_stack_segment]
-  fn drop(&self)
+  fn drop(&mut self)
   {
     unsafe
     { ft::FT_Done_FreeType(self.library); }

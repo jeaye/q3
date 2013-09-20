@@ -129,7 +129,7 @@ impl<'self> Mesh_Renderer<'self>
 #[unsafe_destructor]
 impl<'self> Drop for Mesh_Renderer<'self>
 {
-  fn drop(&self)
+  fn drop(&mut self)
   {
     check!(gl2::delete_vertex_arrays(&[self.vao]));
     check!(gl2::delete_buffers(&[self.position_vbo, self.tex_vbo, self.ibo]));

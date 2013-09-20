@@ -159,7 +159,7 @@ impl State for BSP_Renderer
 #[unsafe_destructor]
 impl Drop for BSP_Renderer
 {
-  fn drop(&self)
+  fn drop(&mut self)
   {
     check!(gl2::delete_vertex_arrays(&[self.vao]));
     check!(gl2::delete_buffers(&[self.vbo]));

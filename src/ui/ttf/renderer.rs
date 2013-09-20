@@ -145,7 +145,7 @@ impl Renderer
           expecting_color = false;
 
           /* Convert char to int. */
-          let num = u32::from_str(color_str);
+          let num = color_str.from_str();
           match num
           {
             Some(val) => { color = self.get_color(val); },
@@ -236,7 +236,7 @@ impl Renderer
 #[unsafe_destructor]
 impl Drop for Renderer
 {
-  fn drop(&self)
+  fn drop(&mut self)
   {
     check!(gl2::delete_vertex_arrays(&[self.vao]));
     check!(gl2::delete_buffers(&[self.vbo]));

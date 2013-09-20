@@ -103,7 +103,7 @@ impl Texture
 #[unsafe_destructor]
 impl Drop for Texture
 {
-  fn drop(&self)
+  fn drop(&mut self)
   {
     check!(gl2::delete_textures(&[self.obj]));
   }
