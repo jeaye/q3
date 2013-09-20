@@ -23,6 +23,19 @@ mod check;
 #[path = "../../util/log_macros.rs"]
 mod log_macros;
 
+#[packed]
+struct Point
+{
+  x: f32, y: f32,
+  u: f32, v: f32,
+  r: f32, g: f32, b: f32,
+}
+impl Point
+{
+  pub fn new(nx: f32, ny: f32, nu: f32, nv: f32, nr: f32, ng: f32, nb: f32) -> Point
+  { Point { x: nx, y: ny, u: nu, v: nv, r: nr, g: ng, b: nb } }
+}
+
 struct Renderer
 {
   vao: gl2::GLuint,
@@ -59,7 +72,12 @@ impl Renderer
 
     let data: ~[u8] = ~[];
     check!(gl2::buffer_data(gl2::ARRAY_BUFFER, data, gl2::STREAM_DRAW));
+
+    /* Setup vertex attribs. */
     check!(gl2::enable_vertex_attrib_array(0));
+    check!(gl2::vertex_attrib_pointer_f32(0, 4, false, sys::size_of::<Point>() as i32, 0));
+    check!(gl2::enable_vertex_attrib_array(1));
+    check!(gl2::vertex_attrib_pointer_f32(1, 3, false, sys::size_of::<Point>() as i32, (sys::size_of::<f32>() * 4) as u32));
 
     renderer
   }
@@ -92,24 +110,7 @@ impl Renderer
     check!(gl2::bind_texture(gl2::TEXTURE_2D, font.texture_atlas));
 
     check!(gl2::bind_vertex_array(self.vao));
-    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.vbo));
-    check!(gl2::enable_vertex_attrib_array(0));
-    check!(gl2::vertex_attrib_pointer_f32(0, 4, false, sys::size_of::<Point>() as i32, 0));
-    check!(gl2::enable_vertex_attrib_array(1));
-    check!(gl2::vertex_attrib_pointer_f32(1, 3, false, sys::size_of::<Point>() as i32, (sys::size_of::<f32>() * 4) as u32));
 
-    #[packed]
-    struct Point
-    {
-      x: f32, y: f32,
-      u: f32, v: f32,
-      r: f32, g: f32, b: f32,
-    }
-    impl Point
-    {
-      pub fn new(nx: f32, ny: f32, nu: f32, nv: f32, nr: f32, ng: f32, nb: f32) -> Point
-      { Point { x: nx, y: ny, u: nu, v: nv, r: nr, g: ng, b: nb } }
-    }
     let mut color = math::Vec3f::new(1.0, 1.0, 1.0);
     let mut color_str = ~"";
     let mut expecting_color = false;
@@ -180,12 +181,12 @@ impl Renderer
         count += 6;
       }
 
+      check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.vbo));
       check!(gl2::buffer_data(gl2::ARRAY_BUFFER, coords, gl2::STREAM_DRAW)); 
       check!(gl2::draw_arrays(gl2::TRIANGLES, 0, count));
+      check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, 0));
     }
 
-    check!(gl2::disable_vertex_attrib_array(0));
-    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, 0));
     check!(gl2::bind_vertex_array(0));
   }
 

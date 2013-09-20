@@ -117,7 +117,6 @@ impl Map_Renderer
     mr.ibos[0] = names[2];
     mr.ibos[1] = names[3];
 
-    check!(gl2::bind_vertex_array(mr.vao));
     check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, mr.vox_vbo));
     check!(gl2::buffer_data(gl2::ARRAY_BUFFER, voxel, gl2::STATIC_DRAW));
 
@@ -131,6 +130,24 @@ impl Map_Renderer
     check!(gl2::bind_buffer(gl2::TEXTURE_BUFFER, mr.offset_tex_vbo));
     check!(gl2::buffer_data(gl2::TEXTURE_BUFFER, mr.map.voxels, gl2::STATIC_DRAW));
 
+    /* Setup vertex attribs. */
+    check!(gl2::bind_vertex_array(mr.vao));
+
+    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, mr.vox_vbo));
+    check!(gl2::vertex_attrib_pointer_f32(0, 3, false, 0, 0));
+    check!(gl2::enable_vertex_attrib_array(0));
+
+    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, mr.ibos[0]));
+    check!(gl2::vertex_attrib_i_pointer_i32(1, 1, 0, 0));
+    check!(gl2::enable_vertex_attrib_array(1));
+    check!(gl2::vertex_attrib_divisor(1, 1));
+
+    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, mr.ibos[1]));
+    check!(gl2::vertex_attrib_i_pointer_i32(1, 1, 0, 0));
+    check!(gl2::enable_vertex_attrib_array(1));
+    check!(gl2::vertex_attrib_divisor(1, 1));
+
+    /* Generate buffer texture. */
     let name = check!(gl2::gen_textures(1));
     log_assert!(name.len() == 1);
     mr.offset_tex = name[0];
@@ -311,10 +328,6 @@ impl State for Map_Renderer
 
     check!(gl2::bind_vertex_array(self.vao));
 
-    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.vox_vbo));
-    check!(gl2::vertex_attrib_pointer_f32(0, 3, false, 0, 0));
-    check!(gl2::enable_vertex_attrib_array(0));
-
     if self.curr_ibo == 0
     { check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.ibos[1])); }
     else
@@ -333,8 +346,6 @@ impl State for Map_Renderer
     if self.wireframe
     { check!(gl2::polygon_mode(gl2::FRONT_AND_BACK, gl2::FILL)); }
 
-    check!(gl2::disable_vertex_attrib_array(0));
-    check!(gl2::disable_vertex_attrib_array(1));
     check!(gl2::bind_vertex_array(0));
     check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, 0));
     

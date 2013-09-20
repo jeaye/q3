@@ -98,6 +98,10 @@ impl Renderer
     renderer.vbo = name[0];
     check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, renderer.vbo));
 
+    /* Setup vertex attribs. */
+    check!(gl2::enable_vertex_attrib_array(0));
+    check!(gl2::vertex_attrib_pointer_f32(0, 4, false, 0, 0));
+
     struct Point
     {
       x: f32, y: f32,
@@ -197,16 +201,10 @@ impl Renderer
     tex.bind(0);
 
     check!(gl2::bind_vertex_array(self.vao));
-    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.vbo));
-    check!(gl2::enable_vertex_attrib_array(0));
-    check!(gl2::vertex_attrib_pointer_f32(0, 4, false, 0, 0));
-
     check!(gl2::draw_arrays(gl2::TRIANGLE_FAN, 0, 4));
 
     tex.unbind();
 
-    check!(gl2::disable_vertex_attrib_array(0));
-    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, 0));
     check!(gl2::bind_vertex_array(0));
   }
 }

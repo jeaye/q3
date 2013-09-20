@@ -76,11 +76,8 @@ impl BSP_Renderer
     check!(gl2::bind_vertex_array(self.vao));
     check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.vbo));
     check!(gl2::buffer_data(gl2::ARRAY_BUFFER, self.game_renderer.game.bsp_map.verts, gl2::STATIC_DRAW));
-  }
 
-  fn render_mesh(&self)
-  {
-    check!(gl2::bind_vertex_array(self.vao));
+    /* Setup vertex attribs. */
     check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.vbo));
     check!(gl2::enable_vertex_attrib_array(0));
     check!(gl2::enable_vertex_attrib_array(1));
@@ -92,12 +89,13 @@ impl BSP_Renderer
                 sys::size_of::<bsp::lump::Vertex>() as i32, 
                 sys::size_of::<bsp::lump::Vertex>() as u32 -
                 sys::size_of::<math::Vec4u8>() as u32));
-    check!(gl2::draw_arrays(gl2::TRIANGLES, 0, self.game_renderer.game.bsp_map.verts.len() as i32));
+  }
 
-    check!(gl2::disable_vertex_attrib_array(0));
-    check!(gl2::disable_vertex_attrib_array(1));
+  fn render_mesh(&self)
+  {
+    check!(gl2::bind_vertex_array(self.vao));
+    check!(gl2::draw_arrays(gl2::TRIANGLES, 0, self.game_renderer.game.bsp_map.verts.len() as i32));
     check!(gl2::bind_vertex_array(0));
-    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, 0));
   }
 }
 
