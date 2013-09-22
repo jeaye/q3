@@ -11,6 +11,7 @@
 */
 
 use std::{ vec, cmp };
+use extra;
 use math;
 use primitive::Triangle;
 use super::{ Vertex, Visible };
@@ -109,7 +110,10 @@ impl Map
       }
     }
 
-    //let mut voxels = extra::treemap::TreeSet::new(); /* TODO: Bring back in; maintain indices. */
+    /* Voxels are temporarily stored in a set, which will prevent the
+     * voxelization algorithm from adding any duplicated. We trade a bit
+     * of CPU to save some memory here. */
+    let mut voxels = extra::treemap::TreeSet::new();
     for tri in tris.iter()
     {
       /* Calculate bounding box of the triangle. */
@@ -172,8 +176,7 @@ impl Map
               { av_color };
 
               /* We have intersection; add a reference to this voxel to the index map. */
-              let new_val = true;
-              self.voxels.push(
+              voxels.insert(
               Vertex
               {
                 position: math::Vec3f::new( x as f32 - (self.resolution / 2) as f32, 
@@ -181,22 +184,40 @@ impl Map
                                             z as f32 - (self.resolution / 2) as f32), 
                 color: col
               });
-              if new_val
-              {
-                /* Update the state of the voxel. */
-                let index = (z * ((self.resolution * self.resolution) as i32)) + (y * (self.resolution as i32)) + x;
-                self.states.get_mut_ref()[index] = self.voxels.len() as u32 - 1u32;
-                self.states.get_mut_ref()[index] |= Visible;
-              }
             }
           }
         }
       }
     }
 
-    /* Move to array form. */
-    //for x in voxels.iter()
-    //{ self.voxels.push(*x); }
+    /* Now that all of the voxels have been put in the set, we
+     * can pull them out and store them in a contiguous structure.
+     * Otherwise, giving the voxels to OpenGL would be difficult. */
+    for vox in voxels.iter()
+    {
+      /* Determine the voxel-space position. */
+      let x = (vox.position.x + (self.resolution / 2) as f32) as i32;
+      let y = (vox.position.y + (self.resolution / 2) as f32) as i32;
+      let z = (vox.position.z + (self.resolution / 2) as f32) as i32;
+      log_assert!(x >= 0 && y >= 0 && z >= 0);
+      log_assert!(x < self.resolution as i32 &&
+                  y < self.resolution as i32 &&
+                  z < self.resolution as i32);
+
+      log_assert!(self.states.is_some());
+      let states = self.states.get_mut_ref();
+
+      /* Calculate the index of this voxel in the state grid. */
+      let index = (z * ((self.resolution * self.resolution) as i32)) + (y * (self.resolution as i32)) + x;
+      log_assert!(index < states.len() as i32);
+
+      /* Update the state grid with this voxel's data. */
+      states[index] = self.voxels.len() as u32;
+      states[index] |= Visible;
+
+      /* Move this voxel into contiguous memory. */
+      self.voxels.push(*vox);
+    }
 
     log_debug!("Enabled %u of %u voxels", self.voxels.len(), self.states.get_mut_ref().len());
 
