@@ -38,8 +38,7 @@ make release && ./bin/q3
 ```
 **NOTE:** Ensure that you have Freetype2 installed.  
 **NOTE:** I don't have access to a Windows machine at the moment, so I'm not sure yet what will go into building 
-this under something like MinGW. If you're interested in looking into it, please feel free to send me a pull
-request!
+this under something like MinGW. This should be coming with r0.3, as per #26.
 
 
 ### Who're you?
