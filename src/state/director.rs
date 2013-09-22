@@ -70,6 +70,17 @@ impl Director
     local_data::set(tls_key, director);
   }
 
+  /* Destroys the director. */
+  pub fn destroy()
+  {
+    let mut director = local_data::pop(tls_key);
+    log_assert!(director.is_some());
+    let director = director.get_mut_ref();
+
+    while director.states.len() > 0
+    { director.states.pop().unload(); }
+  }
+
   /* Accesses the singleton director from task-local storage. */
   pub fn get_mut<T>(handler: &fn(&mut Director) -> T) -> T
   {
@@ -185,13 +196,6 @@ impl Director
       }
       None => { log_debug!("Invalid state to swap '%s'", key); }
     }
-  }
-
-  /* Unloads all states from the top down. */
-  pub fn clear(&mut self)
-  {
-    while self.states.len() > 0
-    { self.states.pop().unload(); }
   }
 
   /** Updating and rendering. **/

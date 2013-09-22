@@ -190,6 +190,9 @@ fn main(argc: int, argv: **u8, crate_map: *u8) -> int
       { true } 
       gl_worker_port.recv(); /* Wait for the worker to finish. */
     }
+
+    /* Cleanup TLS. */
+    state::Director::destroy();
   }
 }
 
