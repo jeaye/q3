@@ -22,7 +22,7 @@ UNAME=$(shell uname)
 
 # Get git HEAD
 export COMMIT=$(shell cd ${PROJ_DIR} && git rev-parse --short HEAD)
-export VERSION=0.1
+export VERSION=0.2
 
 # Colors
 COLOR_OFF=$(shell tput sgr0)
