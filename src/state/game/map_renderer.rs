@@ -286,6 +286,11 @@ impl State for Map_Renderer
     let (states, visible_voxels) = self.map_stream.recv();
     self.map.states = Some(states);
     self.visible_voxels = Some(visible_voxels);
+
+    /* Cleanup GL. */
+    check!(gl2::delete_vertex_arrays(&[self.vao]));
+    check!(gl2::delete_buffers(&[self.vox_vbo, self.offset_tex_vbo,
+                                 self.ibos[0], self.ibos[1]]));
   }
 
   fn get_key(&self) -> &str
@@ -350,17 +355,6 @@ impl State for Map_Renderer
     check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, 0));
     
     false
-  }
-}
-
-#[unsafe_destructor]
-impl Drop for Map_Renderer
-{
-  fn drop(&mut self)
-  {
-    check!(gl2::delete_vertex_arrays(&[self.vao]));
-    check!(gl2::delete_buffers(&[self.vox_vbo, self.offset_tex_vbo,
-                                 self.ibos[0], self.ibos[1]]));
   }
 }
 

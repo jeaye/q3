@@ -113,7 +113,13 @@ impl State for BSP_Renderer
   }
 
   fn unload(&mut self)
-  { log_debug!("Unloading bsp renderer state."); }
+  {
+    log_debug!("Unloading bsp renderer state.");
+
+    /* Cleanup GL. */
+    check!(gl2::delete_vertex_arrays(&[self.vao]));
+    check!(gl2::delete_buffers(&[self.vbo]));
+  }
 
   fn get_key(&self) -> &str
   { &"bsp_renderer" }
@@ -154,15 +160,5 @@ impl State for BSP_Renderer
   { (self.game_renderer.camera as @mut ui::Input_Listener).key_action(key, action, _mods) }
   fn mouse_moved(&mut self, x: f32, y: f32) -> bool
   { (self.game_renderer.camera as @mut ui::Input_Listener).mouse_moved(x, y) }
-}
-
-#[unsafe_destructor]
-impl Drop for BSP_Renderer
-{
-  fn drop(&mut self)
-  {
-    check!(gl2::delete_vertex_arrays(&[self.vao]));
-    check!(gl2::delete_buffers(&[self.vbo]));
-  }
 }
 

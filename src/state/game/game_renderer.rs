@@ -67,6 +67,7 @@ impl State for Game_Renderer
   fn unload(&mut self)
   {
     log_debug!("Unloading game renderer state");
+
     (self.map_renderer as @mut State).unload();
   }
 
