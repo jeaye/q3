@@ -160,7 +160,6 @@ impl Model
           {
             read_param!();
             joint.name = param.clone();
-            log_debug!("Joint: %s", joint.name);
 
             read_type!(joint.parent);
 

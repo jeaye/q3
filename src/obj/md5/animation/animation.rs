@@ -189,7 +189,6 @@ impl Animation
             read_type!(joint.flags);
             read_type!(joint.start_index);
 
-            log_debug!("Joint: %s", joint.name);
             self.joint_infos.push(joint);
 
             ignore_line!();
@@ -218,7 +217,6 @@ impl Animation
             read_type!(bound.max.y);
             read_type!(bound.max.z);
 
-            log_debug!("Bound %s %s", bound.min.to_str(), bound.max.to_str());
             self.bounds.push(bound);
 
             ignore_line!();
@@ -251,9 +249,6 @@ impl Animation
 
             base_frame.orientation.compute_w();
 
-            log_debug!("Base frame %s %s",
-                        base_frame.position.to_str(),
-                        base_frame.orientation.to_str());
             self.base_frames.push(base_frame);
           }
           read_junk!(); /* } */
@@ -262,7 +257,6 @@ impl Animation
         }
         ~"frame" =>
         {
-          log_debug!("Reading frame");
           let mut frame = Frame_Data::new();
           read_type!(frame.id);
           read_junk!(); /* { */
