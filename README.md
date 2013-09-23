@@ -43,10 +43,8 @@ this under something like MinGW. This should be coming with r0.3, as per #26.
 
 ### Who're you?
 Hi! I'm Jeaye, a C++ software engineer.  
-* **Email:**
-  * jeaye (at) arrownext (dot) com  
-* **LinkedIn:**
-  * http://www.linkedin.com/in/jeaye  
+* **Website:**
+  * http://www.jeaye.com
 * **IRC:**
   * #rust on irc.mozilla.org:6697 
   * #q3 on irc.freenode.net:6667 
