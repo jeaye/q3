@@ -9,8 +9,63 @@
 #    Submodule and configuration manager.
 #
 
-BWD=$PWD/build # BWD is the build directory
-SWD=$(cd $(dirname $0) && pwd) # SWD is the source directory
+# Re-invoke the configure script
+# and keep the output at bay.
+if [ $# -ne 1 -o "$1" != "quiet" ];
+then
+  $0 "quiet" > /dev/null
+  exit $?
+fi
+
+# Exit on errors
+set -o errexit
+# Exit if we try to use an unbound variable
+set -o nounset
+
+# Determine system
+UNAME_LINUX=0
+UNAME_CYGWIN=0
+UNAME_OSX=0
+UNAME=$(uname -o)
+if [ "$UNAME" = "GNU/Linux" ];
+then
+  UNAME_LINUX=1
+elif [ "$UNAME" = "Darwin" ];
+then
+  UNAME_OSX=1
+elif [ "$UNAME" = "Cygwin" ];
+then
+  UNAME_CYGWIN=1
+else
+  echo "Invalid uname ($UNAME): Unsuppported platform"
+fi
+
+# Colors
+COLOR_OFF=$(tput sgr0)
+COLOR_RED=$(tput setaf 1)
+COLOR_YELLOW=$(tput setaf 3)
+COLOR_GREEN=$(tput setaf 2)
+
+# Output colorizing
+ECHO_PREFIX=$COLOR_GREEN»»»$COLOR_OFF
+if [ "$UNAME" = "Linux" ];
+then
+	ECHO="echo -e $ECHO_PREFIX"
+else
+	ECHO="echo $ECHO_PREFIX"
+fi
+
+log() { $ECHO "$@" 1>&2; }
+
+log "Configuring Q³"
+
+# BWD is the build directory
+BWD=$PWD/build 
+log "Build directory: $BWD"
+
+# SWD is the source directory
+SWD=$(cd $(dirname $0) && pwd) 
+log "Source directory: $SWD"
 
 function readlink() {
   DIR=$(echo "${1%/*}")
@@ -19,100 +74,114 @@ function readlink() {
 }
 
 # Update submodules
-  pushd $SWD
-    git submodule update --recursive --init
-  popd
+pushd $SWD
+  git submodule update --recursive --init
+popd
 
-rm -r build
+# Clean up any previous build data
+rm -rf build
 mkdir -p build
 cd build
 
 ## Build GLFW3 (doesn't support out of source builds)
-  mkdir -p glfw_static glfw_shared
+mkdir -p glfw_static glfw_shared
 
-  # Static
-  pushd glfw_static
-    cmake $SWD/lib/glfw/CMakeLists.txt -DBUILD_SHARED_LIBS=OFF
-    pushd $SWD/lib/glfw
-      make clean
-      make glfw
-      cp src/libglfw3.a $BWD/glfw_static
-      ln $BWD/glfw_static/libglfw3.a $BWD/glfw_static/libglfw.a
-    popd
+# Static
+log "Building glfw_static"
+pushd glfw_static
+  cmake $SWD/lib/glfw/CMakeLists.txt -DBUILD_SHARED_LIBS=OFF
+  pushd $SWD/lib/glfw
+    make clean
+    make glfw
+    cp src/libglfw3.a $BWD/glfw_static
+    ln -sf $BWD/glfw_static/libglfw3.a $BWD/glfw_static/libglfw.a
   popd
+popd
 
-  # Dynamic
-  pushd glfw_shared
-    cmake $SWD/lib/glfw/CMakeLists.txt -DBUILD_SHARED_LIBS=ON
-    pushd $SWD/lib/glfw
-      make clean
-      make glfw
+# Dynamic
+log "Building glfw_shared"
+pushd glfw_shared
+  cmake $SWD/lib/glfw/CMakeLists.txt -DBUILD_SHARED_LIBS=ON
+  pushd $SWD/lib/glfw
+    make clean
+    make glfw
 
+    if [ "0" -eq "$UNAME_LINUX" -o "0" -eq "$UNAME_CYGWIN" ];
+    then
       # Linux
       cp src/libglfw.so $BWD/../
-      ln $BWD/../libglfw.so $BWD/../libglfw.so.3
-      ln $BWD/../libglfw.so $BWD/../libglfw.so.3.0
-
+      ln -sf $BWD/../libglfw.so $BWD/../libglfw.so.3
+      ln -sf $BWD/../libglfw.so $BWD/../libglfw.so.3.0
+    elif [ "0" -eq "$UNAME_OSX" ];
+    then
       # Mac
       cp src/libglfw.3.0.dylib $BWD/../
-      ln $BWD/../libglfw.3.0.dylib $BWD/../libglfw.3.dylib
-      ln $BWD/../libglfw.3.0.dylib $BWD/../libglfw.dylib
-    popd
+      ln -sf $BWD/../libglfw.3.0.dylib $BWD/../libglfw.3.dylib
+      ln -sf $BWD/../libglfw.3.0.dylib $BWD/../libglfw.dylib
+    fi
   popd
+popd
 
 ## GLFW3 Rust
-  mkdir -p glfw-rs
-  pushd glfw-rs
-    pushd $SWD/lib/glfw-rs
-      ln -s $BWD/glfw_static/libglfw* ./
-      ln -s $SWD/lib/glfw/src/libglfw* ./
-      rustpkg build glfw
+log "Building glfw-rs"
+mkdir -p glfw-rs
+pushd glfw-rs
+  pushd $SWD/lib/glfw-rs
+    ln -sf $BWD/glfw_static/libglfw* ./
+    ln -sf $SWD/lib/glfw/src/libglfw* ./
+    rustpkg build glfw
 
+    if [ "0" -eq "$UNAME_LINUX" -o "0" -eq "$UNAME_CYGWIN" ];
+    then
       # Linux
-      rm $BWD/../*.so
+      rm -f $BWD/../*.so
       for file in `find build -name '*.so'`; do
-        cp -v $file $BWD/../
+        cp $file $BWD/../
       done
-
+    elif [ "0" -eq "$UNAME_OSX" ];
+    then
       # Mac
-      rm $BWD/../*.dylib
+      rm -f $BWD/../*.dylib
       for file in `find build -name '*.dylib'`; do
-        cp -v $file $BWD/../
+        cp $file $BWD/../
       done
-    popd
+    fi
   popd
+popd
 
 ## OpenGL ES
-  mkdir -p rust-opengles
-  pushd rust-opengles
-    sh $SWD/lib/rust-opengles/configure
-    make clean
-    make -B
-  popd
+log "Building rust-opengles"
+mkdir -p rust-opengles
+pushd rust-opengles
+  sh $SWD/lib/rust-opengles/configure
+  make clean
+  make -B
+popd
 
 ## STB-Image
-  mkdir -p stb-image
-  pushd stb-image
-    sh $SWD/lib/stb-image/configure
-    make clean
-    make -B
-  popd
+log "Building stb-image"
+mkdir -p stb-image
+pushd stb-image
+  sh $SWD/lib/stb-image/configure
+  make clean
+  make -B
+popd
 
 ## Q³
-  cd .. # Back to the original invoking directory
-  
-  # Move over the make file
-  sed "s#%PROJ_DIR%#${SWD}#" $SWD/Makefile.stub > Makefile 
-  
-  readlink $SWD/build
-  swd_link=$link_res
-  readlink $BWD
-  bwd_link=$link_res
-  if [ "$swd_link" != "$bwd_link" ];
-  then
-    # Link the data directory, since this is an out of source build
-    ln -s $SWD/data data
-  fi
+cd .. # Back to the original invoking directory
 
-echo "Done configuring Q³."
+# Move over the make file
+sed "s#%PROJ_DIR%#${SWD}#" $SWD/Makefile.stub > Makefile 
+
+readlink $SWD/build
+swd_link=$link_res
+readlink $BWD
+bwd_link=$link_res
+if [ "$swd_link" != "$bwd_link" ];
+then
+  # Link the data directory, since this is an out of source build
+  ln -sf $SWD/data data
+fi
+
+log "Done configuring Q³."
 

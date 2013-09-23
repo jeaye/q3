@@ -31,7 +31,7 @@ COLOR_YELLOW=$(shell tput setaf 3)
 COLOR_GREEN=$(shell tput setaf 2)
 
 # Output colorizing
-ECHO_PREFIX=${COLOR_RED}»»»${COLOR_OFF}
+ECHO_PREFIX=${COLOR_GREEN}»»»${COLOR_OFF}
 ifeq ($(UNAME), Linux)
 	ECHO=echo -e
 else
