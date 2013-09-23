@@ -26,14 +26,14 @@ set -o nounset
 UNAME_LINUX=0
 UNAME_CYGWIN=0
 UNAME_OSX=0
-UNAME=$(uname -o)
-if [ "$UNAME" = "GNU/Linux" ];
+UNAME=$(uname)
+if [ "$UNAME" = "Linux" ];
 then
   UNAME_LINUX=1
 elif [ "$UNAME" = "Darwin" ];
 then
   UNAME_OSX=1
-elif [ "$UNAME" = "Cygwin" ];
+elif [ "$(uname -o)" = "Cygwin" ];
 then
   UNAME_CYGWIN=1
 else
@@ -48,7 +48,7 @@ COLOR_YELLOW=$(tput setaf 3)
 COLOR_GREEN=$(tput setaf 2)
 
 # Output colorizing
-ECHO_PREFIX=$COLOR_GREEN»»»$COLOR_OFF
+ECHO_PREFIX=$COLOR_GREEN"»»»"$COLOR_OFF
 if [ "$UNAME" = "Linux" ];
 then
 	ECHO="echo -e $ECHO_PREFIX"
@@ -59,6 +59,17 @@ fi
 log() { $ECHO "$@" 1>&2; }
 
 log "Configuring Q³"
+
+if [ "1" -eq "$UNAME_LINUX" ];
+then
+  log "Platform: Linux"
+elif [ "1" -eq "$UNAME_OSX" ];
+then
+  log "Platform: OSX"
+elif [ "1" -eq "$UNAME_CYGWIN" ];
+then
+  log "Platform: Cygwin"
+fi
 
 # BWD is the build directory
 BWD=$PWD/build 
@@ -107,13 +118,13 @@ pushd glfw_shared
     make clean
     make glfw
 
-    if [ "0" -eq "$UNAME_LINUX" -o "0" -eq "$UNAME_CYGWIN" ];
+    if [ "1" -eq "$UNAME_LINUX" -o "1" -eq "$UNAME_CYGWIN" ];
     then
       # Linux
       cp src/libglfw.so $BWD/../
       ln -sf $BWD/../libglfw.so $BWD/../libglfw.so.3
       ln -sf $BWD/../libglfw.so $BWD/../libglfw.so.3.0
-    elif [ "0" -eq "$UNAME_OSX" ];
+    elif [ "1" -eq "$UNAME_OSX" ];
     then
       # Mac
       cp src/libglfw.3.0.dylib $BWD/../
