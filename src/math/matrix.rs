@@ -3,7 +3,7 @@
     See licensing in LICENSE file, or at:
         http://www.opensource.org/licenses/BSD-3-Clause
 
-    File: math/matrix.rs
+    File: super/matrix.rs
     Author: Jesse 'Jeaye' Wilkerson
     Description:
       A 16 component (4x4) matrix of floats
@@ -11,7 +11,6 @@
 */
 
 use std::ptr;
-use math;
 
 type Component = f32;
 
@@ -123,7 +122,7 @@ impl Mat4x4
     mat
   }
 
-  pub fn new_lookat(position: math::Vec3f, target: math::Vec3f, up: math::Vec3f) -> Mat4x4
+  pub fn new_lookat(position: super::Vec3f, target: super::Vec3f, up: super::Vec3f) -> Mat4x4
   {
     let mut forward = target - position;
     forward.normalize();
@@ -148,21 +147,21 @@ impl Mat4x4
   pub fn get_height(&self) -> uint
   { return 4; }
 
-  pub fn get_up(&self) -> math::Vec3f
-  { math::Vec3f::new(self.data[0][1], self.data[1][1], self.data[2][1]) }
-  pub fn get_down(&self) -> math::Vec3f
-  { math::Vec3f::new(-self.data[0][1], -self.data[1][1], -self.data[2][1]) }
-  pub fn get_left(&self) -> math::Vec3f
-  { math::Vec3f::new(-self.data[0][0], -self.data[1][0], -self.data[2][0]) }
-  pub fn get_right(&self) -> math::Vec3f
-  { math::Vec3f::new(self.data[0][0], self.data[1][0], self.data[2][0]) }
-  pub fn get_forward(&self) -> math::Vec3f
-  { math::Vec3f::new(-self.data[0][2], -self.data[1][2], -self.data[2][2]) }
-  pub fn get_backward(&self) -> math::Vec3f
-  { math::Vec3f::new(self.data[0][2], self.data[1][2], self.data[2][2]) }
+  pub fn get_up(&self) -> super::Vec3f
+  { super::Vec3f::new(self.data[0][1], self.data[1][1], self.data[2][1]) }
+  pub fn get_down(&self) -> super::Vec3f
+  { super::Vec3f::new(-self.data[0][1], -self.data[1][1], -self.data[2][1]) }
+  pub fn get_left(&self) -> super::Vec3f
+  { super::Vec3f::new(-self.data[0][0], -self.data[1][0], -self.data[2][0]) }
+  pub fn get_right(&self) -> super::Vec3f
+  { super::Vec3f::new(self.data[0][0], self.data[1][0], self.data[2][0]) }
+  pub fn get_forward(&self) -> super::Vec3f
+  { super::Vec3f::new(-self.data[0][2], -self.data[1][2], -self.data[2][2]) }
+  pub fn get_backward(&self) -> super::Vec3f
+  { super::Vec3f::new(self.data[0][2], self.data[1][2], self.data[2][2]) }
 
-  pub fn get_position(&self) -> math::Vec3f
-  { math::Vec3f::new(self.data[3][0], self.data[3][1], self.data[3][2]) }
+  pub fn get_position(&self) -> super::Vec3f
+  { super::Vec3f::new(self.data[3][0], self.data[3][1], self.data[3][2]) }
 
   pub fn identity(&mut self)
   {

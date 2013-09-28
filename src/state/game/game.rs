@@ -15,14 +15,14 @@
 */
 
 use extra;
-use BSP_Map = bsp::Map;
-use Voxel_Map = voxel::Map;
+use BSP_Map = obj::bsp::Map;
+use Voxel_Map = obj::voxel::Map;
 use super::State;
-use util::Log;
+use log::Log;
 
 #[macro_escape]
-#[path = "../../util/log_macros.rs"]
-mod log_macros;
+#[path = "../../log/macros.rs"]
+mod macros;
 
 pub struct Game
 {

@@ -15,11 +15,11 @@ use extra;
 use math;
 use primitive::Triangle;
 use super::{ Vertex, Visible };
-use util::Log;
+use log::Log;
 
 #[macro_escape]
-#[path = "../../util/log_macros.rs"]
-mod log_macros;
+#[path = "../../log/macros.rs"]
+mod macros;
 
 struct Map
 {

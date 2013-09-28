@@ -86,6 +86,7 @@ function readlink() {
 }
 
 # Update submodules
+log "Updating submodules"
 pushd $SWD
   git submodule update --recursive --init
 popd
@@ -141,6 +142,7 @@ pushd glfw-rs
   pushd $SWD/lib/glfw-rs
     ln -sf $BWD/glfw_static/libglfw* ./
     ln -sf $SWD/lib/glfw/src/libglfw* ./
+    touch src/glfw/lib.rs
     rustpkg build glfw
 
     if [ "0" -eq "$UNAME_LINUX" -o "0" -eq "$UNAME_CYGWIN" ];
@@ -194,6 +196,9 @@ then
   # Link the data directory, since this is an out of source build
   ln -sf $SWD/data data
 fi
+
+# Require a clean build
+find . -maxdepth 1 -type f -name '.build_*' | grep -v git | xargs rm -f || true
 
 log "Done configuring Q³."
 

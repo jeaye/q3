@@ -3,7 +3,7 @@
     See licensing in LICENSE file, or at:
         http://www.opensource.org/licenses/BSD-3-Clause
 
-    File: util/log_macros.rs
+    File: log/macros.rs
     Author: Jesse 'Jeaye' Wilkerson
     Description:
       Usage of logging utilities is generally

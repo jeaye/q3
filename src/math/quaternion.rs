@@ -11,7 +11,6 @@
 */
 
 use std::{ f32, cmp };
-use math;
 
 type Component = f32;
 
@@ -29,16 +28,16 @@ impl Quaternion
   pub fn new(x: Component, y: Component, z: Component, w: Component) -> Quaternion
   { Quaternion { x: x, y: y, z: z, w: w } }
 
-  pub fn new_from_vec(vec: &math::Vec3f) -> Quaternion
+  pub fn new_from_vec(vec: &super::Vec3f) -> Quaternion
   { Quaternion { x: vec.x, y: vec.y, z: vec.z, w: 0.0 } }
 
   pub fn zero() -> Quaternion
   { Quaternion { x: 0.0, y: 0.0, z: 0.0, w: 0.0 } }
 
-  pub fn new_from_axis(axis: &math::Vec3f, angle: f32) -> Quaternion
+  pub fn new_from_axis(axis: &super::Vec3f, angle: f32) -> Quaternion
   {
     let sin_angle = angle.sin();
-    let norm_axis = math::Vec3f::new_normalized(axis);
+    let norm_axis = super::Vec3f::new_normalized(axis);
 
     Quaternion {  x: (norm_axis.x * sin_angle),
                   y: (norm_axis.y * sin_angle),
@@ -156,17 +155,17 @@ impl Quaternion
     { self.w = -t.sqrt(); }
   }
 
-  pub fn rotate_vec(&self, vec: &math::Vec3f) -> math::Vec3f
+  pub fn rotate_vec(&self, vec: &super::Vec3f) -> super::Vec3f
   {
     let mut inv = Quaternion::new(-self.x, -self.y, -self.z, self.w);
     inv.normalize();
 
     let tmp = self.mul_vec(vec);
     let final = tmp * inv;
-    math::Vec3f::new(final.x, final.y, final.z)
+    super::Vec3f::new(final.x, final.y, final.z)
   }
 
-  pub fn mul_vec(&self, vec: &math::Vec3f) -> Quaternion
+  pub fn mul_vec(&self, vec: &super::Vec3f) -> Quaternion
   {
     Quaternion::new
     (
@@ -194,10 +193,10 @@ impl Quaternion
           self.w as float)
   }
 
-  pub fn to_vec(&self) -> math::Vec3f
-  { math::Vec3f::new(self.x, self.y, self.z) }
+  pub fn to_vec(&self) -> super::Vec3f
+  { super::Vec3f::new(self.x, self.y, self.z) }
 
-  pub fn to_mat(&self) -> math::Mat4x4
+  pub fn to_mat(&self) -> super::Mat4x4
   {
     let x2 = self.x * self.x;
     let y2 = self.y * self.y;
@@ -210,7 +209,7 @@ impl Quaternion
     let wz = self.w * self.z;
 
     /* Magic. */
-    math::Mat4x4
+    super::Mat4x4
     {
       data:
       [

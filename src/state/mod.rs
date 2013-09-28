@@ -9,26 +9,39 @@
       An aggregator of state items.
 */
 
-/* Director */
+#[link(name = "state", vers = "0.2")];
+#[crate_type = "lib"];
+
+extern mod extra;
+extern mod opengles;
+extern mod glfw;
+
+extern mod log;
+extern mod console;
+extern mod math;
+extern mod gl;
+extern mod ui;
+extern mod obj;
+
 pub use self::director::Director;
 pub use self::director::State;
-
 pub use self::game::Game;
 pub use self::game_renderer::Game_Renderer;
+pub use self::map_renderer::Map_Renderer;
 pub use self::bsp_renderer::BSP_Renderer;
-pub use self::console::Console;
 pub use self::console_renderer::Console_Renderer;
 
-mod director;
-
+pub mod director;
 #[path = "game/game.rs"]
-mod game;
+pub mod game;
 #[path = "game/game_renderer.rs"]
-mod game_renderer;
+pub mod game_renderer;
+#[path = "game/map_renderer.rs"]
+pub mod map_renderer;
 #[path = "game/bsp_renderer.rs"]
-mod bsp_renderer;
-#[path = "console/console.rs"]
-mod console;
+pub mod bsp_renderer;
 #[path = "console/console_renderer.rs"]
-mod console_renderer;
+pub mod console_renderer;
+#[path = "camera/camera.rs"]
+pub mod camera;
 

@@ -13,20 +13,21 @@
 
 use std::{ vec, ptr, sys, cast, cell };
 use extra;
-use state::State;
 use gl2 = opengles::gl2;
 use gl;
 use math;
-use voxel;
-use state;
-use util::Log;
+use obj::voxel;
+use log::Log;
+use console;
+use super::{ State, Director };
 
+#[macro_escape]
 #[path = "../../gl/check.rs"]
 mod check;
 
 #[macro_escape]
-#[path = "../../util/log_macros.rs"]
-mod log_macros;
+#[path = "../../log/macros.rs"]
+mod macros;
 
 pub struct Map_Renderer
 {
@@ -155,11 +156,11 @@ impl Map_Renderer
     check!(gl2::tex_buffer(gl2::TEXTURE_BUFFER, 0x8815 /* RGB32F */, mr.offset_tex_vbo));
 
     /* Console functions. */
-    do state::Director::push_deferred ||
+    do Director::push_deferred ||
     {
-      state::Console::get().registry.accessors.insert(~"map.wireframe", |_|
+      console::Console::get().registry.accessors.insert(~"map.wireframe", |_|
       { mr.wireframe.to_str() });
-      state::Console::get().add_mutator("map.wireframe", |p, x|
+      console::Console::get().add_mutator("map.wireframe", |p, x|
       {
         let mut error = ~"";
         if x == "true"

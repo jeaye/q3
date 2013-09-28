@@ -13,15 +13,16 @@ use std::sys;
 use gl2 = opengles::gl2;
 use gl;
 use math;
-use super::{ Mesh };
-use util::Log;
+use super::Mesh;
+use log::Log;
 
+#[macro_escape]
 #[path = "../../../gl/check.rs"]
 mod check;
 
 #[macro_escape]
-#[path = "../../../util/log_macros.rs"]
-mod log_macros;
+#[path = "../../../log/macros.rs"]
+mod macros;
 
 struct Mesh_Renderer<'self>
 {

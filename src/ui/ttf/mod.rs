@@ -12,6 +12,6 @@
 pub use self::font::Font;
 pub use self::renderer::Renderer;
 
-mod font;
-mod renderer;
+pub mod font;
+pub mod renderer;
 

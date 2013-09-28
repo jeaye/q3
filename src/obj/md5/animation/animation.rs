@@ -11,11 +11,11 @@
 
 use std::{ io, path };
 use super::{ Joint_Info, Bound, Base_Frame, Frame_Data, Frame_Skeleton, Skeleton_Joint };
-use util::Log;
+use log::Log;
 
 #[macro_escape]
-#[path = "../../../util/log_macros.rs"]
-mod log_macros;
+#[path = "../../../log/macros.rs"]
+mod macros;
 
 struct Animation
 {

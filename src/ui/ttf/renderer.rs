@@ -11,17 +11,18 @@
 
 use std::{ vec, sys };
 use gl;
+use gl2 = opengles::gl2;
 use super::Font;
 use math;
-use gl2 = opengles::gl2;
-use util::Log;
+use log::Log;
 
+#[macro_escape]
 #[path = "../../gl/check.rs"]
 mod check;
 
 #[macro_escape]
-#[path = "../../util/log_macros.rs"]
-mod log_macros;
+#[path = "../../log/macros.rs"]
+mod macros;
 
 #[packed]
 struct Point

@@ -6,35 +6,29 @@
     File: gl/camera.rs
     Author: Jesse 'Jeaye' Wilkerson
     Description:
-      The game's camera that handles movement,
+      The game's camera that handles 
       projection, viewport sizing, etc.
+      Movement and input-related business
+      is handled in the camera state instead.
 */
 
-use std::local_data;
+use std::{ f32, local_data };
 use glfw;
 use gl2 = opengles::gl2;
-use std::f32;
 use math;
-use ui;
-use state;
-use util::Log;
+use console;
+use log::Log;
 
 #[macro_escape]
 mod check;
 
 #[macro_escape]
-#[path = "../util/log_macros.rs"]
-mod log_macros;
-
-static MOVE_LEFT: u8 = 1;
-static MOVE_RIGHT: u8 = 2;
-static MOVE_FORWARD: u8 = 4;
-static MOVE_BACKWARD: u8 = 8;
-static MOVE_UP: u8 = 16;
-static MOVE_DOWN: u8 = 32;
+#[path = "../log/macros.rs"]
+mod macros;
 
 static tls_key: local_data::Key<@mut Camera> = &local_data::Key;
 
+/* TODO: This should just be a trait. */
 struct Camera
 {
   position: math::Vec3f,
@@ -65,6 +59,7 @@ struct Camera
   show_fps: bool,
   vsync: bool,
 }
+
 impl Camera
 {
   pub fn new(win: @glfw::Window) -> @mut Camera
@@ -91,9 +86,9 @@ impl Camera
       vsync: true,
     };
 
-    state::Console::get().add_accessor("camera.fov", |_|
+    console::Console::get().add_accessor("camera.fov", |_|
     { c.fov.to_str() });
-    state::Console::get().add_mutator("camera.fov", |p, fov|
+    console::Console::get().add_mutator("camera.fov", |p, fov|
     {
       let mut error = ~"";
 
@@ -111,9 +106,9 @@ impl Camera
       else
       { Some(error) }
     });
-    state::Console::get().add_accessor("ui.show_fps", |_|
+    console::Console::get().add_accessor("ui.show_fps", |_|
     { c.show_fps.to_str() });
-    state::Console::get().add_mutator("ui.show_fps", |p, x|
+    console::Console::get().add_mutator("ui.show_fps", |p, x|
     {
       let mut error = ~"";
       if x == "true"
@@ -128,9 +123,9 @@ impl Camera
       else
       { Some(error) }
     });
-    state::Console::get().add_accessor("camera.vsync", |_|
+    console::Console::get().add_accessor("camera.vsync", |_|
     { c.vsync.to_str() });
-    state::Console::get().add_mutator("camera.vsync", |p, x|
+    console::Console::get().add_mutator("camera.vsync", |p, x|
     {
       let mut error = ~"";
       if x == "true"
@@ -153,7 +148,7 @@ impl Camera
     });
 
     /* Set some defaults. */
-    state::Console::run_function(~"set camera.vsync true");
+    console::Console::run_function(~"set camera.vsync true");
 
     c
   }
@@ -174,18 +169,6 @@ impl Camera
     })
   }
 
-  pub fn init(&mut self)
-  {
-    check!(gl2::enable(gl2::CULL_FACE)); 
-    check!(gl2::enable(gl2::DEPTH_TEST));
-    check!(gl2::depth_func(gl2::LEQUAL));
-    check!(gl2::blend_func(gl2::SRC_ALPHA, gl2::ONE_MINUS_SRC_ALPHA));
-    check!(gl2::clear_color(0.0, 0.0, 0.0, 1.0));
-
-    match self.window.get_size()
-    { (width, height) => self.resize(width as i32, height as i32) }
-  }
-
   pub fn resize(&mut self, new_width: i32, new_height: i32)
   {
     /* Avoid division by zero if the window is being fondled. */
@@ -204,118 +187,7 @@ impl Camera
                                       self.near_far.y);
   }
 
-  pub fn update(&mut self, dt: f32)
-  {
-    /* Avoid division by zero if the window is being fondled. */
-    if self.window_size.x == 0 || self.window_size.y == 0
-    { return; }
-
-    /* Frame rate. */
-    self.this_sec += dt;
-    if self.this_sec >= 1.0
-    {
-      self.frame_rate = self.frames_this_sec;
-      self.frames_this_sec = 0.0;
-      self.this_sec -= 1.0;
-    } else
-    { self.frames_this_sec += 1.0; }
-
-
-    /* Update where the camera is looking. */
-    let lookat = math::Vec3f::new
-    (
-      self.angles.x.sin() * self.angles.y.cos(),
-      self.angles.y.sin(),
-      self.angles.x.cos() * self.angles.y.cos()
-    );
-    self.view = math::Mat4x4::new_lookat(self.position, 
-                                    self.position + lookat, /* TODO: * focus for zoom */
-                                    math::Vec3f::new(0.0, 1.0, 0.0));
-
-    /* Move based on the keyboard input. */
-    let forward = self.view.get_forward();
-    let right = self.view.get_right();
-    if self.move_to & MOVE_LEFT > 0
-    { self.position = self.position - right * self.move_speed * dt; }
-    if self.move_to & MOVE_RIGHT  > 0
-    { self.position = self.position + right * self.move_speed * dt; }
-    if self.move_to & MOVE_FORWARD > 0
-    { self.position = self.position + forward * self.move_speed * dt; }
-    if self.move_to & MOVE_BACKWARD > 0
-    { self.position = self.position - forward * self.move_speed * dt; }
-    if self.move_to & MOVE_UP > 0
-    { self.position.y = self.position.y + self.move_speed * dt; }
-    if self.move_to & MOVE_DOWN > 0
-    { self.position.y = self.position.y - self.move_speed * dt; }
-  }
-
   pub fn reset(&mut self)
   { self.position = math::Vec3f::zero(); }
-}
-
-impl ui::Input_Listener for Camera
-{
-  fn key_action(&mut self, key: i32, action: i32, _mods: glfw::KeyMods) -> bool
-  {
-    let mut captured = true;
-
-    if action == glfw::PRESS 
-    {
-      match key
-      {
-        glfw::KEY_W => { self.move_to |= MOVE_FORWARD; }
-        glfw::KEY_A => { self.move_to |= MOVE_LEFT; }
-        glfw::KEY_S => { self.move_to |= MOVE_BACKWARD; }
-        glfw::KEY_D => { self.move_to |= MOVE_RIGHT; }
-        glfw::KEY_LEFT_CONTROL => { self.move_to |= MOVE_DOWN; }
-        glfw::KEY_SPACE => { self.move_to |= MOVE_UP; }
-        _ => { captured = false; }
-      }
-    }
-    else if action == glfw::RELEASE
-    {
-      match key
-      {
-        glfw::KEY_W => { self.move_to &= !MOVE_FORWARD; }
-        glfw::KEY_A => { self.move_to &= !MOVE_LEFT; }
-        glfw::KEY_S => { self.move_to &= !MOVE_BACKWARD; }
-        glfw::KEY_D => { self.move_to &= !MOVE_RIGHT; }
-        glfw::KEY_LEFT_CONTROL => { self.move_to &= !MOVE_DOWN; }
-        glfw::KEY_SPACE => { self.move_to &= !MOVE_UP; }
-        _ => { captured = false; }
-      }
-    }
-
-    captured
-  }
-  fn key_char(&mut self, _ch: char) -> bool
-  { false }
-  fn mouse_action(&mut self, _button: i32, _action: i32, _mods: i32) -> bool
-  { false }
-  fn mouse_moved(&mut self, x: f32, y: f32) -> bool
-  {
-    let dx = x - (self.window_size.x / 2) as f32;
-    let dy = y - (self.window_size.y / 2) as f32;
-
-    self.angles.x -= dx as f32 * self.look_speed;
-    self.angles.y -= dy as f32 * self.look_speed;
-    
-    /* Wrap X. */
-    if self.angles.x < -f32::consts::pi
-    { self.angles.x += f32::consts::pi * 2.0; }
-    else if self.angles.x > f32::consts::pi
-    { self.angles.x -= f32::consts::pi * 2.0; }
-
-    /* Clamp Y. */
-    if self.angles.y < -f32::consts::pi * 0.49
-    { self.angles.y = -f32::consts::pi * 0.49; }
-    else if self.angles.y > f32::consts::pi * 0.49
-    { self.angles.y = f32::consts::pi * 0.49; }
-
-    self.window.set_cursor_pos( (self.window_size.x / 2) as float, 
-                                (self.window_size.y / 2) as float);
-
-    true
-  }
 }
 

@@ -16,7 +16,7 @@ macro_rules! declare
 (
   ($Type:ident, $Mod:ident, $Component:ty) =>
   (
-    mod $Mod
+    pub mod $Mod
     {
       use std::{ ptr };
 

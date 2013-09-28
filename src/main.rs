@@ -14,51 +14,33 @@ extern mod opengles;
 extern mod glfw;
 extern mod stb_image;
 
+/* Q³ */
+extern mod log;
+extern mod console;
+extern mod math;
+extern mod gl;
+extern mod ui;
+extern mod obj;
+extern mod state;
+
 use std::{ libc, rt };
 use gl2 = opengles::gl2;
-use util::Log;
-
-#[path = "gl/mod.rs"]
-pub mod gl;
-
-#[path = "math/mod.rs"]
-pub mod math;
+use log::Log;
 
 #[macro_escape]
 #[path = "gl/check.rs"]
 mod check;
 
-#[path = "obj/bsp/mod.rs"]
-pub mod bsp; 
-
-#[path = "ui/mod.rs"]
-pub mod ui;
-
-#[path = "obj/primitive/mod.rs"]
-pub mod primitive;
-
-#[path = "obj/voxel/mod.rs"]
-pub mod voxel;
-
-#[path = "state/mod.rs"]
-pub mod state;
-
-#[path = "obj/md5/mod.rs"]
-pub mod md5;
-
-#[path = "util/mod.rs"]
-pub mod util;
-
 #[macro_escape]
-#[path = "util/log_macros.rs"]
-mod log_macros;
+#[path = "log/macros.rs"]
+mod macros;
 
 #[start]
 fn main(argc: int, argv: **u8, crate_map: *u8) -> int
 {
   do rt::start_on_main_thread(argc, argv, crate_map)
   {
-    util::Log::initialize(); /* Main thread. */
+    log::Log::initialize(); /* Main thread. */
     glfw::set_error_callback(error_callback);
 
     do glfw::start
@@ -90,17 +72,14 @@ fn main(argc: int, argv: **u8, crate_map: *u8) -> int
 
       /* Create the console state. */
       state::Director::create();
-      let console_state = state::Console::new();
+      let console_state = console::Console::new();
       let console_renderer_state = state::Console_Renderer::new(console_state);
       do state::Director::get_mut |director|
-      {
-        director.push(console_state as @mut state::State);
-        director.push(console_renderer_state as @mut state::State);
-      }
+      { director.push(console_renderer_state as @mut state::State); }
 
       /* Initialize the default camera. */
       let cam = gl::Camera::new(window);
-      cam.init();
+      (cam as @mut state::State).load();
       gl::Camera::set_active(cam);
       do window.set_size_callback |_, width, height|
       { gl::Camera::get_active().resize(width as i32, height as i32); }
@@ -118,16 +97,16 @@ fn main(argc: int, argv: **u8, crate_map: *u8) -> int
         key_callback(window, key, action);
       }
 
-      let mut _model = md5::Model::new(~"data/models/berserker/berserker.md5mesh");
+      let mut _model = obj::md5::Model::new(~"data/models/berserker/berserker.md5mesh");
       log_assert!(_model.load_animation(~"data/models/berserker/idle.md5anim"));
-      let mut _model_renderer = md5::Model_Renderer::new(&_model);
+      let mut _model_renderer = obj::md5::Model_Renderer::new(&_model);
 
       /* Console functions. */
-      state::Console::get().add_accessor("q3.version", |_|
+      console::Console::get().add_accessor("q3.version", |_|
       { fmt!("%s.%s", env!("VERSION"), env!("COMMIT")) });
-      state::Console::get().add_function(~"quit", |_, _| -> (bool, ~str)
+      console::Console::get().add_function(~"quit", |_, _| -> (bool, ~str)
       { window.set_should_close(true); (true, ~"")});
-      state::Console::get().add_function(~"load_map", |_, map_name| -> (bool, ~str)
+      console::Console::get().add_function(~"load_map", |_, map_name| -> (bool, ~str)
       {
         let mut err = ~"";
 
@@ -159,8 +138,8 @@ fn main(argc: int, argv: **u8, crate_map: *u8) -> int
         { (true, ~"Loaded map: \\5" + map_name + "\\1") }
       });
       /* Load the default map. */
-      let (_loaded, msg) = state::Console::run_function(~"load_map q3ctf1");
-      state::Console::get().add_log(msg);
+      let (_loaded, msg) = console::Console::run_function(~"load_map q3ctf1");
+      console::Console::get().add_log(msg);
 
       /* Delta time. */
       let mut cur_time = extra::time::precise_time_s() as f32;

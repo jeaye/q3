@@ -9,6 +9,11 @@
       An aggregator of math items.
 */
 
+#[link(name = "math", vers = "0.2")];
+#[crate_type = "lib"];
+
+extern mod log;
+
 pub use self::quaternion::*;
 pub use self::matrix::*;
 pub use self::vec2::*;
@@ -17,11 +22,11 @@ pub use self::vec4::*;
 pub use self::bb3::*;
 pub use self::util::*;
 
-mod quaternion;
-mod matrix;
-mod vec2;
-mod vec3;
-mod vec4;
-mod bb3;
-mod util;
+pub mod quaternion;
+pub mod matrix;
+pub mod vec2;
+pub mod vec3;
+pub mod vec4;
+pub mod bb3;
+pub mod util;
 

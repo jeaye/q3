@@ -18,14 +18,14 @@ macro_rules! declare
 (
   ($Type:ident, $Mod:ident, $Component:ty) =>
   (
-    mod $Mod
+    pub mod $Mod
     {
       use std::{ cmp, ptr, clone };
-      use util::Log;
+      use log::Log;
 
       #[macro_escape]
-      #[path = "../../util/log_macros.rs"]
-      mod log_macros;
+      #[path = "../../log/macros.rs"]
+      mod macros;
 
       pub struct $Type
       {

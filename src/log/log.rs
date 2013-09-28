@@ -3,7 +3,7 @@
     See licensing in LICENSE file, or at:
         http://www.opensource.org/licenses/BSD-3-Clause
 
-    File: util/log.rs
+    File: log/log.rs
     Author: Jesse 'Jeaye' Wilkerson
     Description:
       A general logging collection
@@ -38,9 +38,9 @@ static Verbosity_Debug: Verbosity = 3;
 static tls_key: local_data::Key<@mut Log> = &local_data::Key;
 
 #[macro_escape]
-mod log_macros;
+pub mod macros;
 
-struct Log
+pub struct Log
 {
   verbosity: Verbosity,
   push_level: u8, /* The indentation level, for nested logs. */

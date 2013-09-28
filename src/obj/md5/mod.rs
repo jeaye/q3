@@ -28,31 +28,31 @@ pub use self::animation::Animation;
 
 /* Model */
 #[path = "model/model.rs"]
-mod model;
+pub mod model;
 #[path = "model/model_renderer.rs"]
-mod model_renderer;
+pub mod model_renderer;
 #[path = "model/joint.rs"]
-mod joint;
+pub mod joint;
 #[path = "model/weight.rs"]
-mod weight;
+pub mod weight;
 #[path = "model/mesh.rs"]
-mod mesh;
+pub mod mesh;
 #[path = "model/mesh_renderer.rs"]
-mod mesh_renderer;
+pub mod mesh_renderer;
 #[path = "model/vertex.rs"]
-mod vertex;
+pub mod vertex;
 #[path = "model/triangle.rs"]
-mod triangle;
+pub mod triangle;
 
 /* Animation */
 #[path = "animation/joint_info.rs"]
-mod joint_info;
+pub mod joint_info;
 #[path = "animation/bound.rs"]
-mod bound;
+pub mod bound;
 #[path = "animation/frame.rs"]
-mod frame;
+pub mod frame;
 #[path = "animation/skeleton.rs"]
-mod skeleton;
+pub mod skeleton;
 #[path = "animation/animation.rs"]
-mod animation;
+pub mod animation;
 

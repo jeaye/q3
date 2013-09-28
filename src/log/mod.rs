@@ -3,14 +3,19 @@
     See licensing in LICENSE file, or at:
         http://www.opensource.org/licenses/BSD-3-Clause
 
-    File: util/mod.rs
+    File: log/mod.rs
     Author: Jesse 'Jeaye' Wilkerson
     Description:
-      An aggregator of misc util items.
+      An aggregator of logging items.
 */
+
+#[link(name = "log", vers = "0.2")];
+#[crate_type = "lib"];
+
+extern mod extra;
 
 pub use self::log::Log;
 
 #[macro_escape]
-mod log;
+pub mod log;
 

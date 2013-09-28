@@ -9,15 +9,24 @@
       An aggregator of OpenGL items.
 */
 
+#[link(name = "gl", vers = "0.2")];
+#[crate_type = "lib"];
+
+extern mod opengles;
+extern mod glfw;
+extern mod stb_image;
+
+extern mod log;
+extern mod math;
+extern mod console;
+
 pub use self::camera::Camera;
 pub use self::shader::{ Shader, Shader_Builder };
 pub use self::texture::Texture;
-pub use self::util::*;
 pub use self::worker::Worker;
 
-mod camera;
-mod shader;
-mod texture;
-mod util;
-mod worker;
+pub mod camera;
+pub mod shader;
+pub mod texture;
+pub mod worker;
 

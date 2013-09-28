@@ -12,13 +12,13 @@
 
 use std::local_data;
 use glfw;
-use util::Log;
+use log::Log;
 
 static tls_key: local_data::Key<Director> = &local_data::Key;
 
 #[macro_escape]
-#[path = "../util/log_macros.rs"]
-mod log;
+#[path = "../log/macros.rs"]
+mod macros;
 
 pub trait State
 {

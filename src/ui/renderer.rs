@@ -12,18 +12,19 @@
 use std::local_data;
 use glfw;
 use gl;
+use gl2 = opengles::gl2;
 use math;
 use TTF_Renderer = super::ttf::Renderer;
 use TTF_Font = super::ttf::Font;
-use gl2 = opengles::gl2;
-use util::Log;
+use log::Log;
 
+#[macro_escape]
 #[path = "../gl/check.rs"]
 mod check;
 
 #[macro_escape]
-#[path = "../util/log_macros.rs"]
-mod log_macros;
+#[path = "../log/macros.rs"]
+mod macros;
 
 static tls_key: local_data::Key<@mut Renderer> = &local_data::Key;
 

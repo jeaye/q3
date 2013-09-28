@@ -16,8 +16,8 @@
 
 use std::{ str, io };
 use gl2 = opengles::gl2;
-use math;
-use util::Log;
+use log::Log;
+use math::*;
 
 pub use Shader = self::Shaderable;
 
@@ -37,8 +37,8 @@ pub use Shader_Builder = self::Release_Shader;
 mod check;
 
 #[macro_escape]
-#[path = "../util/log_macros.rs"]
-mod log_macros;
+#[path = "../log/macros.rs"]
+mod macros;
 
 pub trait Shaderable
 {
@@ -46,11 +46,11 @@ pub trait Shaderable
   fn get_uniform_location(&self, uniform: &str) -> gl2::GLint;
   fn update_uniform_i32(&self, location: gl2::GLint, i: i32);
   fn update_uniform_f32(&self, location: gl2::GLint, i: f32);
-  fn update_uniform_mat(&self, location: gl2::GLint, mat: &math::Mat4x4);
+  fn update_uniform_mat(&self, location: gl2::GLint, mat: &Mat4x4);
 }
 
 #[cfg(debug_shader)]
-pub struct Debug_Shader
+struct Debug_Shader
 {
   prog: gl2::GLuint,
   vert_obj: gl2::GLuint,
@@ -167,7 +167,7 @@ impl Shader for Debug_Shader
   fn update_uniform_f32(&self, location: gl2::GLint, i: f32)
   { if self.valid { shared::update_uniform_f32(location, i); } }
 
-  fn update_uniform_mat(&self, location: gl2::GLint, mat: &math::Mat4x4)
+  fn update_uniform_mat(&self, location: gl2::GLint, mat: &Mat4x4)
   { if self.valid { shared::update_uniform_mat(location, mat); } }
 }
 
@@ -233,7 +233,7 @@ impl Shader for Release_Shader
   fn update_uniform_f32(&self, location: gl2::GLint, i: f32)
   { shared::update_uniform_f32(location, i); }
 
-  fn update_uniform_mat(&self, location: gl2::GLint, mat: &math::Mat4x4)
+  fn update_uniform_mat(&self, location: gl2::GLint, mat: &Mat4x4)
   { shared::update_uniform_mat(location, mat) }
 }
 
@@ -248,20 +248,20 @@ impl Drop for Release_Shader
   }
 }
 
-mod shared
+pub mod shared
 {
   use gl2 = opengles::gl2;
   use std::cast;
-  use math;
-  use util::Log;
+  use log::Log;
+  use math::*;
 
   #[macro_escape]
   #[path = "../check.rs"]
   mod check;
 
   #[macro_escape]
-  #[path = "../../util/log_macros.rs"]
-  mod log_macros;
+  #[path = "../../log/macros.rs"]
+  mod macros;
 
   pub fn load(shader: &mut super::Shader_Builder, vert_src: &str, frag_src: &str) -> bool
   {
@@ -359,7 +359,7 @@ mod shared
   pub fn update_uniform_f32(location: gl2::GLint, i: f32)
   { check!(gl2::uniform_1f(location, i)); }
 
-  pub fn update_uniform_mat(location: gl2::GLint, mat: &math::Mat4x4)
+  pub fn update_uniform_mat(location: gl2::GLint, mat: &Mat4x4)
   { 
     unsafe
     {

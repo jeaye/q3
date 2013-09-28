@@ -13,15 +13,15 @@
 use std::{ comm, task, local_data };
 use glfw;
 use gl2 = opengles::gl2;
-use util;
-use util::Log;
+use log;
+use log::Log;
 
 #[macro_escape]
 mod check;
 
 #[macro_escape]
-#[path = "../util/log_macros.rs"]
-mod log_macros;
+#[path = "../log/macros.rs"]
+mod macros;
 
 static tls_key: local_data::Key<@Worker> = &local_data::Key;
 
@@ -84,7 +84,7 @@ impl Worker
   {
     let (task_port, exit_channel, window) = data;
     window.make_context_current();
-    util::Log::initialize(); /* Done for every thread. */
+    log::Log::initialize(); /* Done for every thread. */
 
     loop
     {

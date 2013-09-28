@@ -13,13 +13,13 @@ use std::{ cmp, path, io, sys, cast };
 use math;
 use super::lump;
 use primitive::{ Triangle, Vertex_PC };
-use util::Log;
+use log::Log;
 
 #[path = "../../gl/check.rs"]
 mod check;
 #[macro_escape]
-#[path = "../../util/log_macros.rs"]
-mod log_macros;
+#[path = "../../log/macros.rs"]
+mod macros;
 
 pub struct Map
 {

@@ -20,13 +20,14 @@ use gl;
 use glfw;
 use ui;
 use math;
-use bsp;
-use util::Log;
+use obj::bsp;
+use log::Log;
 
 #[macro_escape]
-#[path = "../../util/log_macros.rs"]
-mod log_macros;
+#[path = "../../log/macros.rs"]
+mod macros;
 
+#[macro_escape]
 #[path = "../../gl/check.rs"]
 mod check;
 
@@ -157,8 +158,8 @@ impl State for BSP_Renderer
   }
 
   fn key_action(&mut self, key: i32, action: i32, _mods: glfw::KeyMods) -> bool
-  { (self.game_renderer.camera as @mut ui::Input_Listener).key_action(key, action, _mods) }
+  { (self.game_renderer.camera as @mut State).key_action(key, action, _mods) }
   fn mouse_moved(&mut self, x: f32, y: f32) -> bool
-  { (self.game_renderer.camera as @mut ui::Input_Listener).mouse_moved(x, y) }
+  { (self.game_renderer.camera as @mut State).mouse_moved(x, y) }
 }
 

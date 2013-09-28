@@ -9,12 +9,22 @@
       An aggregator of UI items.
 */
 
+#[link(name = "ui", vers = "0.2")];
+#[crate_type = "lib"];
+
+extern mod opengles;
+extern mod glfw;
+extern mod stb_image;
+
+extern mod log;
+extern mod math;
+extern mod gl;
+
 pub use self::renderer::Renderer;
 pub use self::ttf::Font;
 pub use self::input::{ Input_Listener };
 
-mod renderer;
-#[path = "ttf/mod.rs"]
-mod ttf;
-mod input;
+pub mod renderer;
+pub mod ttf;
+pub mod input;
 

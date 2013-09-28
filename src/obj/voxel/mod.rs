@@ -13,7 +13,7 @@ pub use self::map::Map;
 pub use self::vertex::Vertex;
 pub use self::behavior::{ Visible };
 
-mod map;
-mod vertex;
-mod behavior;
+pub mod map;
+pub mod vertex;
+pub mod behavior;
 

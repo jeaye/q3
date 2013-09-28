@@ -16,6 +16,7 @@ use gl;
 use math;
 use super::{ Model, Mesh_Renderer };
 
+#[macro_escape]
 #[path = "../../../gl/check.rs"]
 mod check;
 

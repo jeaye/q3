@@ -13,14 +13,14 @@ use std::{ vec, cast };
 use gl2 = opengles::gl2;
 use stb_image;
 use math;
-use util::Log;
+use log::Log;
 
 #[macro_escape]
 mod check;
 
 #[macro_escape]
-#[path = "../util/log_macros.rs"]
-mod log_macros;
+#[path = "../log/macros.rs"]
+mod macros;
 
 struct Texture
 {

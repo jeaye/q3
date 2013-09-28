@@ -12,21 +12,20 @@
 */
 
 use super::{ State, Game };
-use gl;
 use glfw;
+use gl;
 use ui;
 use math;
-use self::map_renderer::Map_Renderer;
-use util::Log;
+use super::Map_Renderer;
+use log::Log;
 
-mod map_renderer;
-
+#[macro_escape]
 #[path = "../../gl/check.rs"]
 mod check;
 
 #[macro_escape]
-#[path = "../../util/log_macros.rs"]
-mod log_macros;
+#[path = "../../log/macros.rs"]
+mod macros;
 
 pub struct Game_Renderer
 {
@@ -99,8 +98,8 @@ impl State for Game_Renderer
   }
 
   fn key_action(&mut self, key: i32, action: i32, _mods: glfw::KeyMods) -> bool
-  { (self.camera as @mut ui::Input_Listener).key_action(key, action, _mods) }
+  { (self.camera as @mut State).key_action(key, action, _mods) }
   fn mouse_moved(&mut self, x: f32, y: f32) -> bool
-  { (self.camera as @mut ui::Input_Listener).mouse_moved(x, y) }
+  { (self.camera as @mut State).mouse_moved(x, y) }
 }
 

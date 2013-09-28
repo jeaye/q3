@@ -3,6 +3,7 @@ build/
 tags
 update.sh
 Makefile
+.build*
 
 *.DS_Store
 *.dylib

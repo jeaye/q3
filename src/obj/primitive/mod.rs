@@ -12,6 +12,6 @@
 pub use self::vertex::{ Vertex_P, Vertex_PC, Vertex_PN, Vertex_PCN };
 pub use self::triangle::{ Triangle, Triangle_Index };
 
-mod vertex;
-mod triangle;
+pub mod vertex;
+pub mod triangle;
 

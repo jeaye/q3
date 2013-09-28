@@ -11,11 +11,21 @@
 # Set by configure
 PROJ_DIR=%PROJ_DIR%
 
-DEBUG_CONFIGS=--cfg debug_shader --cfg check_gl
-DEBUG_OPTIMIZATION=0 # Change for debug info
+ifneq (${MODE}, debug)
+ifneq (${MODE}, release)
+	MODE=release # Default to release
+endif
+endif
 
-RELEASE_CONFIGS=--cfg release_shader
-RELEASE_OPTIMIZATION=3
+ifeq (${MODE}, debug)
+	CONFIGS=--cfg debug_shader --cfg check_gl
+	OPTIMIZATION=--opt-level 0 
+	VERSION_NAME=${COLOR_YELLOW}DEBUG${COLOR_OFF}
+else
+	CONFIGS=--cfg release_shader
+	OPTIMIZATION=--opt-level 3
+	VERSION_NAME=${COLOR_PURPLE}RELEASE${COLOR_OFF}
+endif
 
 # Determine system
 UNAME=$(shell uname)
@@ -29,6 +39,7 @@ COLOR_OFF=$(shell tput sgr0)
 COLOR_RED=$(shell tput setaf 1)
 COLOR_YELLOW=$(shell tput setaf 3)
 COLOR_GREEN=$(shell tput setaf 2)
+COLOR_PURPLE=$(shell tput setaf 5)
 
 # Output colorizing
 ECHO_PREFIX=${COLOR_GREEN}»»»${COLOR_OFF}
@@ -38,36 +49,76 @@ else
 	ECHO=echo 
 endif
 
-# Version names of the build types we can attempt
-VERSION_NAME_DEBUG=${COLOR_YELLOW}DEBUG${COLOR_OFF}
-VERSION_NAME_RELEASE=${COLOR_GREEN}RELEASE${COLOR_OFF}
+LIBS=-L. -Lbuild/q3 -Lbuild/glfw_static -Lbuild/glfw-rs -Lbuild/rust-opengles -Lbuild/stb-image -L/opt/local/lib
 
-LIBS=-L. -Lbuild/glfw_static -Lbuild/glfw-rs -Lbuild/rust-opengles -Lbuild/stb-image -L/opt/local/lib
+LOG_SRC=$(shell find src/log -type f -name '*.rs')
+CONSOLE_SRC=$(shell find src/console -type f -name '*.rs')
+MATH_SRC=$(shell find src/math -type f -name '*.rs')
+GL_SRC=$(shell find src/gl -type f -name '*.rs')
+UI_SRC=$(shell find src/ui -type f -name '*.rs')
+OBJ_SRC=$(shell find src/obj -type f -name '*.rs')
+STATE_SRC=$(shell find src/state -type f -name '*.rs')
+
+MODULES=.build_log .build_console .build_math .build_gl .build_ui .build_obj .build_state
 
 .SILENT:
 
-.PHONY: all setup debug release pretty clean
-all: setup debug
+.PHONY: all setup clean
+
+all: setup .build_log .build_console .build_math .build_gl .build_ui .build_obj .build_state
+	${ECHO} "${ECHO_PREFIX} Linking"
+	rustc ${PROJ_DIR}/src/main.rs -o bin/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
+	${ECHO} "${ECHO_PREFIX} Success"
 
 setup:
+	${ECHO} "${ECHO_PREFIX} ${VERSION_NAME} Q³ [${VERSION}.${COMMIT}]"
 	mkdir -p bin
+	mkdir -p build/q3
 
-debug: clean
-	${ECHO} "${ECHO_PREFIX} Building ${VERSION_NAME_DEBUG} Q³ [commit: ${COMMIT}](this can take a while)"
-	echo
-	rustc ${PROJ_DIR}/src/main.rs -o bin/q3 ${LIBS} ${DEBUG_CONFIGS} --opt-level ${DEBUG_OPTIMIZATION}
-	${ECHO} "${ECHO_PREFIX} Finished building ${VERSION_NAME_DEBUG} Q³"
+.build_log: ${LOG_SRC}
+	${ECHO} "${ECHO_PREFIX} Building log"
+	rm -f build/q3/liblog*
+	rustc src/log/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
+	touch .build_log
 
-release: clean
-	${ECHO} "${ECHO_PREFIX} Building ${VERSION_NAME_RELEASE} Q³ [commit: ${COMMIT}](this can take a while)"
-	echo
-	rustc ${PROJ_DIR}/src/main.rs -o bin/q3 ${LIBS} ${RELEASE_CONFIGS} --opt-level ${RELEASE_OPTIMIZATION}
-	${ECHO} "${ECHO_PREFIX} Finished building ${VERSION_NAME_RELEASE} Q³"
+.build_console: ${CONSOLE_SRC} .build_log
+	${ECHO} "${ECHO_PREFIX} Building console"
+	rm -f build/q3/libconsole*
+	rustc src/console/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
+	touch .build_console
 
-pretty:
-	rustc ${PROJ_DIR}/src/main.rs -o bin/q3 ${LIBS} --pretty normal
+.build_math: ${MATH_SRC} .build_console
+	${ECHO} "${ECHO_PREFIX} Building math"
+	rm -f build/q3/libmath*
+	rustc src/math/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
+	touch .build_math
+
+.build_gl: ${GL_SRC} .build_math
+	${ECHO} "${ECHO_PREFIX} Building gl"
+	rm -f build/q3/libgl*
+	rustc src/gl/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
+	touch .build_gl
+
+.build_ui: ${UI_SRC} .build_gl
+	${ECHO} "${ECHO_PREFIX} Building ui"
+	rm -f build/q3/libui*
+	rustc src/ui/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
+	touch .build_ui
+
+.build_obj: ${OBJ_SRC} .build_ui
+	${ECHO} "${ECHO_PREFIX} Building obj"
+	rm -f build/q3/libobj*
+	rustc src/obj/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
+	touch .build_obj
+
+.build_state: ${STATE_SRC} .build_obj
+	${ECHO} "${ECHO_PREFIX} Building state"
+	rm -f build/q3/libstate*
+	rustc src/state/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
+	touch .build_state
 
 clean:
+	${ECHO} "${ECHO_PREFIX} Cleaning"
 	-rm -f bin/q3
-	-rm -rf glfw-rs glfw_shared glfw_static rust-opengles stb-image
+	-rm -f ${MODULES}
 

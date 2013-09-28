@@ -11,21 +11,22 @@
 
 use std::{ vec, cmp, ptr };
 use std::hashmap::HashMap;
-use std::libc::{ c_uint };
+use std::libc::c_uint;
 use math;
 use self::glyph::Glyph;
 use gl2 = opengles::gl2;
-use util::Log;
+use log::Log;
 
+#[macro_escape]
 #[path = "../../gl/check.rs"]
 mod check;
 
 #[macro_escape]
-#[path = "../../util/log_macros.rs"]
-mod log_macros;
+#[path = "../../log/macros.rs"]
+mod macros;
 
-mod glyph;
-mod ft;
+pub mod glyph;
+pub mod ft;
 
 struct Font
 {

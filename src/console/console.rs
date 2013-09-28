@@ -3,7 +3,7 @@
     See licensing in LICENSE file, or at:
         http://www.opensource.org/licenses/BSD-3-Clause
 
-    File: state/console/console.rs
+    File: console/console.rs
     Author: Jesse 'Jeaye' Wilkerson
     Description:
       Manages the model portion
@@ -12,14 +12,11 @@
 
 use std::local_data;
 use std::hashmap::HashMap;
-use glfw;
-use math;
-use super::State;
-use util::Log;
+use log::Log;
 
 #[macro_escape]
-#[path = "../../util/log_macros.rs"]
-mod log_macros;
+#[path = "../log/macros.rs"]
+mod macros;
 
 /* Takes: property name; Returns: property value. */
 type Property_Accessor = @fn(&str) -> ~str; 
@@ -67,9 +64,6 @@ struct Registry
 
 struct Console
 {
-  position: math::Vec2f,
-  velocity: f32, /* On the Y axis only. */
-  
   body: ~str,
   prefix: ~str,
   input: ~str,
@@ -83,9 +77,6 @@ impl Console
   {
     let c = @mut Console
     {
-      position: math::Vec2f::zero(),
-      velocity: 300.0,
-
       body: fmt!("Welcome to Q³\nVersion: %s.%s", env!("VERSION"), env!("COMMIT")),
       prefix: ~"> ",
       input: ~"", 
@@ -211,84 +202,6 @@ impl Console
       }
       None => { (false, fmt!("\\\\2Error: \\\\1Invalid function '%s'", func)) }
     }
-  }
-}
-
-impl State for Console
-{
-  fn load(&mut self)
-  { log_debug!("Loading console state."); }
-
-  fn unload(&mut self)
-  { log_debug!("Unloading console state."); }
-
-  fn get_key(&self) -> &str
-  { &"console" }
-
-  fn update(&mut self, _delta: f32) -> bool /* dt is in terms of seconds. */
-  { false }
-
-  fn render(&mut self) -> bool
-  { false }
-
-  fn key_action(&mut self, key: i32, action: i32, _mods: glfw::KeyMods) -> bool
-  {
-    if action == glfw::PRESS || action == glfw::REPEAT
-    {
-      /* Mac grave is world 1 for some reason. */
-      if key == glfw::KEY_GRAVE_ACCENT || key == glfw::KEY_WORLD_1 
-      {
-        self.velocity *= -1.0;
-        return true;
-      }
-
-      /* The following only apply if the console is enabled. */
-      if self.velocity > 0.0
-      {
-        if key == glfw::KEY_ENTER
-        {
-          if self.input.len() == 0
-          { return true; }
-
-          /* Run the function and add the output to the log. */
-          let input = self.input.clone();
-          let (_res, output) = Console::run_function(input);
-          self.add_log(output);
-
-          self.input.clear();
-        }
-        else if key == glfw::KEY_BACKSPACE
-        {
-          if self.input.len() > 0
-          { self.input.pop_char(); }
-        }
-        /* Non-whitespace. */
-        else if key >= 32 && key <= 93
-        {
-          /* This will be handled when we receive it as a char. */
-        }
-
-        return true;
-      }
-    }
-
-    false
-  }
-
-  fn key_char(&mut self, ch: char) -> bool
-  {
-    /* Check if the console is enabled. */
-    if self.velocity > 0.0
-    {
-      /* Non-whitespace and not ` or ~ */
-      if ch >= 0x20u8 as char && ch <= 0x7Du8 as char && ch != 0x60u8 as char
-      {
-        self.input.push_char(ch);
-        return true;
-      }
-    }
-
-    false
   }
 }
 

@@ -6,10 +6,22 @@
     File: obj/mod.rs
     Author: Jesse 'Jeaye' Wilkerson
     Description:
-      Aggregator for obj modules.
+      Aggregator for modules related to
+      game objects.
 */
 
-//pub use traits::{ Movable, Rotatable, Scalable };
+#[link(name = "obj", vers = "0.2")];
+#[crate_type = "lib"];
 
-pub mod traits;
+extern mod extra;
+extern mod opengles;
+
+extern mod log;
+extern mod math;
+extern mod gl;
+
+pub mod bsp;
+pub mod md5;
+pub mod primitive;
+pub mod voxel;
 
