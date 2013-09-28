@@ -34,7 +34,7 @@ as submodules. To configure, simply run (in source and out of source builds are 
 ```
 From there, you should be able to compile and run a release build with:  
 ```bash
-make release && ./bin/q3
+make && ./bin/q3
 ```
 **NOTE:** Ensure that you have Freetype2 installed.  
 **NOTE:** I don't have access to a Windows machine at the moment, so I'm not sure yet what will go into building 
