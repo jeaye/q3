@@ -9,7 +9,7 @@
       A 3D bounding box.
 */
 
-struct BB3 /* TODO: Check super on this shit. */
+pub struct BB3 /* TODO: Check super on this shit. */
 {
   top_left: super::Vec3f,
   bottom_right: super::Vec3f,

@@ -127,12 +127,12 @@ impl State for Console_Renderer
     false
   }
 
-  fn key_action(&mut self, key: i32, action: i32, _mods: glfw::KeyMods) -> bool
+  fn key_action(&mut self, key: glfw::Key, action: glfw::Action, _mods: glfw::Modifiers) -> bool
   {
-    if action == glfw::PRESS || action == glfw::REPEAT
+    if action == glfw::Press || action == glfw::Repeat
     {
       /* Mac grave is world 1 for some reason. */
-      if key == glfw::KEY_GRAVE_ACCENT || key == glfw::KEY_WORLD_1 
+      if key == glfw::KeyGraveAccent || key == glfw::KeyWorld1 
       {
         self.velocity *= -1.0;
         return true;
@@ -141,7 +141,7 @@ impl State for Console_Renderer
       /* The following only apply if the console is enabled. */
       if self.velocity > 0.0
       {
-        if key == glfw::KEY_ENTER
+        if key == glfw::KeyEnter
         {
           if self.console.input.len() == 0
           { return true; }
@@ -153,13 +153,13 @@ impl State for Console_Renderer
 
           self.console.input.clear();
         }
-        else if key == glfw::KEY_BACKSPACE
+        else if key == glfw::KeyBackspace
         {
           if self.console.input.len() > 0
           { self.console.input.pop_char(); }
         }
         /* Non-whitespace. */
-        else if key >= 32 && key <= 93
+        else if key as i32 >= 32 && key as i32 <= 93
         {
           /* This will be handled when we receive it as a char. */
         }

@@ -40,7 +40,7 @@ pub trait State
   { false }
 
   /* TODO: Trait inheritance with Input_Listener. */
-  fn key_action(&mut self, _key: i32, _action: i32, _mods: glfw::KeyMods) -> bool
+  fn key_action(&mut self, _key: glfw::Key, _action: glfw::Action, _mods: glfw::Modifiers) -> bool
   { false }
   fn key_char(&mut self, _ch: char) -> bool
   { false }
@@ -50,10 +50,15 @@ pub trait State
   { false }
 }
 
+pub trait Deferred
+{
+  fn call(&mut self);
+}
+
 pub struct Director
 {
   states: ~[@mut State],
-  deferreds: ~[@fn()],
+  deferreds: ~[@mut Deferred],
 }
 
 impl Director
@@ -131,7 +136,7 @@ impl Director
     state.unload();
   }
 
-  pub fn push_deferred(def: @fn())
+  pub fn push_deferred(def: @mut Deferred)
   {
     do Director::get_mut |director|
     { director.deferreds.push(def); }
@@ -140,7 +145,7 @@ impl Director
   fn run_deferreds(&mut self)
   {
     for x in self.deferreds.iter()
-    { (*x)(); }
+    { (*x).call(); }
     self.deferreds.clear();
   }
 
@@ -232,7 +237,7 @@ impl Director
   }
 
   /** Input handling. **/
-  pub fn key_action(key: i32, action: i32, mods: glfw::KeyMods)
+  pub fn key_action(key: glfw::Key, action: glfw::Action, mods: glfw::Modifiers)
   {
     let mut states = do Director::get |director|
     { do director.states.map |x| { *x } };

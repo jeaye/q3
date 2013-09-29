@@ -14,7 +14,7 @@ use std::ptr;
 
 type Component = f32;
 
-struct Mat4x4
+pub struct Mat4x4
 {
   data: [[f32, ..4], ..4]
 }

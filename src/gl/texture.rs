@@ -22,7 +22,7 @@ mod check;
 #[path = "../log/macros.rs"]
 mod macros;
 
-struct Texture
+pub struct Texture
 {
   target: gl2::GLenum,
   obj: gl2::GLuint,

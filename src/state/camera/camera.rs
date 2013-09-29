@@ -99,33 +99,33 @@ impl State for gl::Camera
     false
   }
 
-  fn key_action(&mut self, key: i32, action: i32, _mods: glfw::KeyMods) -> bool
+  fn key_action(&mut self, key: glfw::Key, action: glfw::Action, _mods: glfw::Modifiers) -> bool
   {
     let mut captured = true;
 
-    if action == glfw::PRESS 
+    if action == glfw::Press 
     {
       match key
       {
-        glfw::KEY_W => { self.move_to |= MOVE_FORWARD; }
-        glfw::KEY_A => { self.move_to |= MOVE_LEFT; }
-        glfw::KEY_S => { self.move_to |= MOVE_BACKWARD; }
-        glfw::KEY_D => { self.move_to |= MOVE_RIGHT; }
-        glfw::KEY_LEFT_CONTROL => { self.move_to |= MOVE_DOWN; }
-        glfw::KEY_SPACE => { self.move_to |= MOVE_UP; }
+        glfw::KeyW => { self.move_to |= MOVE_FORWARD; }
+        glfw::KeyA => { self.move_to |= MOVE_LEFT; }
+        glfw::KeyS => { self.move_to |= MOVE_BACKWARD; }
+        glfw::KeyD => { self.move_to |= MOVE_RIGHT; }
+        glfw::KeyLeftControl => { self.move_to |= MOVE_DOWN; }
+        glfw::KeySpace => { self.move_to |= MOVE_UP; }
         _ => { captured = false; }
       }
     }
-    else if action == glfw::RELEASE
+    else if action == glfw::Release
     {
       match key
       {
-        glfw::KEY_W => { self.move_to &= !MOVE_FORWARD; }
-        glfw::KEY_A => { self.move_to &= !MOVE_LEFT; }
-        glfw::KEY_S => { self.move_to &= !MOVE_BACKWARD; }
-        glfw::KEY_D => { self.move_to &= !MOVE_RIGHT; }
-        glfw::KEY_LEFT_CONTROL => { self.move_to &= !MOVE_DOWN; }
-        glfw::KEY_SPACE => { self.move_to &= !MOVE_UP; }
+        glfw::KeyW => { self.move_to &= !MOVE_FORWARD; }
+        glfw::KeyA => { self.move_to &= !MOVE_LEFT; }
+        glfw::KeyS => { self.move_to &= !MOVE_BACKWARD; }
+        glfw::KeyD => { self.move_to &= !MOVE_RIGHT; }
+        glfw::KeyLeftControl => { self.move_to &= !MOVE_DOWN; }
+        glfw::KeySpace => { self.move_to &= !MOVE_UP; }
         _ => { captured = false; }
       }
     }

@@ -19,7 +19,7 @@ use math;
 use obj::voxel;
 use log::Log;
 use console;
-use super::{ State, Director };
+use super::{ State, Director, Deferred };
 
 #[macro_escape]
 #[path = "../../gl/check.rs"]
@@ -156,26 +156,17 @@ impl Map_Renderer
     check!(gl2::tex_buffer(gl2::TEXTURE_BUFFER, 0x8815 /* RGB32F */, mr.offset_tex_vbo));
 
     /* Console functions. */
-    do Director::push_deferred ||
+    struct Tmp_Deferred
+    { mr: @mut Map_Renderer }
+    impl Deferred for Tmp_Deferred
     {
-      console::Console::get().registry.accessors.insert(~"map.wireframe", |_|
-      { mr.wireframe.to_str() });
-      console::Console::get().add_mutator("map.wireframe", |p, x|
+      fn call(&mut self)
       {
-        let mut error = ~"";
-        if x == "true"
-        { mr.wireframe = true; }
-        else if x == "false"
-        { mr.wireframe = false; }
-        else
-        { error = fmt!("Invalid value for %s (use 'true' or 'false')", p); }
-
-        if error.len() == 0
-        { None }
-        else
-        { Some(error) }
-      });
+        console::Console::get().add_accessor("map.wireframe", self.mr as @mut console::Accessor);
+        console::Console::get().add_mutator("map.wireframe", self.mr as @mut console::Mutator);
+      }
     }
+    Director::push_deferred(@mut Tmp_Deferred{ mr: mr } as @mut Deferred);
 
     mr
   }
@@ -356,6 +347,48 @@ impl State for Map_Renderer
     check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, 0));
     
     false
+  }
+}
+
+impl console::Accessor for Map_Renderer
+{
+  fn access(&self, name: &str) -> ~str
+  {
+    match name
+    {
+      "map.wireframe" =>
+      { self.wireframe.to_str() }
+
+      _ => ~"ERROR"
+    }
+  }
+}
+
+impl console::Mutator for Map_Renderer
+{
+  fn mutate(&mut self, name: &str, val: &str) -> Option<~str>
+  {
+    match name
+    {
+      "map.wireframe" =>
+      {
+        let mut error = ~"";
+
+        if val == "true"
+        { self.wireframe = true; }
+        else if val == "false"
+        { self.wireframe = false; }
+        else
+        { error = fmt!("Invalid value for %s (use 'true' or 'false')", name); }
+
+        if error.len() == 0
+        { None }
+        else
+        { Some(error) }
+      }
+
+      _ => Some(~"ERROR"),
+    }
   }
 }
 

@@ -12,7 +12,7 @@
       is handled in the camera state instead.
 */
 
-use std::{ f32, local_data };
+use std::local_data;
 use glfw;
 use gl2 = opengles::gl2;
 use math;
@@ -29,7 +29,7 @@ mod macros;
 static tls_key: local_data::Key<@mut Camera> = &local_data::Key;
 
 /* TODO: This should just be a trait. */
-struct Camera
+pub struct Camera
 {
   position: math::Vec3f,
   angles: math::Vec2f,
@@ -86,66 +86,13 @@ impl Camera
       vsync: true,
     };
 
-    console::Console::get().add_accessor("camera.fov", |_|
-    { c.fov.to_str() });
-    console::Console::get().add_mutator("camera.fov", |p, fov|
-    {
-      let mut error = ~"";
+    console::Console::get().add_accessor("camera.fov", c as @mut console::Accessor);
+    console::Console::get().add_accessor("camera.vsync", c as @mut console::Accessor);
+    console::Console::get().add_accessor("ui.show_fps", c as @mut console::Accessor);
 
-      c.fov = match f32::from_str(fov)
-      {
-        Some(x) => { x },
-        None => { error = fmt!("Invalid value for %s (use a floating point number)", p); c.fov }
-      };
-
-      /* Rebuild the projection info. */
-      c.resize(c.window_size.x, c.window_size.y);
-
-      if error.len() == 0
-      { None }
-      else
-      { Some(error) }
-    });
-    console::Console::get().add_accessor("ui.show_fps", |_|
-    { c.show_fps.to_str() });
-    console::Console::get().add_mutator("ui.show_fps", |p, x|
-    {
-      let mut error = ~"";
-      if x == "true"
-      { c.show_fps = true; }
-      else if x == "false"
-      { c.show_fps = false; }
-      else
-      { error = fmt!("Invalid value for %s (use 'true' or 'false')", p); }
-
-      if error.len() == 0
-      { None }
-      else
-      { Some(error) }
-    });
-    console::Console::get().add_accessor("camera.vsync", |_|
-    { c.vsync.to_str() });
-    console::Console::get().add_mutator("camera.vsync", |p, x|
-    {
-      let mut error = ~"";
-      if x == "true"
-      {
-        c.vsync = true;
-        glfw::set_swap_interval(1); 
-      }
-      else if x == "false"
-      {
-        c.vsync = false;
-        glfw::set_swap_interval(0);
-      }
-      else
-      { error = fmt!("Invalid value for %s (use 'true' or 'false')", p); }
-
-      if error.len() == 0
-      { None }
-      else
-      { Some(error) }
-    });
+    console::Console::get().add_mutator("camera.fov", c as @mut console::Mutator);
+    console::Console::get().add_mutator("camera.vsync", c as @mut console::Mutator);
+    console::Console::get().add_mutator("ui.show_fps", c as @mut console::Mutator);
 
     /* Set some defaults. */
     console::Console::run_function(~"set camera.vsync true");
@@ -189,5 +136,90 @@ impl Camera
 
   pub fn reset(&mut self)
   { self.position = math::Vec3f::zero(); }
+}
+
+impl console::Accessor for Camera
+{
+  fn access(&self, name: &str) -> ~str
+  {
+    match name
+    {
+      "camera.fov" =>
+      { self.fov.to_str() },
+      "camera.vsync" =>
+      { self.vsync.to_str() },
+      "ui.show_fps" =>
+      { self.show_fps.to_str() },
+
+      _ => { ~"ERROR" },
+    }
+  }
+}
+
+impl console::Mutator for Camera
+{
+  fn mutate(&mut self, name: &str, val: &str) -> Option<~str>
+  {
+    match name
+    {
+      "camera.fov" =>
+      {
+        let mut error = ~"";
+
+        self.fov = match from_str::<f32>(val)
+        {
+          Some(x) => { x },
+          None => { error = fmt!("Invalid value for %s (use a floating point number)", name); self.fov }
+        };
+
+        /* Rebuild the projection info. */
+        self.resize(self.window_size.x, self.window_size.y);
+
+        if error.len() == 0
+        { None }
+        else
+        { Some(error) }
+      },
+      "ui.show_fps" =>
+      {
+        let mut error = ~"";
+
+        if val == "true"
+        { self.show_fps = true; }
+        else if val == "false"
+        { self.show_fps = false; }
+        else
+        { error = fmt!("Invalid value for %s (use 'true' or 'false')", name); }
+
+        if error.len() == 0
+        { None }
+        else
+        { Some(error) }
+      },
+      "camera.vsync" =>
+      {
+        let mut error = ~"";
+
+        if val == "true"
+        {
+          self.vsync = true;
+          glfw::set_swap_interval(1); 
+        }
+        else if val == "false"
+        {
+          self.vsync = false;
+          glfw::set_swap_interval(0);
+        }
+        else
+        { error = fmt!("Invalid value for %s (use 'true' or 'false')", name); }
+
+        if error.len() == 0
+        { None }
+        else
+        { Some(error) }
+      },
+      _ => { Some(~"Invalid property name") }
+    }
+  }
 }
 

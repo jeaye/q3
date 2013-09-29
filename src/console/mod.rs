@@ -14,7 +14,7 @@
 
 extern mod log;
 
-pub use self::console::Console;
+pub use self::console::*;
 
 pub mod console;
 

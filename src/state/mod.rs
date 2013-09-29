@@ -23,8 +23,7 @@ extern mod gl;
 extern mod ui;
 extern mod obj;
 
-pub use self::director::Director;
-pub use self::director::State;
+pub use self::director::{ State, Director, Deferred };
 pub use self::game::Game;
 pub use self::game_renderer::Game_Renderer;
 pub use self::map_renderer::Map_Renderer;

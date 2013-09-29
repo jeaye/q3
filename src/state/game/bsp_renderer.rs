@@ -157,7 +157,7 @@ impl State for BSP_Renderer
     false
   }
 
-  fn key_action(&mut self, key: i32, action: i32, _mods: glfw::KeyMods) -> bool
+  fn key_action(&mut self, key: glfw::Key, action: glfw::Action, _mods: glfw::Modifiers) -> bool
   { (self.game_renderer.camera as @mut State).key_action(key, action, _mods) }
   fn mouse_moved(&mut self, x: f32, y: f32) -> bool
   { (self.game_renderer.camera as @mut State).mouse_moved(x, y) }

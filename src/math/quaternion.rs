@@ -15,7 +15,7 @@ use std::{ f32, cmp };
 type Component = f32;
 
 #[deriving(Clone)]
-struct Quaternion
+pub struct Quaternion
 {
   x: Component,
   y: Component,

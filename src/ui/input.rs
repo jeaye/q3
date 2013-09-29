@@ -15,7 +15,7 @@ pub trait Input_Listener
 {
   /*  Returns true when the event has been captured. If the event is not
       captured, it's set to the next lower state. Rinse and repeat. */
-  fn key_action(&mut self, key: i32, action: i32, mods: glfw::KeyMods) -> bool;
+  fn key_action(&mut self, key: glfw::Key, action: glfw::Action, mods: glfw::Modifiers) -> bool;
   fn key_char(&mut self, ch: char) -> bool;
   fn mouse_action(&mut self, button: i32, action: i32, mods: i32) -> bool;
   fn mouse_moved(&mut self, x: f32, y: f32) -> bool;

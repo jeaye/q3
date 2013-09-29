@@ -19,11 +19,20 @@ use log::Log;
 mod macros;
 
 /* Takes: property name; Returns: property value. */
-type Property_Accessor = @fn(&str) -> ~str; 
+pub trait Accessor
+{
+  fn access(&self, name: &str) -> ~str;
+}
 /* Takes: property name, new value; Returns: Some(failure message). */
-type Property_Mutator = @fn(&str, &str) -> Option<~str>;
+pub trait Mutator
+{
+  fn mutate(&mut self, name: &str, val: &str) -> Option<~str>;
+}
 /* Takes: function name, params; Returns: sucess/failure, message. */
-type Function = @fn(&str, &str) -> (bool, ~str);
+pub trait Functor
+{
+  fn call(&mut self, name: &str, params: &str) -> (bool, ~str);
+}
 
 static tls_key: local_data::Key<@mut Console> = &local_data::Key;
 
@@ -45,8 +54,8 @@ struct Registry
       Ex: set map.wireframe on
       Ex: get map.wireframe
   */
-  accessors: HashMap<~str, Property_Accessor>,
-  mutators: HashMap<~str, Property_Mutator>,
+  accessors: HashMap<~str, @mut Accessor>,
+  mutators: HashMap<~str, @mut Mutator>,
 
   /*
       A map of arbitrary functions to callbacks.
@@ -59,10 +68,10 @@ struct Registry
       Ex: record my.avi
       Ex: callvote kick annoying_dude
   */
-  functions: HashMap<~str, Function>,
+  functions: HashMap<~str, @mut Functor>,
 }
 
-struct Console
+pub struct Console
 {
   body: ~str,
   prefix: ~str,
@@ -83,9 +92,9 @@ impl Console
 
       registry: Registry
       {
-        accessors: HashMap::<~str, Property_Accessor>::new(),
-        mutators: HashMap::<~str, Property_Mutator>::new(),
-        functions: HashMap::<~str, Function>::new(),
+        accessors: HashMap::<~str, @mut Accessor>::new(),
+        mutators: HashMap::<~str, @mut Mutator>::new(),
+        functions: HashMap::<~str, @mut Functor>::new(),
       },
     };
 
@@ -93,61 +102,11 @@ impl Console
     local_data::set(tls_key, c);
 
     /* The 'get' and 'set' functions are built in to the console. */
-    c.registry.functions.insert(~"get",
-    |_get, property| -> (bool, ~str)
-    {
-      let mut msg;
-      let mut success = false;
+    c.registry.functions.insert(~"get", c as @mut Functor);
+    c.registry.functions.insert(~"set", c as @mut Functor);
 
-      /* Check if this property exists. */
-      match c.registry.accessors.find(&property.to_owned())
-      {
-        Some(func) =>
-        { msg = fmt!("%s = %s", property, (*func)(property)); success = true; }
-        None =>
-        { msg = fmt!("\\\\2Error: \\\\1Invalid property '%s'", property); }
-      }
-
-      (success, msg)
-    });
-
-    c.registry.functions.insert(~"set",
-    |_set, params| -> (bool, ~str)
-    {
-      let mut msg;
-      let mut success = false;
-      let mut property = ~"";
-      let mut params = params.to_owned();
-      for x in params.split_iter(' ')
-      { property = x.to_owned(); break; }
-
-      /* We require a property and a value.
-       * Remove the property from the string.
-       */
-      for _ in property.iter()
-      { params.shift_char(); }
-      if params.len() > 0
-      { params.shift_char(); }
-
-      /* Check if this property exists. */
-      match c.registry.mutators.find(&property)
-      {
-        Some(func) =>
-        {
-          /* Pass the args to the property mutator. */
-          match (*func)(property, params)
-          {
-            /* Check if the mutator liked the args. */
-            Some(err) => { success = false; msg = ~"\\\\2Error: \\\\1" + err; }
-            None => { success = true; msg = fmt!("\\\\1%s = %s", property, params); }
-          }
-        }
-        None => { msg = fmt!("\\\\2Error: \\\\1The property '%s' does not exist.", property); }
-      }
-
-      (success, msg)
-    });
-
+    /* Default properties. */
+    c.add_accessor("q3.version", c as @mut Accessor);
 
     c
   }
@@ -166,11 +125,11 @@ impl Console
     })
   }
 
-  pub fn add_function(&mut self, name: ~str, func: Function)
+  pub fn add_function(&mut self, name: ~str, func: @mut Functor)
   { self.registry.functions.insert(name, func); }
-  pub fn add_accessor(&mut self, name: &str, accessor: Property_Accessor)
+  pub fn add_accessor(&mut self, name: &str, accessor: @mut Accessor)
   { self.registry.accessors.insert(name.to_owned(), accessor); }
-  pub fn add_mutator(&mut self, name: &str, mutator: Property_Mutator)
+  pub fn add_mutator(&mut self, name: &str, mutator: @mut Mutator)
   { self.registry.mutators.insert(name.to_owned(), mutator); }
   pub fn add_log(&mut self, text: &str)
   { self.body.push_str("\n" + text); }
@@ -195,12 +154,88 @@ impl Console
     let fun = Console::get().registry.functions.find(&func);
     match fun
     {
-      Some(f) =>
+      Some(ref f) =>
       {
         let input = input_func.clone();
-        (*f)(func, input)
+        (*f).call(func, input)
       }
       None => { (false, fmt!("\\\\2Error: \\\\1Invalid function '%s'", func)) }
+    }
+  }
+}
+
+impl Functor for Console
+{
+  fn call(&mut self, name: &str, params: &str) -> (bool, ~str)
+  {
+    match name
+    {
+      "get" =>
+      {
+        let mut msg;
+        let mut success = false;
+
+        /* Check if this property exists. */
+        match self.registry.accessors.find(&params.to_owned())
+        {
+          Some(func) =>
+          { msg = fmt!("%s = %s", params, (*func).access(params)); success = true; }
+          None =>
+          { msg = fmt!("\\\\2Error: \\\\1Invalid property '%s'", params); }
+        }
+
+        (success, msg)
+      }
+      "set" =>
+      {
+        let mut msg;
+        let mut success = false;
+        let mut property = ~"";
+        let mut params = params.to_owned();
+        for x in params.split_iter(' ')
+        { property = x.to_owned(); break; }
+
+        /* We require a property and a value.
+         * Remove the property from the string.
+         */
+        for _ in property.iter()
+        { params.shift_char(); }
+        if params.len() > 0
+        { params.shift_char(); }
+
+        /* Check if this property exists. */
+        match self.registry.mutators.find(&property)
+        {
+          Some(func) =>
+          {
+            /* Pass the args to the property mutator. */
+            match (*func).mutate(property, params)
+            {
+              /* Check if the mutator liked the args. */
+              Some(err) => { success = false; msg = ~"\\\\2Error: \\\\1" + err; }
+              None => { success = true; msg = fmt!("\\\\1%s = %s", property, params); }
+            }
+          }
+          None => { msg = fmt!("\\\\2Error: \\\\1The property '%s' does not exist.", property); }
+        }
+
+        (success, msg)
+      }
+      _ => { (false, ~"\\\\2Error: \\\\1Invalid function") }
+    }
+  }
+}
+
+impl Accessor for Console
+{
+  fn access(&self, name: &str) -> ~str
+  {
+    match name
+    {
+      "q3.version" =>
+      { fmt!("%s.%s", env!("VERSION"), env!("COMMIT")) },
+
+      _ => ~"ERROR",
     }
   }
 }
