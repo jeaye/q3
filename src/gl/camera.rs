@@ -164,59 +164,40 @@ impl console::Mutator for Camera
     {
       "camera.fov" =>
       {
-        let mut error = ~"";
-
-        self.fov = match from_str::<f32>(val)
+        let res = console::Util::parse_f32(name, val);
+        match res
         {
-          Some(x) => { x },
-          None => { error = fmt!("Invalid value for %s (use a floating point number)", name); self.fov }
-        };
-
-        /* Rebuild the projection info. */
-        self.resize(self.window_size.x, self.window_size.y);
-
-        if error.len() == 0
-        { None }
-        else
-        { Some(error) }
+          Ok(val) =>
+          {
+            self.fov = val;
+            self.resize(self.window_size.x, self.window_size.y);
+            None
+          }
+          Err(msg) => { Some(msg) }
+        }
       },
       "ui.show_fps" =>
       {
-        let mut error = ~"";
-
-        if val == "true"
-        { self.show_fps = true; }
-        else if val == "false"
-        { self.show_fps = false; }
-        else
-        { error = fmt!("Invalid value for %s (use 'true' or 'false')", name); }
-
-        if error.len() == 0
-        { None }
-        else
-        { Some(error) }
+        let res = console::Util::parse_bool(name, val);
+        match res
+        {
+          Ok(val) => { self.show_fps = val; None },
+          Err(msg) => { Some(msg) }
+        }
       },
       "camera.vsync" =>
       {
-        let mut error = ~"";
-
-        if val == "true"
+        let res = console::Util::parse_bool(name, val);
+        match res
         {
-          self.vsync = true;
-          glfw::set_swap_interval(1); 
+          Ok(val) =>
+          {
+            self.vsync = val;
+            glfw::set_swap_interval(if self.vsync { 1 } else { 0 });
+            None
+          },
+          Err(msg) => { Some(msg) }
         }
-        else if val == "false"
-        {
-          self.vsync = false;
-          glfw::set_swap_interval(0);
-        }
-        else
-        { error = fmt!("Invalid value for %s (use 'true' or 'false')", name); }
-
-        if error.len() == 0
-        { None }
-        else
-        { Some(error) }
       },
       _ => { Some(~"Invalid property name") }
     }

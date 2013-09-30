@@ -15,6 +15,8 @@
 extern mod log;
 
 pub use self::console::*;
+pub use self::util::Util;
 
 pub mod console;
+pub mod util;
 

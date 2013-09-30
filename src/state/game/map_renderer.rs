@@ -372,19 +372,12 @@ impl console::Mutator for Map_Renderer
     {
       "map.wireframe" =>
       {
-        let mut error = ~"";
-
-        if val == "true"
-        { self.wireframe = true; }
-        else if val == "false"
-        { self.wireframe = false; }
-        else
-        { error = fmt!("Invalid value for %s (use 'true' or 'false')", name); }
-
-        if error.len() == 0
-        { None }
-        else
-        { Some(error) }
+        let res = console::Util::parse_bool(name, val);
+        match res
+        {
+          Ok(val) => { self.wireframe = val; None },
+          Err(msg) => { Some(msg) }
+        }
       }
 
       _ => Some(~"ERROR"),

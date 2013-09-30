@@ -111,7 +111,7 @@ impl Console
     c
   }
 
-  /* Accesses the singleton consol from task-local storage. */
+  /* Accesses the singleton console from task-local storage. */
   pub fn get() -> @mut Console
   {
     local_data::get(tls_key, 
@@ -126,11 +126,20 @@ impl Console
   }
 
   pub fn add_function(&mut self, name: ~str, func: @mut Functor)
-  { self.registry.functions.insert(name, func); }
+  {
+    log_debug!("Adding function: %s", name);
+    self.registry.functions.insert(name, func);
+  }
   pub fn add_accessor(&mut self, name: &str, accessor: @mut Accessor)
-  { self.registry.accessors.insert(name.to_owned(), accessor); }
+  {
+    log_debug!("Adding read access to property: %s", name);
+    self.registry.accessors.insert(name.to_owned(), accessor);
+  }
   pub fn add_mutator(&mut self, name: &str, mutator: @mut Mutator)
-  { self.registry.mutators.insert(name.to_owned(), mutator); }
+  {
+    log_debug!("Adding write access to property: %s", name);
+    self.registry.mutators.insert(name.to_owned(), mutator);
+  }
   pub fn add_log(&mut self, text: &str)
   { self.body.push_str("\n" + text); }
   pub fn add_error_log(&mut self, text: &str)
