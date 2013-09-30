@@ -9,12 +9,14 @@
       Utility functions for the in-game console.
 */
 
+use std::ascii::*;
+
 pub struct Util;
 impl Util
 {
   pub fn parse_bool(name: &str, val: &str) -> Result<bool, ~str>
   {
-    match val.to_ascii().to_lower().to_str_ascii()
+    match val.to_ascii_lower()
     {
       ~"true" => Ok(true),
       ~"on" => Ok(true),
