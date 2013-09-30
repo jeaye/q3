@@ -54,7 +54,7 @@ struct Registry
       Ex: set map.wireframe on
       Ex: get map.wireframe
   */
-  accessors: HashMap<~str, @mut Accessor>,
+  accessors: HashMap<~str, @Accessor>,
   mutators: HashMap<~str, @mut Mutator>,
 
   /*
@@ -92,7 +92,7 @@ impl Console
 
       registry: Registry
       {
-        accessors: HashMap::<~str, @mut Accessor>::new(),
+        accessors: HashMap::<~str, @Accessor>::new(),
         mutators: HashMap::<~str, @mut Mutator>::new(),
         functions: HashMap::<~str, @mut Functor>::new(),
       },
@@ -106,7 +106,7 @@ impl Console
     c.registry.functions.insert(~"set", c as @mut Functor);
 
     /* Default properties. */
-    c.add_accessor("q3.version", c as @mut Accessor);
+    c.add_accessor("q3.version", c as @Accessor);
 
     c
   }
@@ -130,7 +130,7 @@ impl Console
     log_debug!("Adding function: %s", name);
     self.registry.functions.insert(name, func);
   }
-  pub fn add_accessor(&mut self, name: &str, accessor: @mut Accessor)
+  pub fn add_accessor(&mut self, name: &str, accessor: @Accessor)
   {
     log_debug!("Adding read access to property: %s", name);
     self.registry.accessors.insert(name.to_owned(), accessor);

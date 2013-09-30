@@ -86,9 +86,9 @@ impl Camera
       vsync: true,
     };
 
-    console::Console::get().add_accessor("camera.fov", c as @mut console::Accessor);
-    console::Console::get().add_accessor("camera.vsync", c as @mut console::Accessor);
-    console::Console::get().add_accessor("ui.show_fps", c as @mut console::Accessor);
+    console::Console::get().add_accessor("camera.fov", c as @console::Accessor);
+    console::Console::get().add_accessor("camera.vsync", c as @console::Accessor);
+    console::Console::get().add_accessor("ui.show_fps", c as @console::Accessor);
 
     console::Console::get().add_mutator("camera.fov", c as @mut console::Mutator);
     console::Console::get().add_mutator("camera.vsync", c as @mut console::Mutator);

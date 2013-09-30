@@ -162,7 +162,7 @@ impl Map_Renderer
     {
       fn call(&mut self)
       {
-        console::Console::get().add_accessor("map.wireframe", self.mr as @mut console::Accessor);
+        console::Console::get().add_accessor("map.wireframe", self.mr as @console::Accessor);
         console::Console::get().add_mutator("map.wireframe", self.mr as @mut console::Mutator);
       }
     }
