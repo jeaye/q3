@@ -78,7 +78,7 @@ impl Font
       for curr in chars.iter()
       {
         if ft::FT_Load_Char(font.face, curr as u32, ft::LOAD_RENDER) != 0
-        { loop; }
+        { continue; }
 
         /* If we've exhausted the width for this row, add another. */
         if row_width + (*ft_glyph).bitmap.width + 1 >= max_width

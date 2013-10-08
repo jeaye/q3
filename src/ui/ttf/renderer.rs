@@ -141,7 +141,7 @@ impl Renderer
           if curr.is_digit()
           {
             color_str.push_char(curr);
-            loop;
+            continue;
           }
           expecting_color = false;
 
@@ -158,7 +158,7 @@ impl Renderer
           expecting_color = true;
           color_str.clear();
           color_str.reserve(2);
-          loop;
+          continue;
         }
 
         let end_x = temp_pos.x + glyph.offset.x;
@@ -171,7 +171,7 @@ impl Renderer
 
         /* Skip empty glyphs. */
         if end_w <= 0.1 || end_h <= 0.1
-        { loop; }
+        { continue; }
 
         coords.push(Point::new(end_x, -end_y - end_h, glyph.tex.x, glyph.tex.y, color.x, color.y, color.z));
         coords.push(Point::new(end_x, -end_y, glyph.tex.x, glyph.tex.y + (end_h / (font.atlas_dimensions.y as f32)), color.x, color.y, color.z));

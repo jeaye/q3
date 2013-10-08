@@ -12,6 +12,9 @@
 #[link(name = "state", vers = "0.2")];
 #[crate_type = "lib"];
 
+#[feature(globs)];
+#[feature(macro_rules)];
+
 extern mod extra;
 extern mod opengles;
 extern mod glfw;

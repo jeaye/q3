@@ -208,7 +208,7 @@ impl Map
     let mut verts: ~[lump::Vertex] = ~[];
     for face in self.faces.iter()
     {
-      if face.kind != 1 { loop; }
+      if face.kind != 1 { continue; }
 
       match face.num_vertices
       {

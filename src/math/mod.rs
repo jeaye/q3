@@ -12,6 +12,9 @@
 #[link(name = "math", vers = "0.2")];
 #[crate_type = "lib"];
 
+#[feature(globs)];
+#[feature(macro_rules)];
+
 extern mod log;
 
 pub use self::quaternion::*;

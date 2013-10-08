@@ -30,10 +30,10 @@ use extra::term::color;
 
 /* Default is error. */
 type Verbosity = u8;
-static Verbosity_None: Verbosity = 0;
-static Verbosity_Error: Verbosity = 1;
-static Verbosity_Info: Verbosity = 2;
-static Verbosity_Debug: Verbosity = 3;
+static VERBOSITY_NONE: Verbosity = 0;
+static VERBOSITY_ERROR: Verbosity = 1;
+static VERBOSITY_INFO: Verbosity = 2;
+static VERBOSITY_DEBUG: Verbosity = 3;
 
 static tls_key: local_data::Key<@mut Log> = &local_data::Key;
 
@@ -57,13 +57,13 @@ impl Log
                  {
                    Some(val) => match val
                    {
-                     ~"0" => Verbosity_None,
-                     ~"1" => Verbosity_Error,
-                     ~"2" => Verbosity_Info,
-                     ~"3" => Verbosity_Debug,
-                     _ => Verbosity_Info, /* default */
+                     ~"0" => VERBOSITY_NONE,
+                     ~"1" => VERBOSITY_ERROR,
+                     ~"2" => VERBOSITY_INFO,
+                     ~"3" => VERBOSITY_DEBUG,
+                     _ => VERBOSITY_INFO, /* default */
                    },
-                   None => Verbosity_Info /* default */
+                   None => VERBOSITY_INFO /* default */
                  },
       push_level: 0,
       terminal: term::Terminal::new(io::stdout()).unwrap(),
@@ -90,22 +90,22 @@ impl Log
   pub fn debug(module: &str, message: &str)
   {
     let logger = Log::get();
-    if logger.verbosity >= Verbosity_Debug
-    { Log::log(module, message, Verbosity_Debug); }
+    if logger.verbosity >= VERBOSITY_DEBUG
+    { Log::log(module, message, VERBOSITY_DEBUG); }
   }
 
   pub fn info(module: &str, message: &str)
   {
     let logger = Log::get();
-    if logger.verbosity >= Verbosity_Info
-    { Log::log(module, message, Verbosity_Info); }
+    if logger.verbosity >= VERBOSITY_INFO
+    { Log::log(module, message, VERBOSITY_INFO); }
   }
 
   pub fn error(module: &str, message: &str)
   {
     let logger = Log::get();
-    if logger.verbosity >= Verbosity_Error
-    { Log::log(module, message, Verbosity_Error); }
+    if logger.verbosity >= VERBOSITY_ERROR
+    { Log::log(module, message, VERBOSITY_ERROR); }
   }
 
   pub fn get_module(file: &str) -> ~str
@@ -143,17 +143,17 @@ impl Log
 
     match verbosity
     {
-      Verbosity_Debug =>
+      VERBOSITY_DEBUG =>
       {
         logger.terminal.fg(color::BRIGHT_GREEN);
         print(" debug => ");
       },
-      Verbosity_Info =>
+      VERBOSITY_INFO =>
       {
         logger.terminal.fg(color::BRIGHT_YELLOW);
         print(" info => ");
       },
-      Verbosity_Error =>
+      VERBOSITY_ERROR =>
       {
         logger.terminal.fg(color::BRIGHT_RED);
         print(" error => ");

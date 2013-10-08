@@ -39,7 +39,7 @@ macro_rules! declare
         {
           let len = self.length();
 
-          if (len as f32).approx_eq(&0.0)
+          if (len as f64).approx_eq(&0.0)
           { return; }
 
           self.x /= len;
@@ -48,13 +48,13 @@ macro_rules! declare
 
         pub fn length(&self) -> $Component
         { (((self.x * self.x) + 
-            (self.y * self.y)) as float).sqrt() as $Component }
+            (self.y * self.y)) as f64).sqrt() as $Component }
 
         pub unsafe fn to_ptr(&self) -> *$Type
         { ptr::to_unsafe_ptr(self) } 
 
         pub fn to_str(&self) -> ~str
-        { fmt!("(%f, %f)", self.x as float, self.y as float) }
+        { format!("({}, {})", self.x, self.y) }
       }
 
       /***** Operator Overloads *****/

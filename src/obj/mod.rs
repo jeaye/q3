@@ -13,6 +13,9 @@
 #[link(name = "obj", vers = "0.2")];
 #[crate_type = "lib"];
 
+#[feature(globs)];
+#[feature(macro_rules)];
+
 extern mod extra;
 extern mod opengles;
 

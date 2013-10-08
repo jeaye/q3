@@ -9,6 +9,9 @@
       Entry point.
 */
 
+#[feature(globs)];
+#[feature(macro_rules)];
+
 extern mod extra;
 extern mod opengles;
 extern mod glfw;

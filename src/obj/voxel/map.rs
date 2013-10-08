@@ -92,11 +92,11 @@ impl Map
     /* Calculate, given resolution (how many states across), the dimensions of a voxel. */
     self.voxel_size = cmp::max( max.x - min.x,
                                 cmp::max(max.y - min.y, max.z - min.z)) / (self.resolution as f32);
-    log_debug!("Voxel size is %f", self.voxel_size as float);
+    log_debug!("Voxel size is %f", self.voxel_size as f64);
 
     /* World space mid point of the grid. */
     let mid_offset = (((self.resolution as f32) / 2.0) * self.voxel_size); 
-    log_debug!("Midpoint offset is %f", mid_offset as float);
+    log_debug!("Midpoint offset is %f", mid_offset as f64);
 
     /* Create 3D array of states. */
     self.states = Some(vec::with_capacity(((self.resolution + 1) as f32).pow(&3.0) as uint));

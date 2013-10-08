@@ -57,7 +57,7 @@ macro_rules! declare
         {
           let len = self.length();
 
-          if (len as f32).approx_eq(&0.0)
+          if (len as f64).approx_eq(&0.0)
           { return; }
 
           self.x /= len;
@@ -68,7 +68,7 @@ macro_rules! declare
         pub fn length(&self) -> $Component
         { (((self.x * self.x) + 
             (self.y * self.y) + 
-            (self.z * self.z)) as float).sqrt() as $Component }
+            (self.z * self.z)) as f64).sqrt() as $Component }
 
         pub fn cross(&self, rhs: &$Type) -> $Type
         {
@@ -94,7 +94,7 @@ macro_rules! declare
         { ptr::to_unsafe_ptr(self) } 
 
         pub fn to_str(&self) -> ~str
-        { fmt!("(%f, %f, %f)", self.x as float, self.y as float, self.z as float) }
+        { format!("({}, {}, {})", self.x, self.y, self.z) }
       }
 
       /***** Operator Overloads *****/
@@ -197,9 +197,9 @@ macro_rules! declare
       {
         fn eq(&self, other: &$Type) -> bool
         {
-          (self.x as f32).approx_eq(&(other.x as f32)) && 
-          (self.y as f32).approx_eq(&(other.y as f32)) && 
-          (self.z as f32).approx_eq(&(other.z as f32))
+          (self.x as f64).approx_eq(&(other.x as f64)) && 
+          (self.y as f64).approx_eq(&(other.y as f64)) && 
+          (self.z as f64).approx_eq(&(other.z as f64))
         }
         fn ne(&self, other: &$Type) -> bool
         { !(self == other) }

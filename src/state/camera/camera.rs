@@ -156,8 +156,8 @@ impl State for gl::Camera
     else if self.angles.y > f32::consts::pi * 0.49
     { self.angles.y = f32::consts::pi * 0.49; }
 
-    self.window.set_cursor_pos( (self.window_size.x / 2) as float, 
-                                (self.window_size.y / 2) as float);
+    self.window.set_cursor_pos( (self.window_size.x / 2) as f64, 
+                                (self.window_size.y / 2) as f64);
 
     true
   }
