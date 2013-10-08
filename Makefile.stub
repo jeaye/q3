@@ -52,16 +52,16 @@ endif
 LIBS=-L. -Lbuild/q3 -Lbuild/glfw_static -Lbuild/glfw-rs -Lbuild/rust-opengles -Lbuild/stb-image -L/opt/local/lib
 
 # Shared
-LOG_SRC=$(shell find src/shared/log -type f -name '*.rs')
-CONSOLE_SRC=$(shell find src/shared/console -type f -name '*.rs')
-MATH_SRC=$(shell find src/shared/math -type f -name '*.rs')
-OBJ_SRC=$(shell find src/shared/obj -type f -name '*.rs')
+LOG_SRC=$(shell find ${PROJ_DIR}/src/shared/log -type f -name '*.rs')
+CONSOLE_SRC=$(shell find ${PROJ_DIR}/src/shared/console -type f -name '*.rs')
+MATH_SRC=$(shell find ${PROJ_DIR}/src/shared/math -type f -name '*.rs')
+OBJ_SRC=$(shell find ${PROJ_DIR}/src/shared/obj -type f -name '*.rs')
 
 # Client
-GL_SRC=$(shell find src/client/gl -type f -name '*.rs')
-MD5_SRC=$(shell find src/client/md5 -type f -name '*.rs')
-UI_SRC=$(shell find src/client/ui -type f -name '*.rs')
-STATE_SRC=$(shell find src/client/state -type f -name '*.rs')
+GL_SRC=$(shell find ${PROJ_DIR}/src/client/gl -type f -name '*.rs')
+MD5_SRC=$(shell find ${PROJ_DIR}/src/client/md5 -type f -name '*.rs')
+UI_SRC=$(shell find ${PROJ_DIR}/src/client/ui -type f -name '*.rs')
+STATE_SRC=$(shell find ${PROJ_DIR}/src/client/state -type f -name '*.rs')
 
 # Dummy modules
 SHARED_MODULES=.build_log .build_console .build_math .build_obj
