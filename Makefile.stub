@@ -51,74 +51,104 @@ endif
 
 LIBS=-L. -Lbuild/q3 -Lbuild/glfw_static -Lbuild/glfw-rs -Lbuild/rust-opengles -Lbuild/stb-image -L/opt/local/lib
 
-LOG_SRC=$(shell find src/log -type f -name '*.rs')
-CONSOLE_SRC=$(shell find src/console -type f -name '*.rs')
-MATH_SRC=$(shell find src/math -type f -name '*.rs')
-GL_SRC=$(shell find src/gl -type f -name '*.rs')
-UI_SRC=$(shell find src/ui -type f -name '*.rs')
-OBJ_SRC=$(shell find src/obj -type f -name '*.rs')
-STATE_SRC=$(shell find src/state -type f -name '*.rs')
+# Shared
+LOG_SRC=$(shell find src/shared/log -type f -name '*.rs')
+CONSOLE_SRC=$(shell find src/shared/console -type f -name '*.rs')
+MATH_SRC=$(shell find src/shared/math -type f -name '*.rs')
+OBJ_SRC=$(shell find src/shared/obj -type f -name '*.rs')
 
-MODULES=.build_log .build_console .build_math .build_gl .build_ui .build_obj .build_state
+# Client
+GL_SRC=$(shell find src/client/gl -type f -name '*.rs')
+MD5_SRC=$(shell find src/client/md5 -type f -name '*.rs')
+UI_SRC=$(shell find src/client/ui -type f -name '*.rs')
+STATE_SRC=$(shell find src/client/state -type f -name '*.rs')
+
+# Dummy modules
+SHARED_MODULES=.build_log .build_console .build_math .build_obj
+CLIENT_MODULES=.build_gl .build_md5 .build_ui .build_state
 
 .SILENT:
 
-.PHONY: all setup clean
+.PHONY: all setup_client client setup_server server clean
 
-all: setup .build_log .build_console .build_math .build_gl .build_ui .build_obj .build_state
-	${ECHO} "${ECHO_PREFIX} Building client"
-	rustc ${PROJ_DIR}/src/main.rs -o bin/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
-	${ECHO} "${ECHO_PREFIX} Success"
+all: client server
 
-setup:
-	${ECHO} "${ECHO_PREFIX} ${VERSION_NAME} Q³ [${VERSION}.${COMMIT}]"
+### CLIENT
+
+setup_client:
+	${ECHO} "${ECHO_PREFIX} ${VERSION_NAME} Q³ Client [${VERSION}.${COMMIT}]"
 	mkdir -p bin
 	mkdir -p build/q3
+
+client: setup_client ${SHARED_MODULES} ${CLIENT_MODULES}
+	${ECHO} "${ECHO_PREFIX} Linking client"
+	rustc ${PROJ_DIR}/src/client/main.rs -o bin/client ${LIBS} ${CONFIGS} ${OPTIMIZATION}
+	${ECHO} "${ECHO_PREFIX} Success"
 
 .build_log: ${LOG_SRC}
 	${ECHO} "${ECHO_PREFIX} Building log"
 	rm -f build/q3/liblog*
-	rustc src/log/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
+	rustc src/shared/log/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
 	touch .build_log
 
 .build_console: ${CONSOLE_SRC} .build_log
 	${ECHO} "${ECHO_PREFIX} Building console"
 	rm -f build/q3/libconsole*
-	rustc src/console/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
+	rustc src/shared/console/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
 	touch .build_console
 
 .build_math: ${MATH_SRC} .build_console
 	${ECHO} "${ECHO_PREFIX} Building math"
 	rm -f build/q3/libmath*
-	rustc src/math/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
+	rustc src/shared/math/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
 	touch .build_math
 
-.build_gl: ${GL_SRC} .build_math
-	${ECHO} "${ECHO_PREFIX} Building gl"
-	rm -f build/q3/libgl*
-	rustc src/gl/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
-	touch .build_gl
-
-.build_ui: ${UI_SRC} .build_gl
-	${ECHO} "${ECHO_PREFIX} Building ui"
-	rm -f build/q3/libui*
-	rustc src/ui/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
-	touch .build_ui
-
-.build_obj: ${OBJ_SRC} .build_ui
+.build_obj: ${OBJ_SRC} .build_math
 	${ECHO} "${ECHO_PREFIX} Building obj"
 	rm -f build/q3/libobj*
-	rustc src/obj/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
+	rustc src/shared/obj/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
 	touch .build_obj
 
-.build_state: ${STATE_SRC} .build_obj
+.build_gl: ${GL_SRC} .build_obj
+	${ECHO} "${ECHO_PREFIX} Building gl"
+	rm -f build/q3/libgl*
+	rustc src/client/gl/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
+	touch .build_gl
+
+.build_md5: ${OBJ_SRC} .build_gl
+	${ECHO} "${ECHO_PREFIX} Building md5"
+	rm -f build/q3/libmd5*
+	rustc src/client/md5/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
+	touch .build_md5
+
+.build_ui: ${UI_SRC} .build_md5
+	${ECHO} "${ECHO_PREFIX} Building ui"
+	rm -f build/q3/libui*
+	rustc src/client/ui/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
+	touch .build_ui
+
+.build_state: ${STATE_SRC} .build_ui
 	${ECHO} "${ECHO_PREFIX} Building state"
 	rm -f build/q3/libstate*
-	rustc src/state/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
+	rustc src/client/state/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
 	touch .build_state
+
+### SERVER
+
+setup_server:
+	${ECHO} "${ECHO_PREFIX} ${VERSION_NAME} Q³ Server [${VERSION}.${COMMIT}]"
+	mkdir -p bin
+	mkdir -p build/q3
+
+server: setup_server ${SHARED_MODULES} ${SERVER_MODULES}
+	${ECHO} "${ECHO_PREFIX} Linking server"
+	rustc ${PROJ_DIR}/src/server/main.rs -o bin/server ${LIBS} ${CONFIGS} ${OPTIMIZATION}
+	${ECHO} "${ECHO_PREFIX} Success"
+
+### MISC
 
 clean:
 	${ECHO} "${ECHO_PREFIX} Cleaning"
-	-rm -f bin/q3
-	-rm -f ${MODULES}
+	-rm -f bin/client bin/server
+	-rm -f ${SHARED_MODULES} ${CLIENT_MODULES} ${SERVER_MODULES}
 

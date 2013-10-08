@@ -34,11 +34,20 @@ as submodules. To configure, simply run (in source and out of source builds are 
 ```
 From there, you should be able to compile and run a release build with:  
 ```bash
-make && ./bin/q3
+make && ./bin/client
+```
+The server can be executed via:  
+```bash
+./bin/server
+```
+You may also individually build server/client or specify a debug build:  
+```bash
+make server && make client # Make either separately
+make MODE=debug # Debug symbols and faster compilation
 ```
 **NOTE:** Ensure that you have Freetype2 installed.  
 **NOTE:** I don't have access to a Windows machine at the moment, so I'm not sure yet what will go into building 
-this under something like MinGW. This should be coming with r0.3, as per #26.
+this under something like MinGW. This should be coming with r0.3, as per [#26](https://github.com/jeaye/q3/issues/26).
 
 
 ### Who're you?
