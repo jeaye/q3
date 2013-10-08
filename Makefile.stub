@@ -88,49 +88,49 @@ client: setup_client ${SHARED_MODULES} ${CLIENT_MODULES}
 .build_log: ${LOG_SRC}
 	${ECHO} "${ECHO_PREFIX} Building log"
 	rm -f build/q3/liblog*
-	rustc src/shared/log/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
+	rustc ${PROJ_DIR}/src/shared/log/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
 	touch .build_log
 
 .build_console: ${CONSOLE_SRC} .build_log
 	${ECHO} "${ECHO_PREFIX} Building console"
 	rm -f build/q3/libconsole*
-	rustc src/shared/console/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
+	rustc ${PROJ_DIR}/src/shared/console/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
 	touch .build_console
 
 .build_math: ${MATH_SRC} .build_console
 	${ECHO} "${ECHO_PREFIX} Building math"
 	rm -f build/q3/libmath*
-	rustc src/shared/math/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
+	rustc ${PROJ_DIR}/src/shared/math/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
 	touch .build_math
 
 .build_obj: ${OBJ_SRC} .build_math
 	${ECHO} "${ECHO_PREFIX} Building obj"
 	rm -f build/q3/libobj*
-	rustc src/shared/obj/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
+	rustc ${PROJ_DIR}/src/shared/obj/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
 	touch .build_obj
 
 .build_gl: ${GL_SRC} .build_obj
 	${ECHO} "${ECHO_PREFIX} Building gl"
 	rm -f build/q3/libgl*
-	rustc src/client/gl/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
+	rustc ${PROJ_DIR}/src/client/gl/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
 	touch .build_gl
 
 .build_md5: ${OBJ_SRC} .build_gl
 	${ECHO} "${ECHO_PREFIX} Building md5"
 	rm -f build/q3/libmd5*
-	rustc src/client/md5/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
+	rustc ${PROJ_DIR}/src/client/md5/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
 	touch .build_md5
 
 .build_ui: ${UI_SRC} .build_md5
 	${ECHO} "${ECHO_PREFIX} Building ui"
 	rm -f build/q3/libui*
-	rustc src/client/ui/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
+	rustc ${PROJ_DIR}/src/client/ui/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
 	touch .build_ui
 
 .build_state: ${STATE_SRC} .build_ui
 	${ECHO} "${ECHO_PREFIX} Building state"
 	rm -f build/q3/libstate*
-	rustc src/client/state/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
+	rustc ${PROJ_DIR}/src/client/state/mod.rs --out-dir build/q3 ${LIBS} ${CONFIGS} ${OPTIMIZATION}
 	touch .build_state
 
 ### SERVER
