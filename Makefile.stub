@@ -49,7 +49,7 @@ else
 	ECHO=echo 
 endif
 
-LIBS=-L. -Lbuild/q3 -Lbuild/glfw_static -Lbuild/glfw-rs -Lbuild/rust-opengles -Lbuild/stb-image -L/opt/local/lib
+LIBS=-L. -Lbuild/q3 -Lbuild/glfw_static -Lbuild/glfw-rs -Lbuild/rust-opengles -Lbuild/stb-image -L/opt/local/lib -Lbuild/ncurses-rs
 
 # Shared
 LOG_SRC=$(shell find ${PROJ_DIR}/src/shared/log -type f -name '*.rs')

@@ -14,4 +14,7 @@
 	path = lib/stb-image
 	url = git://github.com/jeaye/rust-stb-image.git
   ignore = dirty
-
+[submodule "lib/ncurses-rs"]
+	path = lib/ncurses-rs
+	url = git://github.com/jeaye/ncurses-rs.git
+  ignore = dirty

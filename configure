@@ -181,6 +181,17 @@ pushd stb-image
   make -B
 popd
 
+## STB-Image
+log "Building ncurses-rs"
+mkdir -p ncurses-rs
+pushd ncurses-rs
+  pushd $SWD/lib/ncurses-rs
+    make clean
+    make -B
+    mv lib/libncurses* $BWD/ncurses-rs/
+  popd
+popd
+
 ## Q³
 cd .. # Back to the original invoking directory
 
