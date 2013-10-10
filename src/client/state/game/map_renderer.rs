@@ -16,6 +16,7 @@ use extra;
 use gl2 = opengles::gl2;
 use gl;
 use math;
+use obj;
 use obj::voxel;
 use log::Log;
 use console;
@@ -31,7 +32,7 @@ mod macros;
 
 pub struct Map_Renderer
 {
-  map: @mut voxel::Map,
+  map: @mut obj::Voxel_Map,
 
   vao: gl2::GLuint,
   vox_vbo: gl2::GLuint,
@@ -56,7 +57,7 @@ pub struct Map_Renderer
 
 impl Map_Renderer
 {
-  pub fn new(map: @mut voxel::Map) -> @mut Map_Renderer
+  pub fn new(map: @mut obj::Voxel_Map) -> @mut Map_Renderer
   {
     let (local_stream, _) = extra::comm::DuplexStream();
 

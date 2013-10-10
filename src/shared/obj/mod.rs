@@ -22,6 +22,9 @@ extern mod opengles;
 extern mod log;
 extern mod math;
 
+pub use BSP_Map = self::bsp::map::Map;
+pub use Voxel_Map = self::voxel::map::Map;
+
 pub mod bsp;
 pub mod primitive;
 pub mod voxel;

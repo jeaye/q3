@@ -15,8 +15,7 @@
 */
 
 use extra;
-use BSP_Map = obj::bsp::Map;
-use Voxel_Map = obj::voxel::Map;
+use obj;
 use super::State;
 use log::Log;
 
@@ -26,21 +25,21 @@ mod macros;
 
 pub struct Game
 {
-  bsp_map: BSP_Map,
-  voxel_map: @mut Voxel_Map,
+  bsp_map: obj::BSP_Map,
+  voxel_map: @mut obj::Voxel_Map,
 }
 
 impl Game
 {
   pub fn new(map_name: &str) -> Result<@mut Game, ~str>
   {
-    let bmap = BSP_Map::new(~"data/maps/" + map_name + ".bsp");
+    let bmap = obj::BSP_Map::new(~"data/maps/" + map_name + ".bsp");
     if bmap.is_err()
     { return Err(bmap.unwrap_err()); }
     let bmap = bmap.unwrap();
 
     let start_time = extra::time::precise_time_s();
-    let vmap = Voxel_Map::new(bmap.tris, 300);
+    let vmap = obj::Voxel_Map::new(bmap.tris, 300);
     let time = extra::time::precise_time_s() - start_time;
     log_info!("Voxelization took %f seconds", time);
     if vmap.is_err()

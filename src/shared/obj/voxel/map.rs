@@ -21,7 +21,7 @@ use log::Log;
 #[path = "../../log/macros.rs"]
 mod macros;
 
-struct Map
+pub struct Map
 {
   resolution: u32,
   voxel_size: f32,
