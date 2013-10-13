@@ -17,7 +17,6 @@
 #[feature(macro_rules)];
 
 extern mod extra;
-extern mod opengles;
 
 extern mod log;
 extern mod math;
