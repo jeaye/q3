@@ -11,39 +11,66 @@
 */
 
 #[feature(globs)];
+#[feature(macro_rules)];
 
+extern mod log;
+extern mod console;
 extern mod ui;
 
 use std::os;
+use log::Log;
+
+#[macro_escape]
+#[path = "../shared/log/macros.rs"]
+mod macros;
 
 struct Server
 {
-  log: ~str,
-  ui_driver: ~ui::Driver,
+  ui_driver: Option<~ui::Driver>,
 }
 
 impl Server
 {
   pub fn new() -> Server
   {
+    let server = Server
+    {
+      ui_driver: None,
+    };
+    
+    server
+  }
+
+  pub fn initialize(&mut self)
+  {
+    /* Create the console. */
+    let _console = console::Console::new();
+
+    self.parse_cmd_line();
+  }
+
+  fn parse_cmd_line(&mut self)
+  {
     let args = os::args();
     if args.contains(&~"--help")
     { Server::show_help(); }
+    if args.contains(&~"--version")
+    { Server::show_version(); }
 
     /* Determine the UI driver. */
     let driver =
     if args.contains(&~"--gui")
-    { fail!("GUI mode is not yet implemented"); }
+    { log_fail!("GUI mode is not yet implemented"); }
     else
-    { ui::term::initialize().expect("Unable to create terminal UI") };
+    { ui::term::initialize() };
+    log_assert!(driver.is_some(), "Unable to initialize UI");
+    self.ui_driver = driver;
+  }
 
-    let server = Server
-    {
-      log: ~"",
-      ui_driver: driver,
-    };
-
-    server
+  fn show_version()
+  {
+    println!("Q³ Server {}.{}", env!("VERSION"), env!("COMMIT"));
+    fail!("Exiting");
   }
 
   fn show_help()
@@ -51,7 +78,8 @@ impl Server
     let args = os::args();
 
     println!("Q³ Server {}.{}", env!("VERSION"), env!("COMMIT"));
-    println!("Usage:\n\t{} [options...]", args[0]);
+    println!("Usage:");
+    println!("\t{} [options...]", args[0]);
     println!("");
     println!("Options:");
     println!("\t--help\tShows this help menu and exits");
@@ -65,6 +93,8 @@ impl Server
 
 fn main()
 {
-  let _server = Server::new();
+  log::Log::initialize(); 
+  let mut server = Server::new();
+  server.initialize();
 }
 

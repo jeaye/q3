@@ -17,8 +17,11 @@
 
 extern mod extra;
 
-pub use self::log::Log;
+pub use self::log::{ Log, Verbosity };
+pub use self::log::{ VERBOSITY_DEBUG, VERBOSITY_INFO, VERBOSITY_ERROR, VERBOSITY_NONE };
+pub use self::listener::Listener;
 
 #[macro_escape]
 pub mod log;
+pub mod listener;
 

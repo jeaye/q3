@@ -77,7 +77,7 @@ SERVER_MODULES=.build_server_ui
 
 .PHONY: all setup_client client setup_server server clean
 
-all: client server
+all: clean client server
 
 ### CLIENT
 

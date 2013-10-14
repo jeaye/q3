@@ -27,13 +27,14 @@
 use std::{ io, local_data, os };
 use extra::term;
 use extra::term::color;
+use listener;
 
 /* Default is error. */
-type Verbosity = u8;
-static VERBOSITY_NONE: Verbosity = 0;
-static VERBOSITY_ERROR: Verbosity = 1;
-static VERBOSITY_INFO: Verbosity = 2;
-static VERBOSITY_DEBUG: Verbosity = 3;
+pub type Verbosity = u8;
+pub static VERBOSITY_NONE: Verbosity = 0;
+pub static VERBOSITY_ERROR: Verbosity = 1;
+pub static VERBOSITY_INFO: Verbosity = 2;
+pub static VERBOSITY_DEBUG: Verbosity = 3;
 
 static tls_key: local_data::Key<@mut Log> = &local_data::Key;
 
@@ -45,6 +46,7 @@ pub struct Log
   verbosity: Verbosity,
   push_level: u8, /* The indentation level, for nested logs. */
   terminal: term::Terminal,
+  listener: Option<@mut listener::Listener>,
 }
 
 impl Log
@@ -67,6 +69,7 @@ impl Log
                  },
       push_level: 0,
       terminal: term::Terminal::new(io::stdout()).unwrap(),
+      listener: None,
     };
 
     local_data::set(tls_key, logger);
@@ -85,6 +88,12 @@ impl Log
         None => log_fail!("Singleton not available")
       }
     })
+  }
+
+  pub fn set_listener(listener: @mut listener::Listener)
+  {
+    let logger = Log::get();
+    logger.listener = Some(listener);
   }
 
   pub fn debug(module: &str, message: &str)
@@ -131,6 +140,16 @@ impl Log
   fn log(module: &str, message: &str, verbosity: Verbosity)
   {
     let logger = Log::get();
+
+    /* Allow the listener to intervene. */
+    let log_to_stdout = match logger.listener
+    {
+      Some(ref mut listener) =>
+      { (*listener).log(module, message, verbosity) }
+      None => { true },
+    };
+    if !log_to_stdout
+    { return; }
 
     /* Display the current module. */
     logger.terminal.fg(color::BRIGHT_WHITE);
