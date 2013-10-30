@@ -11,7 +11,7 @@
       used only to render the voxel map.
 */
 
-use std::{ vec, ptr, sys, cast, cell };
+use std::{ vec, ptr, mem, cast, cell };
 use extra;
 use gl2 = opengles::gl2;
 use gl;
@@ -237,7 +237,7 @@ impl Map_Renderer
       check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, ibo));
       unsafe
       {
-        let size = visible_voxels.len() * sys::size_of::<u32>();
+        let size = visible_voxels.len() * mem::size_of::<u32>();
         let mem = check!(gl2::map_buffer_range(gl2::ARRAY_BUFFER, 0, size as i64, gl2::MAP_WRITE_BIT));
         log_assert!(mem != ptr::null());
         ptr::copy_nonoverlapping_memory(cast::transmute(mem), vec::raw::to_ptr(visible_voxels), size);

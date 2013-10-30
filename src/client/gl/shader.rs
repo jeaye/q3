@@ -14,7 +14,10 @@
       functionality for performance.
 */
 
-use std::{ str, io };
+use std::str;
+use std::rt::io;
+use std::rt::io::Reader;
+use std::rt::io::file::FileInfo;
 use gl2 = opengles::gl2;
 use log::Log;
 use math::*;
@@ -27,8 +30,6 @@ pub use Shader = self::Shaderable;
 
 #[cfg(debug_shader)] /* TODO: Can I use one of these for multiple lines? { } */
 pub use Shader_Builder = self::Debug_Shader;
-#[cfg(debug_shader)]
-use std::libc;
 
 #[cfg(release_shader)]
 pub use Shader_Builder = self::Release_Shader;
@@ -57,8 +58,8 @@ struct Debug_Shader
   frag_obj: gl2::GLuint,
   vert_file: ~str,
   frag_file: ~str,
-  vert_file_time: libc::time_t,
-  frag_file_time: libc::time_t,
+  vert_file_time: u64,
+  frag_file_time: u64,
   valid: bool, /* Whether or not the last compilation succeeded. */
 }
 
@@ -98,22 +99,22 @@ impl Debug_Shader
       frag_file_time: 0,
       valid: false,
     };
-    shader.vert_file_time = match Path(new_vert_file).stat()
+    shader.vert_file_time = match Path::new(new_vert_file).stat()
     {
-      Some(ref st) => st.st_mtime,
+      Some(ref st) => st.modified,
       None => 0
     };
-    shader.frag_file_time = match Path(new_frag_file).stat()
+    shader.frag_file_time = match Path::new(new_frag_file).stat()
     {
-      Some(ref st) => st.st_mtime,
+      Some(ref st) => st.modified,
       None => 0
     };
 
-    let fio = io::file_reader(&Path(new_vert_file)).unwrap();
-    let vert_src = str::from_utf8(fio.read_whole_stream());
+    let mut fio = Path::new(new_vert_file).open_reader(io::Open).expect("Unable to open reader");
+    let vert_src = str::from_utf8(fio.read_to_end());
 
-    let fio = io::file_reader(&Path(new_frag_file)).unwrap();
-    let frag_src = str::from_utf8(fio.read_whole_stream());
+    let mut fio = Path::new(new_frag_file).open_reader(io::Open).expect("Unable to open reader");
+    let frag_src = str::from_utf8(fio.read_to_end());
 
     log_assert!(shared::load(shader, vert_src, frag_src));
     shader.valid = true;
@@ -128,25 +129,25 @@ impl Shader for Debug_Shader
   fn bind(&mut self)
   {
     /* Get the time stamp on the files. */
-    let vert_time = match Path(self.vert_file).stat()
+    let vert_time = match Path::new(self.vert_file.clone()).stat()
     {
-      Some(ref st) => st.st_mtime,
+      Some(ref st) => st.modified,
       None => 0
     };
-    let frag_time = match Path(self.frag_file).stat()
+    let frag_time = match Path::new(self.frag_file.clone()).stat()
     {
-      Some(ref st) => st.st_mtime,
+      Some(ref st) => st.modified,
       None => 0
     };
 
     /* Check if the files are newer than before. */
     if vert_time > self.vert_file_time || frag_time > self.frag_file_time
     {
-      let fio = io::file_reader(&Path(self.vert_file)).unwrap();
-      let vert_src = str::from_utf8(fio.read_whole_stream());
+      let mut fio = Path::new(self.vert_file.clone()).open_reader(io::Open).expect("Unable to open reader");
+      let vert_src = str::from_utf8(fio.read_to_end());
 
-      let fio = io::file_reader(&Path(self.frag_file)).unwrap();
-      let frag_src = str::from_utf8(fio.read_whole_stream());
+      let mut fio = Path::new(self.frag_file.clone()).open_reader(io::Open).expect("Unable to open reader");
+      let frag_src = str::from_utf8(fio.read_to_end());
 
       self.valid = shared::load(self, vert_src, frag_src);
 
@@ -206,11 +207,11 @@ impl Release_Shader
   {
     let shader = @mut Release_Shader{ prog: 0, vert_obj: 0, frag_obj: 0 };
 
-    let fio = io::file_reader(&Path(vert_file)).unwrap();
-    let vert_src = str::from_utf8(fio.read_whole_stream());
+    let mut fio = Path::new(vert_file).open_reader(io::Open).expect("Unable to open reader");
+    let vert_src = str::from_utf8(fio.read_to_end());
 
-    let fio = io::file_reader(&Path(frag_file)).unwrap();
-    let frag_src = str::from_utf8(fio.read_whole_stream());
+    let mut fio = Path::new(frag_file).open_reader(io::Open).expect("Unable to open reader");
+    let frag_src = str::from_utf8(fio.read_to_end());
 
     log_assert!(shared::load(shader, vert_src, frag_src));
 
@@ -348,7 +349,7 @@ pub mod shared
     let name = check!(gl2::get_uniform_location(shader.prog, uniform.to_owned()));
     match name
     {
-      -1 => { log_error!("Uniform '%s' not found!", uniform); name }
+      -1 => { log_error!("Uniform '{}' not found!", uniform); name }
       _ => { name }
     }
   }

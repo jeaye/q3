@@ -58,7 +58,7 @@ impl Texture
     {
       stb_image::image::ImageU8(ref image) => 
       {
-        log_debug!("Loaded image %s with %ux%u:%u", 
+        log_debug!("Loaded image {} with {}x{}:{}", 
                     tex.filename, image.width, image.height, image.depth);
 
         tex.size = math::Vec2i::new(image.width as i32, image.height as i32);
@@ -66,7 +66,7 @@ impl Texture
         {
           3 => { gl2::RGB },
           4 => { gl2::RGBA },
-          x => { log_error!("Invalid texture depth %u", x); gl2::RGBA }
+          x => { log_error!("Invalid texture depth {}", x); gl2::RGBA }
         };
 
         let data = image.data.clone();
@@ -84,7 +84,7 @@ impl Texture
           ));
         }
       }
-      _ => log_fail!("Failed to load texture %s", tex.filename)
+      _ => log_fail!("Failed to load texture {}", tex.filename)
     }
 
     tex

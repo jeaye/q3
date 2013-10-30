@@ -14,7 +14,7 @@
 */
 
 use super::{ State, Game_Renderer };
-use std::sys;
+use std::mem;
 use gl2 = opengles::gl2;
 use gl;
 use glfw;
@@ -84,12 +84,12 @@ impl BSP_Renderer
     check!(gl2::enable_vertex_attrib_array(1));
 
     check!(gl2::vertex_attrib_pointer_f32(0, 3, false, 
-                sys::size_of::<bsp::lump::Vertex>() as i32, 
+                mem::size_of::<bsp::lump::Vertex>() as i32, 
                 0));
     check!(gl2::vertex_attrib_pointer_u8(1, 4, true, 
-                sys::size_of::<bsp::lump::Vertex>() as i32, 
-                sys::size_of::<bsp::lump::Vertex>() as u32 -
-                sys::size_of::<math::Vec4u8>() as u32));
+                mem::size_of::<bsp::lump::Vertex>() as i32, 
+                mem::size_of::<bsp::lump::Vertex>() as u32 -
+                mem::size_of::<math::Vec4u8>() as u32));
   }
 
   fn render_mesh(&self)
@@ -148,7 +148,7 @@ impl State for BSP_Renderer
       if self.game_renderer.camera.show_fps
       {
         ui_renderer.render_font(
-          fmt!("%d", fps as int), 
+          format!("{}", fps), 
           math::Vec2f::new(self.game_renderer.camera.window_size.x as f32 - 40.0, 0.0), 
           &self.game_renderer.fps_font); 
       }

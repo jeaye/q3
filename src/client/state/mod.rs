@@ -14,6 +14,7 @@
 
 #[feature(globs)];
 #[feature(macro_rules)];
+#[feature(managed_boxes)];
 
 extern mod extra;
 extern mod opengles;

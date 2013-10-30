@@ -9,7 +9,10 @@
       Loader and handler of BSP maps.
 */
 
-use std::{ cmp, path, io, sys, cast };
+use std::{ vec, cmp, ptr, mem, cast };
+use std::rt::io;
+use std::rt::io::{ Reader, Seek };
+use std::rt::io::file::{ FileReader, FileInfo };
 use math;
 use super::lump;
 use primitive::{ Triangle, Vertex_PC };
@@ -49,23 +52,29 @@ impl Map
       error: ~"",
     };
 
-    let fio = io::file_reader(@path::PosixPath(file));
-    if fio.is_err()
-    { return Err(fmt!("Failed to read file: %s", file)); }
-    let fio = fio.unwrap();
-    unsafe {  fio.read( cast::transmute((&map.header, sys::size_of::<lump::Header>())),
-                        sys::size_of::<lump::Header>()); }
+    let fio = Path::new(file).open_reader(io::Open);
+    if fio.is_none()
+    { return Err(format!("Failed to read file: {}", file)); }
+    let mut fio = fio.unwrap();
+    let mut buff = vec::from_elem(mem::size_of::<lump::Header>(), 0u8);
+    unsafe
+    {
+      let len = buff.len();
+      fio.read(buff.mut_slice(0, len));
+      ptr::copy_nonoverlapping_memory::<u8, *u8>(cast::transmute(&mut map.header),
+                                                 vec::raw::to_ptr(buff), len);
+    }
 
     log_assert!( map.header.magic[0] == 'I' as i8 &&
              map.header.magic[1] == 'B' as i8 &&
              map.header.magic[2] == 'S' as i8 &&
              map.header.magic[3] == 'P' as i8);
 
-    if !map.read_verts(fio)
+    if !map.read_verts(&mut fio)
     { return Err(map.error); }
-    if !map.read_faces(fio)
+    if !map.read_faces(&mut fio)
     { return Err(map.error); }
-    if !map.read_mesh_verts(fio)
+    if !map.read_mesh_verts(&mut fio)
     { return Err(map.error); }
 
     map.triangulate();
@@ -73,19 +82,25 @@ impl Map
     Ok(map)
   }
 
-  fn read_verts(&mut self, fio: @io::Reader) -> bool
+  fn read_verts(&mut self, fio: &mut io::file::FileReader) -> bool
   {
-    fio.seek(self.header.lumps[lump::Vertex_Type as int].offset as int, io::SeekSet);
+    fio.seek(self.header.lumps[lump::Vertex_Type as int].offset as i64, io::SeekSet);
     let num_verts = (self.header.lumps[lump::Vertex_Type as int].length) /
-                    (sys::size_of::<lump::Vertex>() as i32);
+                    (mem::size_of::<lump::Vertex>() as i32);
     if !(num_verts > 0)
     { self.error = ~"Invalid vertex count"; return false; }
 
     let mut vert = lump::Vertex::new();
+    let mut buff = vec::from_elem(mem::size_of::<lump::Vertex>(), 0u8);
     for i in range(0, num_verts)
     {
-      unsafe { fio.read( cast::transmute((&vert, sys::size_of::<lump::Vertex>())),
-                sys::size_of::<lump::Vertex>()); }
+      unsafe
+      {
+        let len = buff.len();
+        fio.read(buff.mut_slice(0, len));
+        ptr::copy_nonoverlapping_memory::<u8, *u8>(cast::transmute(&mut vert),
+                                                   vec::raw::to_ptr(buff), len);
+      }
       
       /* BSP likes Z to be up; we like Y to be up. */
       let temp = vert.position.y;
@@ -163,38 +178,50 @@ impl Map
     true
   }
 
-  fn read_faces(&mut self, fio: @io::Reader) -> bool
+  fn read_faces(&mut self, fio: &mut io::file::FileReader) -> bool
   {
-    fio.seek(self.header.lumps[lump::Face_Type as int].offset as int, io::SeekSet);
+    fio.seek(self.header.lumps[lump::Face_Type as int].offset as i64, io::SeekSet);
     let num_faces = (self.header.lumps[lump::Face_Type as int].length) /
-                    (sys::size_of::<lump::Face>() as i32);
+                    (mem::size_of::<lump::Face>() as i32);
     if !(num_faces > 0)
     { self.error = ~"Invalid face count"; return false; }
 
-    let face = lump::Face::new();
+    let mut face = lump::Face::new();
+    let mut buff = vec::from_elem(mem::size_of::<lump::Face>(), 0u8);
     for _ in range(0, num_faces)
     {
-      unsafe { fio.read( cast::transmute((&face, sys::size_of::<lump::Face>())),
-                sys::size_of::<lump::Face>()); }
+      unsafe
+      {
+        let len = buff.len();
+        fio.read(buff.mut_slice(0, len));
+        ptr::copy_nonoverlapping_memory::<u8, *u8>(cast::transmute(&mut face),
+                                                   vec::raw::to_ptr(buff), len);
+      }
       self.faces.push(face);
     }
 
     true
   }
 
-  fn read_mesh_verts(&mut self, fio: @io::Reader) -> bool
+  fn read_mesh_verts(&mut self, fio: &mut io::file::FileReader) -> bool
   {
-    fio.seek(self.header.lumps[lump::Mesh_Vert_Type as int].offset as int, io::SeekSet);
+    fio.seek(self.header.lumps[lump::Mesh_Vert_Type as int].offset as i64, io::SeekSet);
     let num_obj = (self.header.lumps[lump::Mesh_Vert_Type as int].length) /
-                    (sys::size_of::<lump::Mesh_Vert>() as i32);
+                    (mem::size_of::<lump::Mesh_Vert>() as i32);
     if !(num_obj > 0)
     { self.error = ~"Invalid object count"; return false; }
 
-    let obj = lump::Mesh_Vert::new();
+    let mut obj = lump::Mesh_Vert::new();
+    let mut buff = vec::from_elem(mem::size_of::<lump::Mesh_Vert>(), 0u8);
     for _ in range(0, num_obj)
     {
-      unsafe { fio.read( cast::transmute((&obj, sys::size_of::<lump::Mesh_Vert>())),
-                sys::size_of::<lump::Mesh_Vert>()); }
+      unsafe
+      {
+        let len = buff.len();
+        fio.read(buff.mut_slice(0, len));
+        ptr::copy_nonoverlapping_memory::<u8, *u8>(cast::transmute(&mut obj),
+                                                   vec::raw::to_ptr(buff), len);
+      }
       self.mesh_verts.push(obj);
     }
 
@@ -237,12 +264,12 @@ impl Map
           }
         }
         /* Something else. */
-        n => { log_info!("Invalid face: %d", n as int); }
+        n => { log_info!("Invalid face: {}", n); }
       }
     };
 
     self.verts = verts;
-    log_debug!("Trianglulated to %u faces", self.verts.len());
+    log_debug!("Trianglulated to {} faces", self.verts.len());
   }
 }
 

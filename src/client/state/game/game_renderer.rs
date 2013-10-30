@@ -90,8 +90,8 @@ impl State for Game_Renderer
     let ui_renderer = ui::Renderer::get();
     ui_renderer.begin();
     if self.camera.show_fps
-    { ui_renderer.render_font(fmt!("%d", fps as int), math::Vec2f::new(0.0, 0.0), &self.fps_font); }
-    ui_renderer.render_font(fmt!("%s", self.camera.position.to_str()), math::Vec2f::new(0.0, self.camera.window_size.y as f32 - 40.0), &self.fps_font);
+    { ui_renderer.render_font(format!("{}", fps), math::Vec2f::new(0.0, 0.0), &self.fps_font); }
+    ui_renderer.render_font(format!("{}", self.camera.position.to_str()), math::Vec2f::new(0.0, self.camera.window_size.y as f32 - 40.0), &self.fps_font);
     ui_renderer.end();
 
     false

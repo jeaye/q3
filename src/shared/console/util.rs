@@ -26,7 +26,7 @@ impl Util
       ~"off" => Ok(false),
       ~"no" => Ok(false),
 
-      _ => Err(fmt!("Invalid value for %s (bool)", name))
+      _ => Err(format!("Invalid value for {} (bool)", name))
     }
   }
 
@@ -35,7 +35,7 @@ impl Util
     match from_str::<f32>(val)
     {
       Some(x) => Ok(x),
-      None => Err(fmt!("Invalid value for %s (number)", name))
+      None => Err(format!("Invalid value for {} (number)", name))
     }
   }
 }

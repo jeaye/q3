@@ -47,9 +47,9 @@ impl Quaternion
 
   pub fn new_from_euler(yaw: f32, pitch: f32, roll: f32) -> Quaternion
   {
-    let p = pitch * (f32::consts::pi / 180.0) / 2.0;
-    let y = yaw * (f32::consts::pi / 180.0) / 2.0;
-    let r = roll * (f32::consts::pi / 180.0) / 2.0;
+    let p = pitch * (f32::consts::PI / 180.0) / 2.0;
+    let y = yaw * (f32::consts::PI / 180.0) / 2.0;
+    let r = roll * (f32::consts::PI / 180.0) / 2.0;
 
     let sinp = p.sin();
     let siny = y.sin();

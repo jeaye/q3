@@ -12,6 +12,7 @@
 
 #[feature(globs)];
 #[feature(macro_rules)];
+#[feature(managed_boxes)];
 
 extern mod log;
 extern mod console;

@@ -135,7 +135,7 @@ impl Font
         let glyph = match font.glyphs.find_mut(&(curr as u8))
         {
           Some(g) => g,
-          None => log_fail!("Invalid char (%c) in font %s", curr, filename)
+          None => log_fail!("Invalid char ({}) in font {}", curr, filename)
         };
 
         if offset.x + (glyph.dimensions.x as i32) + 1 >= max_width

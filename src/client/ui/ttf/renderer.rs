@@ -9,7 +9,7 @@
       A TTF font renderer.
 */
 
-use std::{ vec, sys };
+use std::{ vec, mem };
 use gl;
 use gl2 = opengles::gl2;
 use super::Font;
@@ -76,9 +76,9 @@ impl Renderer
 
     /* Setup vertex attribs. */
     check!(gl2::enable_vertex_attrib_array(0));
-    check!(gl2::vertex_attrib_pointer_f32(0, 4, false, sys::size_of::<Point>() as i32, 0));
+    check!(gl2::vertex_attrib_pointer_f32(0, 4, false, mem::size_of::<Point>() as i32, 0));
     check!(gl2::enable_vertex_attrib_array(1));
-    check!(gl2::vertex_attrib_pointer_f32(1, 3, false, sys::size_of::<Point>() as i32, (sys::size_of::<f32>() * 4) as u32));
+    check!(gl2::vertex_attrib_pointer_f32(1, 3, false, mem::size_of::<Point>() as i32, (mem::size_of::<f32>() * 4) as u32));
 
     renderer
   }
@@ -131,7 +131,7 @@ impl Renderer
         let glyph = match font.glyphs.find(&(curr as u8))
         {
           Some(g) => g,
-          None => log_fail!("Invalid char (%c) in font %s len %u", curr, font.file, font.glyphs.len())
+          None => log_fail!("Invalid char ({}) in font {} len {}", curr, font.file, font.glyphs.len())
         };
 
         /* Parse color. */

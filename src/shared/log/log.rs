@@ -24,7 +24,8 @@
       log_assert!() and log_fail!().
 */
 
-use std::{ io, local_data, os };
+use std::{ local_data, os };
+use std::rt::io;
 use extra::term;
 use extra::term::color;
 use listener;
@@ -68,7 +69,7 @@ impl Log
                    None => VERBOSITY_INFO /* default */
                  },
       push_level: 0,
-      terminal: term::Terminal::new(io::stdout()).unwrap(),
+      terminal: term::Terminal::new((@mut io::stdout()) as @mut io::Writer).unwrap(),
       listener: None,
     };
 
@@ -177,7 +178,7 @@ impl Log
         logger.terminal.fg(color::BRIGHT_RED);
         print(" error => ");
       },
-      val => log_fail!("Invalid verbosity for logging: %d", val as int)
+      val => log_fail!("Invalid verbosity for logging: {}", val)
     }
     logger.terminal.reset();
     println(message);

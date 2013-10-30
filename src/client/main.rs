@@ -13,6 +13,7 @@
 
 #[feature(globs)];
 #[feature(macro_rules)];
+#[feature(managed_boxes)];
 
 extern mod extra;
 extern mod opengles;
@@ -58,7 +59,7 @@ impl Client
   {
     /* Let GLFW know how to report errors. */
     do glfw::set_error_callback |error, description|
-    { log_fail!("GLFW %d: %s", error as int, description); }
+    { log_fail!("GLFW {}: {}", error as i32, description); }
     
     if glfw::init().is_err()
     { log_fail!("Failed to initialize GLFW"); }
@@ -76,8 +77,8 @@ impl Client
       let window_res = glfw::Window::create(1, 1, "", glfw::Windowed);
       let worker_window = match window_res
       {
-        Ok(win) => { win },
-        Err(()) => { log_fail!("Failed to create worker window") }
+        Some(win) => { win },
+        None => { log_fail!("Failed to create worker window") }
       };
 
       /* Split the worker window's context into the main window. */
@@ -86,8 +87,8 @@ impl Client
       let window_res = worker_window.create_shared(1024, 768, "Q³", glfw::Windowed);
       let window = match window_res
       {
-        Ok(win) => { @win },
-        Err(()) => { log_fail!("Failed to create main window") }
+        Some(win) => { @win },
+        None => { log_fail!("Failed to create main window") }
       };
 
       let client = @mut Client

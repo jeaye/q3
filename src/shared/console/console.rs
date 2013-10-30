@@ -86,7 +86,7 @@ impl Console
   {
     let c = @mut Console
     {
-      body: fmt!("Welcome to Q³\nVersion: %s.%s", env!("VERSION"), env!("COMMIT")),
+      body: format!("Welcome to Q³\nVersion: {}.{}", env!("VERSION"), env!("COMMIT")),
       prefix: ~"> ",
       input: ~"", 
 
@@ -127,17 +127,17 @@ impl Console
 
   pub fn add_function(&mut self, name: ~str, func: @mut Functor)
   {
-    log_debug!("Adding function: %s", name);
+    log_debug!("Adding function: {}", name);
     self.registry.functions.insert(name, func);
   }
   pub fn add_accessor(&mut self, name: &str, accessor: @Accessor)
   {
-    log_debug!("Adding read access to property: %s", name);
+    log_debug!("Adding read access to property: {}", name);
     self.registry.accessors.insert(name.to_owned(), accessor);
   }
   pub fn add_mutator(&mut self, name: &str, mutator: @mut Mutator)
   {
-    log_debug!("Adding write access to property: %s", name);
+    log_debug!("Adding write access to property: {}", name);
     self.registry.mutators.insert(name.to_owned(), mutator);
   }
   pub fn add_log(&mut self, text: &str)
@@ -168,7 +168,7 @@ impl Console
         let input = input_func.clone();
         (*f).call(func, input)
       }
-      None => { (false, fmt!("\\\\2Error: \\\\1Invalid function '%s'", func)) }
+      None => { (false, format!("\\\\2Error: \\\\1Invalid function '{}'", func)) }
     }
   }
 }
@@ -188,9 +188,9 @@ impl Functor for Console
         match self.registry.accessors.find(&params.to_owned())
         {
           Some(func) =>
-          { msg = fmt!("%s = %s", params, (*func).access(params)); success = true; }
+          { msg = format!("{} = {}", params, (*func).access(params)); success = true; }
           None =>
-          { msg = fmt!("\\\\2Error: \\\\1Invalid property '%s'", params); }
+          { msg = format!("\\\\2Error: \\\\1Invalid property '{}'", params); }
         }
 
         (success, msg)
@@ -222,10 +222,10 @@ impl Functor for Console
             {
               /* Check if the mutator liked the args. */
               Some(err) => { success = false; msg = ~"\\\\2Error: \\\\1" + err; }
-              None => { success = true; msg = fmt!("\\\\1%s = %s", property, params); }
+              None => { success = true; msg = format!("\\\\1{} = {}", property, params); }
             }
           }
-          None => { msg = fmt!("\\\\2Error: \\\\1The property '%s' does not exist.", property); }
+          None => { msg = format!("\\\\2Error: \\\\1The property '{}' does not exist.", property); }
         }
 
         (success, msg)
@@ -242,7 +242,7 @@ impl Accessor for Console
     match name
     {
       "q3.version" =>
-      { fmt!("%s.%s", env!("VERSION"), env!("COMMIT")) },
+      { format!("{}.{}", env!("VERSION"), env!("COMMIT")) },
 
       _ => ~"ERROR",
     }

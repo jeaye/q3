@@ -41,7 +41,7 @@ impl Game
     let start_time = extra::time::precise_time_s();
     let vmap = obj::Voxel_Map::new(bmap.tris, 300);
     let time = extra::time::precise_time_s() - start_time;
-    log_info!("Voxelization took %f seconds", time);
+    log_info!("Voxelization took {} seconds", time);
     if vmap.is_err()
     { return Err(vmap.unwrap_err()); }
     let vmap = vmap.unwrap();

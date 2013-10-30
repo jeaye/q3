@@ -145,16 +145,16 @@ impl State for gl::Camera
     self.angles.y -= dy as f32 * self.look_speed;
     
     /* Wrap X. */
-    if self.angles.x < -f32::consts::pi
-    { self.angles.x += f32::consts::pi * 2.0; }
-    else if self.angles.x > f32::consts::pi
-    { self.angles.x -= f32::consts::pi * 2.0; }
+    if self.angles.x < -f32::consts::PI
+    { self.angles.x += f32::consts::PI * 2.0; }
+    else if self.angles.x > f32::consts::PI
+    { self.angles.x -= f32::consts::PI * 2.0; }
 
     /* Clamp Y. */
-    if self.angles.y < -f32::consts::pi * 0.49
-    { self.angles.y = -f32::consts::pi * 0.49; }
-    else if self.angles.y > f32::consts::pi * 0.49
-    { self.angles.y = f32::consts::pi * 0.49; }
+    if self.angles.y < -f32::consts::PI * 0.49
+    { self.angles.y = -f32::consts::PI * 0.49; }
+    else if self.angles.y > f32::consts::PI * 0.49
+    { self.angles.y = f32::consts::PI * 0.49; }
 
     self.window.set_cursor_pos( (self.window_size.x / 2) as f64, 
                                 (self.window_size.y / 2) as f64);

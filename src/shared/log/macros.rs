@@ -16,12 +16,12 @@ macro_rules! log_debug
   ($message:expr) => 
   ({
     let module = Log::get_module(file!());
-    Log::debug(fmt!("[%s]:%u", module, line!()), $message);
+    Log::debug(format!("[{}]:{}", module, line!()), $message);
   });
   ($($message:expr),+) =>
   ({
     let module = Log::get_module(file!());
-    Log::debug(fmt!("[%s]:%u", module, line!()), fmt!($($message),+));
+    Log::debug(format!("[{}]:{}", module, line!()), format!($($message),+));
   });
 )
 
@@ -30,12 +30,12 @@ macro_rules! log_info
   ($message:expr) => 
   ({
     let module = Log::get_module(file!());
-    Log::info(fmt!("[%s]:%u", module, line!()), $message);
+    Log::info(format!("[{}]:{}", module, line!()), $message);
   });
   ($($message:expr),+) =>
   ({
     let module = Log::get_module(file!());
-    Log::info(fmt!("[%s]:%u", module, line!()), fmt!($($message),+));
+    Log::info(format!("[{}]:{}", module, line!()), format!($($message),+));
   });
 )
 
@@ -44,12 +44,12 @@ macro_rules! log_error
   ($message:expr) => 
   ({
     let module = Log::get_module(file!());
-    Log::error(fmt!("[%s]:%u", module, line!()), $message);
+    Log::error(format!("[{}]:{}", module, line!()), $message);
   });
   ($($message:expr),+) =>
   ({
     let module = Log::get_module(file!());
-    Log::error(fmt!("[%s]:%u", module, line!()), fmt!($($message),+));
+    Log::error(format!("[{}]:{}", module, line!()), format!($($message),+));
   });
 )
 
@@ -74,15 +74,15 @@ macro_rules! log_fail
   ($message:expr) => 
   ({
     let module = Log::get_module(file!());
-    Log::error(fmt!("[%s]:%u", module, line!()), $message);
-    Log::error(fmt!("[%s]:%u", module, line!()), "Failing");
+    Log::error(format!("[{}]:{}", module, line!()), $message);
+    Log::error(format!("[{}]:{}", module, line!()), "Failing");
     fail!("Exiting");
   });
   ($($message:expr),+) =>
   ({
     let module = Log::get_module(file!());
-    Log::error(fmt!("[%s]:%u", module, line!()), fmt!($($message),+));
-    Log::error(fmt!("[%s]:%u", module, line!()), "Failing");
+    Log::error(format!("[{}]:{}", module, line!()), format!($($message),+));
+    Log::error(format!("[{}]:{}", module, line!()), "Failing");
     fail!("Exiting");
   });
 )
@@ -92,7 +92,7 @@ macro_rules! log_assert
   ($val:expr) => 
   ({
     if !$val
-    { log_fail!(fmt!("Assertion failed: (%s)", stringify!($val))); }
+    { log_fail!(format!("Assertion failed: ({})", stringify!($val))); }
   });
   ($val:expr, $message:expr) => 
   ({
@@ -102,7 +102,7 @@ macro_rules! log_assert
   ($val:expr, $($message:expr),+) =>
   ({
     if !$val
-    { log_fail!(fmt!($($message),+)); }
+    { log_fail!(format!($($message),+)); }
   });
 )
 

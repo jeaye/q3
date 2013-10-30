@@ -9,8 +9,12 @@
       TODO
 */
 
-use std::{ io, path };
 use super::{ Joint_Info, Bound, Base_Frame, Frame_Data, Frame_Skeleton, Skeleton_Joint };
+use std::char;
+use std::rt::io;
+use std::rt::io::Reader;
+use std::rt::io::buffered::BufferedReader;
+use std::rt::io::file::FileInfo;
 use log::Log;
 
 #[macro_escape]
@@ -85,9 +89,9 @@ impl Animation
 
   fn load(&mut self, file: ~str) -> bool
   {
-    let fior = io::file_reader(&path::Path(file));
-    if fior.is_err()
-    { log_error!("Failed to open animation file %s", file); return false; }
+    let fior = Path::new(file.clone()).open_reader(io::Open);
+    if fior.is_none()
+    { log_error!("Failed to open animation file {}", file); return false; }
 
     /* Clear existing data. */
     self.joint_infos.clear();
@@ -96,23 +100,36 @@ impl Animation
     self.frames.clear();
     self.skeletons.clear();
 
-    let fio = fior.unwrap();
+    let mut fio = BufferedReader::new(fior.unwrap());
     let mut param;
     macro_rules! read_param
     (
       () =>
       ({
         param = ~"";
-        let mut ch = fio.read_char();
-        while ch.is_whitespace() && !fio.eof() /* Find the next word. */
-        { ch = fio.read_char(); }
+        let mut ch = fio.read_byte();
+        while !ch.is_none() && !fio.eof() /* Find the next word. */
+        {
+          let c = char::from_u32(*ch.get_ref() as u32).expect("Invalid char");
+          if c.is_whitespace()
+          { ch = fio.read_byte(); }
+          else
+          { break; }
+        }
 
         if !fio.eof()
         { 
-          param.push_char(ch);
-          ch = fio.read_char();
-          while !ch.is_whitespace() && !fio.eof() /* Read the next word. */
-          { param.push_char(ch); ch = fio.read_char(); }
+          param.push_char(char::from_u32(ch.expect("Invalid char") as u32).expect("Invalid char"));
+          ch = fio.read_byte();
+          while !ch.is_none() && !fio.eof() /* Read the next word. */
+          {
+            let c = char::from_u32(*ch.get_ref() as u32).expect("Invalid char");
+            if c.is_whitespace()
+            { break; }
+
+            param.push_char(char::from_u32(ch.expect("Invalid char") as u32).expect("Invalid char"));
+            ch = fio.read_byte();
+          }
         }
       });
     )
@@ -130,12 +147,12 @@ impl Animation
         if num.is_some()
         { $var = num.unwrap(); }
         else
-        { log_error!("Invalid %s in %s", name, file); }
+        { log_error!("Invalid {} in {}", name, file); }
       });
     )
 
     /* Read the first param and jump into the parsing. */
-    log_debug!("Parsing animation %s", file);
+    log_debug!("Parsing animation {}", file);
     log_push!();
     read_param!();
     while !fio.eof()
@@ -145,7 +162,7 @@ impl Animation
         ~"MD5Version" =>
         {
           read_type!(self.version);
-          log_debug!("Version: %d", self.version as int);
+          log_debug!("Version: {}", self.version);
         }
         ~"commandline" =>
         { ignore_line!(); }
@@ -153,25 +170,25 @@ impl Animation
         {
           read_type!(self.num_frames);
           ignore_line!();
-          log_debug!("Num frames: %d", self.num_frames as int);
+          log_debug!("Num frames: {}", self.num_frames);
         }
         ~"numJoints" =>
         {
           read_type!(self.num_joints);
           ignore_line!();
-          log_debug!("Num joints: %d", self.num_joints as int);
+          log_debug!("Num joints: {}", self.num_joints);
         }
         ~"frameRate" =>
         {
           read_type!(self.frame_rate);
           ignore_line!();
-          log_debug!("Framerate: %d", self.frame_rate as int);
+          log_debug!("Framerate: {}", self.frame_rate);
         }
         ~"numAnimatedComponents" =>
         {
           read_type!(self.num_animated_components);
           ignore_line!();
-          log_debug!("Num animated components: %d", self.num_animated_components as int);
+          log_debug!("Num animated components: {}", self.num_animated_components);
         }
         ~"hierarchy" =>
         {

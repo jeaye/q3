@@ -11,8 +11,12 @@
       MD5 animated models.
 */
 
-use std::{ io, path, vec, str };
 use super::{ Joint, Vertex, Triangle, Weight, Mesh, Animation };
+use std::{ vec, char, str };
+use std::rt::io;
+use std::rt::io::Reader;
+use std::rt::io::buffered::BufferedReader;
+use std::rt::io::file::FileInfo;
 use math;
 use log::Log;
 
@@ -42,16 +46,8 @@ impl Model
   /* TODO: Return Option. */
   pub fn new(mesh_file: ~str) -> Model
   {
-    /* TODO: Custom Path type to handle this. */
-    let dir;
-    let mut posix = true;
-    for x in range(0, mesh_file.len() as i32)
-    { if mesh_file[x] == '\\' as u8 { posix = false; } }
-    if posix
-    { dir = path::PosixPath(mesh_file.clone()).normalize().dirname(); }
-    else
-    { dir = path::WindowsPath(mesh_file.clone()).normalize().dirname(); }
-
+    let path = Path::new(mesh_file.clone());
+    let dir = str::from_utf8(path.dirname());
     let mut model = Model
     {
       file_directory: dir,
@@ -75,31 +71,44 @@ impl Model
 
   fn load(&mut self, file: ~str) -> bool
   {
-    let fior = io::file_reader(&path::Path(file));
-    if fior.is_err()
-    { log_error!("Failed to open model file %s", file); return false; }
+    let fior = Path::new(file.clone()).open_reader(io::Open);
+    if fior.is_none()
+    { log_error!("Failed to open model file {}", file); return false; }
 
     /* Clear existing data. */
     self.joints.clear();
     self.meshes.clear();
 
-    let fio = fior.unwrap();
+    let mut fio = BufferedReader::new(fior.unwrap());
     let mut param;
     macro_rules! read_param
     (
       () =>
       ({
         param = ~"";
-        let mut ch = fio.read_char();
-        while ch.is_whitespace() && !fio.eof() /* Find the next word. */
-        { ch = fio.read_char(); }
+        let mut ch = fio.read_byte();
+        while !ch.is_none() && !fio.eof() /* Find the next word. */
+        {
+          let c = char::from_u32(*ch.get_ref() as u32).expect("Invalid char");
+          if c.is_whitespace()
+          { ch = fio.read_byte(); }
+          else
+          { break; }
+        }
 
         if !fio.eof()
         { 
-          param.push_char(ch);
-          ch = fio.read_char();
-          while !ch.is_whitespace() && !fio.eof() /* Read the next word. */
-          { param.push_char(ch); ch = fio.read_char(); }
+          param.push_char(char::from_u32(ch.expect("Invalid char") as u32).expect("Invalid char"));
+          ch = fio.read_byte();
+          while !ch.is_none() && !fio.eof() /* Read the next word. */
+          {
+            let c = char::from_u32(*ch.get_ref() as u32).expect("Invalid char");
+            if c.is_whitespace()
+            { break; }
+
+            param.push_char(char::from_u32(ch.expect("Invalid char") as u32).expect("Invalid char"));
+            ch = fio.read_byte();
+          }
         }
       });
     )
@@ -117,12 +126,12 @@ impl Model
         if num.is_some()
         { $var = num.unwrap(); }
         else
-        { log_error!("Invalid %s in %s", name, file); }
+        { log_error!("Invalid {} in {}", name, file); }
       });
     )
 
     /* Read the first param and jump into the parsing. */
-    log_debug!("Parsing model %s", file);
+    log_debug!("Parsing model {}", file);
     log_push!();
     read_param!();
     while !fio.eof()
@@ -133,7 +142,7 @@ impl Model
         {
           /* Read version. */
           read_type!(self.version);
-          log_debug!("Model version: %d", self.version as int);
+          log_debug!("Model version: {}", self.version);
         }
         ~"commandline" =>
         { ignore_line!(); }
@@ -141,13 +150,13 @@ impl Model
         {
           read_type!(self.num_joints);
           self.joints = vec::with_capacity(self.num_joints as uint);
-          log_debug!("Model joints: %d", self.num_joints as int);
+          log_debug!("Model joints: {}", self.num_joints);
         }
         ~"numMeshes" =>
         {
           read_type!(self.num_meshes);
           self.meshes = vec::with_capacity(self.num_meshes as uint);
-          log_debug!("Model meshes: %d", self.num_meshes as int);
+          log_debug!("Model meshes: {}", self.num_meshes);
         }
         ~"joints" =>
         {
@@ -207,33 +216,16 @@ impl Model
               {
                 read_param!();
 
-                /* Rust needs to know if it's a POSIX or Windows
-                 * path so it can parse it. Just loop through and
-                 * check for \ which indicates it's for Windows. */
-                let mut posix = true;
-                for x in range(0, param.len() as i32)
-                { if param[x] == '\\' as u8 { posix = false; } }
-                if posix
+                let path = Path::new(param.clone());
+                mesh.texture = match path.filename()
                 {
-                  let path = path::PosixPath(param.clone()).normalize();
-                  mesh.texture = match path.filename()
-                    {
-                      Some(file) => { file.to_owned() },
-                      None => { ~"" }
-                    };
-                }
-                else
-                {
-                  let path =  path::WindowsPath(param.clone()).normalize();
-                  mesh.texture = match path.filename()
-                    {
-                      Some(file) => { file.to_owned() },
-                      None => { ~"" }
-                    };
-                }
+                  Some(file) => { str::from_utf8(file) },
+                  None => { ~"" }
+                };
+
                 /* Remove quotes. */
                 mesh.texture = self.file_directory + "/" + str::replace(mesh.texture, "\"", "");
-                log_debug!("Mesh shader/texture: %s", mesh.texture);
+                log_debug!("Mesh shader/texture: {}", mesh.texture);
 
                 ignore_line!();
               }
@@ -242,7 +234,7 @@ impl Model
                 read_type!(num_verts);
                 ignore_line!();
 
-                log_debug!("Mesh verts: %d", num_verts);
+                log_debug!("Mesh verts: {}", num_verts);
 
                 for _ in range(0, num_verts)
                 {
@@ -265,7 +257,7 @@ impl Model
               {
                 read_type!(num_tris);
                 ignore_line!();
-                log_debug!("Mesh tris: %d", num_tris);
+                log_debug!("Mesh tris: {}", num_tris);
 
                 for _ in range(0, num_tris)
                 {
@@ -287,7 +279,7 @@ impl Model
               {
                 read_type!(num_weights);
                 ignore_line!();
-                log_debug!("Mesh weights: %d", num_weights);
+                log_debug!("Mesh weights: {}", num_weights);
 
                 for _ in range(0, num_weights)
                 {

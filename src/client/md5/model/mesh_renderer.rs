@@ -9,7 +9,7 @@
       Renders an MD5 mesh.
 */
 
-use std::sys;
+use std::mem;
 use gl2 = opengles::gl2;
 use gl;
 use math;
@@ -95,11 +95,11 @@ impl<'self> Mesh_Renderer<'self>
 
     check!(gl2::enable_vertex_attrib_array(0));
     check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.position_vbo));
-    check!(gl2::vertex_attrib_pointer_f32(0, 3, false, sys::size_of::<math::Vec3f>() as i32, 0));
+    check!(gl2::vertex_attrib_pointer_f32(0, 3, false, mem::size_of::<math::Vec3f>() as i32, 0));
 
     check!(gl2::enable_vertex_attrib_array(1));
     check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.tex_vbo));
-    check!(gl2::vertex_attrib_pointer_f32(1, 2, false, sys::size_of::<math::Vec2f>() as i32, 0));
+    check!(gl2::vertex_attrib_pointer_f32(1, 2, false, mem::size_of::<math::Vec2f>() as i32, 0));
 
   }
 
