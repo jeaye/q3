@@ -44,7 +44,7 @@ COLOR_PURPLE=$(shell tput setaf 5)
 # Output colorizing
 ECHO_PREFIX=${COLOR_GREEN}»»»${COLOR_OFF}
 ifeq ($(UNAME), Linux)
-	ECHO=echo -e
+	ECHO=echo
 else
 	ECHO=echo 
 endif

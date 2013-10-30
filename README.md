@@ -1,4 +1,4 @@
-Q³
+Q³ ![Build Status](https://travis-ci.org/jeaye/q3.png)
 ===
 ![Screenshot](pics/012_1_no_wire.png)
 

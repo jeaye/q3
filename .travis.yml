@@ -5,7 +5,7 @@ install:
   - sudo apt-get install rust-nightly
   - sudo apt-get install libXxf86vm-dev
 script:
-  - sh ./configure
+  - ./configure
   - make MODE=debug
   - make clean
   - make 
