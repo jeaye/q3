@@ -11,7 +11,7 @@
 */
 
 use glfw;
-use gl;
+use gfx;
 use gl2 = opengles::gl2;
 use std::f32;
 use math;
@@ -19,7 +19,7 @@ use super::State;
 use log::Log;
 
 #[macro_escape]
-#[path = "../../gl/check.rs"]
+#[path = "../../gfx/check.rs"]
 mod check;
 
 #[macro_escape]
@@ -33,7 +33,7 @@ pub static MOVE_BACKWARD: u8 = 8;
 pub static MOVE_UP: u8 = 16;
 pub static MOVE_DOWN: u8 = 32;
 
-impl State for gl::Camera
+impl State for gfx::Camera
 {
   fn get_key(&self) -> &str
   { &"camera" }

@@ -3,21 +3,21 @@
     See licensing in LICENSE file, or at:
         http://www.opensource.org/licenses/BSD-3-Clause
 
-    File: client/gl/ttf/renderer.rs
+    File: client/gfx/ttf/renderer.rs
     Author: Jesse 'Jeaye' Wilkerson
     Description:
       A TTF font renderer.
 */
 
 use std::{ vec, mem };
-use gl;
+use gfx;
 use gl2 = opengles::gl2;
 use super::Font;
 use math;
 use log::Log;
 
 #[macro_escape]
-#[path = "../../gl/check.rs"]
+#[path = "../../gfx/check.rs"]
 mod check;
 
 #[macro_escape]
@@ -41,7 +41,7 @@ struct Renderer
 {
   vao: gl2::GLuint,
   vbo: gl2::GLuint,
-  shader: @mut gl::Shader,
+  shader: @mut gfx::Shader,
   proj_loc: gl2::GLint,
 }
 
@@ -53,7 +53,7 @@ impl Renderer
     {
         vao: 0,
         vbo: 0,
-        shader: gl::Shader_Builder::new_with_files("data/shaders/text.vert", "data/shaders/text.frag"),
+        shader: gfx::Shader_Builder::new_with_files("data/shaders/text.vert", "data/shaders/text.frag"),
         proj_loc: 0,
     };
     renderer.proj_loc = renderer.shader.get_uniform_location("proj");
@@ -95,7 +95,7 @@ impl Renderer
     check!(gl2::blend_func(gl2::SRC_ALPHA, gl2::ONE_MINUS_SRC_ALPHA));
 
     self.shader.bind();
-    let camera = gl::Camera::get_active();
+    let camera = gfx::Camera::get_active();
     let proj = math::Mat4x4::new_orthographic(0.0, camera.window_size.x as f32, camera.window_size.y as f32, 0.0,  1.0, 100.0);
     self.shader.update_uniform_mat(self.proj_loc, &proj);
   }

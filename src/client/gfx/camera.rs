@@ -3,7 +3,7 @@
     See licensing in LICENSE file, or at:
         http://www.opensource.org/licenses/BSD-3-Clause
 
-    File: client/gl/camera.rs
+    File: client/gfx/camera.rs
     Author: Jesse 'Jeaye' Wilkerson
     Description:
       The game's camera that handles 

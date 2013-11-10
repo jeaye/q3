@@ -60,7 +60,7 @@ SHARED_MATH_SRC=$(shell find ${PROJ_DIR}/src/shared/math -type f -name '*.rs')
 SHARED_OBJ_SRC=$(shell find ${PROJ_DIR}/src/shared/obj -type f -name '*.rs')
 
 # Client
-CLIENT_GL_SRC=$(shell find ${PROJ_DIR}/src/client/gl -type f -name '*.rs')
+CLIENT_GFX_SRC=$(shell find ${PROJ_DIR}/src/client/gfx -type f -name '*.rs')
 CLIENT_MD5_SRC=$(shell find ${PROJ_DIR}/src/client/md5 -type f -name '*.rs')
 CLIENT_UI_SRC=$(shell find ${PROJ_DIR}/src/client/ui -type f -name '*.rs')
 CLIENT_STATE_SRC=$(shell find ${PROJ_DIR}/src/client/state -type f -name '*.rs')
@@ -70,7 +70,7 @@ SERVER_UI_SRC=$(shell find ${PROJ_DIR}/src/server/ui -type f -name '*.rs')
 
 # Dummy modules
 SHARED_MODULES=.build_shared_log .build_shared_console .build_shared_math .build_shared_obj
-CLIENT_MODULES=.build_client_gl .build_client_md5 .build_client_ui .build_client_state
+CLIENT_MODULES=.build_client_gfx .build_client_md5 .build_client_ui .build_client_state
 SERVER_MODULES=.build_server_ui
 
 .SILENT:
@@ -92,13 +92,13 @@ client: setup_client ${SHARED_MODULES} ${CLIENT_MODULES}
 	rustc ${PROJ_DIR}/src/client/main.rs -o bin/client ${CLIENT_LIBS} ${CONFIGS} ${OPTIMIZATION}
 	${ECHO} "${ECHO_PREFIX} Success"
 
-.build_client_gl: ${CLIENT_GL_SRC}
-	${ECHO} "${ECHO_PREFIX} Building client.gl"
-	rm -f build/q3/libgl*
-	rustc ${PROJ_DIR}/src/client/gl/mod.rs --out-dir build/q3/client ${CLIENT_LIBS} ${CONFIGS} ${OPTIMIZATION}
-	touch .build_client_gl
+.build_client_gfx: ${CLIENT_GFX_SRC}
+	${ECHO} "${ECHO_PREFIX} Building client.gfx"
+	rm -f build/q3/libgfx*
+	rustc ${PROJ_DIR}/src/client/gfx/mod.rs --out-dir build/q3/client ${CLIENT_LIBS} ${CONFIGS} ${OPTIMIZATION}
+	touch .build_client_gfx
 
-.build_client_md5: ${CLIENT_MD5_SRC} .build_client_gl
+.build_client_md5: ${CLIENT_MD5_SRC} .build_client_gfx
 	${ECHO} "${ECHO_PREFIX} Building client.md5"
 	rm -f build/q3/libmd5*
 	rustc ${PROJ_DIR}/src/client/md5/mod.rs --out-dir build/q3/client ${CLIENT_LIBS} ${CONFIGS} ${OPTIMIZATION}

@@ -3,7 +3,7 @@
     See licensing in LICENSE file, or at:
         http://www.opensource.org/licenses/BSD-3-Clause
 
-    File: client/gl/ttf/font.rs
+    File: client/gfx/ttf/font.rs
     Author: Jesse 'Jeaye' Wilkerson
     Description:
       TrueType font atlas.
@@ -18,7 +18,7 @@ use gl2 = opengles::gl2;
 use log::Log;
 
 #[macro_escape]
-#[path = "../../gl/check.rs"]
+#[path = "../../gfx/check.rs"]
 mod check;
 
 #[macro_escape]

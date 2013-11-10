@@ -13,14 +13,14 @@
 
 use super::{ State, Game };
 use glfw;
-use gl;
+use gfx;
 use ui;
 use math;
 use super::Map_Renderer;
 use log::Log;
 
 #[macro_escape]
-#[path = "../../gl/check.rs"]
+#[path = "../../gfx/check.rs"]
 mod check;
 
 #[macro_escape]
@@ -30,7 +30,7 @@ mod macros;
 pub struct Game_Renderer
 {
   game: @mut Game,
-  camera: @mut gl::Camera,
+  camera: @mut gfx::Camera,
   map_renderer: @mut Map_Renderer,
 
   fps_font: ui::Font,
@@ -43,7 +43,7 @@ impl Game_Renderer
     let gr = @mut Game_Renderer
     {
       game: game,
-      camera: gl::Camera::get_active(),
+      camera: gfx::Camera::get_active(),
       map_renderer: Map_Renderer::new(game.voxel_map),
 
       fps_font: ui::Font::new("data/fonts/test.ttf", 30),

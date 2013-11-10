@@ -22,7 +22,7 @@ extern mod stb_image;
 
 extern mod log;
 extern mod math;
-extern mod gl;
+extern mod gfx;
 
 pub use self::renderer::Renderer;
 pub use self::ttf::Font;

@@ -3,7 +3,7 @@
     See licensing in LICENSE file, or at:
         http://www.opensource.org/licenses/BSD-3-Clause
 
-    File: client/gl/shader.rs
+    File: client/gfx/shader.rs
     Author: Jesse 'Jeaye' Wilkerson
     Description:
       Abstracts loading, compiling, linking, and

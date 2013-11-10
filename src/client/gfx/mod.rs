@@ -3,13 +3,13 @@
     See licensing in LICENSE file, or at:
         http://www.opensource.org/licenses/BSD-3-Clause
 
-    File: client/gl/mod.rs
+    File: client/gfx/mod.rs
     Author: Jesse 'Jeaye' Wilkerson
     Description:
-      An aggregator of OpenGL items.
+      An aggregator of OpenGL and graphics items.
 */
 
-#[link(name = "gl", vers = "0.2")];
+#[link(name = "gfx", vers = "0.2")];
 #[crate_type = "lib"];
 
 #[feature(globs)];

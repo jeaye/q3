@@ -24,7 +24,7 @@ extern mod stb_image;
 extern mod log;
 extern mod console;
 extern mod math;
-extern mod gl;
+extern mod gfx;
 extern mod md5;
 extern mod ui;
 extern mod obj;
@@ -37,7 +37,7 @@ use gl2 = opengles::gl2;
 use log::Log;
 
 #[macro_escape]
-#[path = "gl/check.rs"]
+#[path = "gfx/check.rs"]
 mod check;
 
 #[macro_escape]
@@ -94,7 +94,7 @@ impl Client
       let client = @mut Client
       {
         main_window: window,
-        gl_worker_port: gl::Worker::initialize(worker_window),
+        gl_worker_port: gfx::Worker::initialize(worker_window),
 
         cur_time: 0.0,
         last_time: 0.0
@@ -119,11 +119,11 @@ impl Client
     { director.push(console_renderer_state as @mut state::State); }
 
     /* Initialize the default camera. */
-    let cam = gl::Camera::new(self.main_window);
+    let cam = gfx::Camera::new(self.main_window);
     (cam as @mut state::State).load();
-    gl::Camera::set_active(cam);
+    gfx::Camera::set_active(cam);
     do self.main_window.set_size_callback |_, width, height|
-    { gl::Camera::get_active().resize(width as i32, height as i32); }
+    { gfx::Camera::get_active().resize(width as i32, height as i32); }
 
     /* Setup callbacks. */
     do self.main_window.set_focus_callback |window, focused|
@@ -172,7 +172,7 @@ impl Client
     }
 
     /* Kill the worker. */
-    do gl::Worker::new_task
+    do gfx::Worker::new_task
     { true } 
     self.gl_worker_port.recv(); /* Wait for the worker to finish. */
 
@@ -223,7 +223,7 @@ impl console::Functor for Client
             director.unshift(game_state as @mut state::State);
             director.unshift(game_renderer_state as @mut state::State);
           }
-          gl::Camera::get_active().reset(); /* Jump back to the origin. */
+          gfx::Camera::get_active().reset(); /* Jump back to the origin. */
         }
 
         if err.len() > 0

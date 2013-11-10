@@ -3,7 +3,7 @@
     See licensing in LICENSE file, or at:
         http://www.opensource.org/licenses/BSD-3-Clause
 
-    File: client/gl/worker.rs
+    File: client/gfx/worker.rs
     Author: Jesse 'Jeaye' Wilkerson
     Description:
       A utility group of functionality

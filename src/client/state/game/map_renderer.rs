@@ -14,7 +14,7 @@
 use std::{ vec, ptr, mem, cast, cell };
 use extra;
 use gl2 = opengles::gl2;
-use gl;
+use gfx;
 use math;
 use obj;
 use obj::voxel;
@@ -23,7 +23,7 @@ use console;
 use super::{ State, Director, Deferred };
 
 #[macro_escape]
-#[path = "../../gl/check.rs"]
+#[path = "../../gfx/check.rs"]
 mod check;
 
 #[macro_escape]
@@ -48,7 +48,7 @@ pub struct Map_Renderer
 
   wireframe: bool,
 
-  shader: @mut gl::Shader,
+  shader: @mut gfx::Shader,
   proj_loc: gl2::GLint,
   world_loc: gl2::GLint,
   voxel_size_loc: gl2::GLint,
@@ -78,7 +78,7 @@ impl Map_Renderer
 
       wireframe: false,
 
-      shader: gl::Shader_Builder::new_with_files("data/shaders/voxel.vert", "data/shaders/voxel.frag"),
+      shader: gfx::Shader_Builder::new_with_files("data/shaders/voxel.vert", "data/shaders/voxel.frag"),
       proj_loc: 0,
       world_loc: 0,
       voxel_size_loc: 0,
@@ -177,7 +177,7 @@ impl Map_Renderer
   {
     self.prev_visible_voxel_count = self.visible_voxels.get_ref().len() as u32;
 
-    let cam = gl::Camera::get_active();
+    let cam = gfx::Camera::get_active();
     let dist = (cam.near_far.y  / self.map.voxel_size) as i32; /* How far the camera can see. */
     let res = self.map.resolution as f32;
     let pos = math::Vec3f::new(cam.position.x / self.map.voxel_size,
@@ -214,7 +214,7 @@ impl Map_Renderer
     /* Start the new background task of culling far-away voxels. */
     let resolution = self.map.resolution;
     let ibo = self.ibos[self.curr_ibo];
-    do gl::Worker::new_task
+    do gfx::Worker::new_task
     {
       let (cell_states, cell_visible_voxels) = remote_stream.recv();
       let states = cell_states.take();
@@ -317,7 +317,7 @@ impl State for Map_Renderer
 
   fn render(&mut self) -> bool
   {
-    let camera = gl::Camera::get_active();
+    let camera = gfx::Camera::get_active();
 
     self.shader.bind();
     self.shader.update_uniform_mat(self.proj_loc, &camera.projection);

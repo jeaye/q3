@@ -11,13 +11,13 @@
 
 use std::mem;
 use gl2 = opengles::gl2;
-use gl;
+use gfx;
 use math;
 use super::Mesh;
 use log::Log;
 
 #[macro_escape]
-#[path = "../../gl/check.rs"]
+#[path = "../../gfx/check.rs"]
 mod check;
 
 #[macro_escape]
@@ -34,13 +34,13 @@ struct Mesh_Renderer<'self>
   ibo: gl2::GLuint, 
   tex0_loc: gl2::GLint,
 
-  shader: @mut gl::Shader, 
-  texture: Option<gl::Texture>,
+  shader: @mut gfx::Shader, 
+  texture: Option<gfx::Texture>,
 }
 
 impl<'self> Mesh_Renderer<'self>
 {
-  pub fn new(m: &'self Mesh, sh: @mut gl::Shader) -> Mesh_Renderer<'self>
+  pub fn new(m: &'self Mesh, sh: @mut gfx::Shader) -> Mesh_Renderer<'self>
   {
     let mut mr = Mesh_Renderer
     {
@@ -57,7 +57,7 @@ impl<'self> Mesh_Renderer<'self>
     };
 
     if m.texture.len() > 0
-    { mr.texture = Some(gl::Texture::new(gl2::TEXTURE_2D, m.texture)); }
+    { mr.texture = Some(gfx::Texture::new(gl2::TEXTURE_2D, m.texture)); }
 
     mr.shader.bind();
     mr.tex0_loc = mr.shader.get_uniform_location("tex0");

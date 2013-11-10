@@ -3,7 +3,7 @@
     See licensing in LICENSE file, or at:
         http://www.opensource.org/licenses/BSD-3-Clause
 
-    File: client/gl/check_internal.rs
+    File: client/gfx/check_internal.rs
     Author: Jesse 'Jeaye' Wilkerson
     Description:
       Provides a handy macro to check the outcome

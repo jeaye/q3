@@ -12,12 +12,12 @@
 
 use std::cast;
 use gl2 = opengles::gl2;
-use gl;
+use gfx;
 use math;
 use super::{ Model, Mesh_Renderer };
 
 #[macro_escape]
-#[path = "../../gl/check.rs"]
+#[path = "../../gfx/check.rs"]
 mod check;
 
 struct Model_Renderer<'self>
@@ -25,7 +25,7 @@ struct Model_Renderer<'self>
   model: &'self Model,
   mesh_renderers: ~[Mesh_Renderer<'self>],
 
-  shader: @mut gl::Shader, /* TODO: shared */
+  shader: @mut gfx::Shader, /* TODO: shared */
   proj_loc: gl2::GLint,
   world_loc: gl2::GLint,
 }
@@ -39,7 +39,7 @@ impl<'self> Model_Renderer<'self>
       model: model,
       mesh_renderers: ~[],
 
-      shader: gl::Shader_Builder::new_with_files("data/shaders/md5.vert", "data/shaders/md5.frag"),
+      shader: gfx::Shader_Builder::new_with_files("data/shaders/md5.vert", "data/shaders/md5.frag"),
       proj_loc: 0,
       world_loc: 0,
     };
@@ -70,7 +70,7 @@ impl<'self> Model_Renderer<'self>
     let world = world * math::Mat4x4::new_rotation_z(180.0);
     let world = world * math::Mat4x4::new_scale(0.1, 0.1, 0.1);
 
-    let camera = gl::Camera::get_active();
+    let camera = gfx::Camera::get_active();
     self.shader.bind();
     self.shader.update_uniform_mat(self.proj_loc, &camera.projection);
     self.shader.update_uniform_mat(self.world_loc, &(world * camera.view));

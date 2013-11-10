@@ -3,7 +3,7 @@
     See licensing in LICENSE file, or at:
         http://www.opensource.org/licenses/BSD-3-Clause
 
-    File: client/gl/ttf/glyph.rs
+    File: client/gfx/ttf/glyph.rs
     Author: Jesse 'Jeaye' Wilkerson
     Description:
       A single character stored in a font's texture atlas.

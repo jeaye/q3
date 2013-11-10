@@ -3,7 +3,7 @@
     See licensing in LICENSE file, or at:
         http://www.opensource.org/licenses/BSD-3-Clause
 
-    File: client/gl/texture.rs
+    File: client/gfx/texture.rs
     Author: Jesse 'Jeaye' Wilkerson
     Description:
       A wrapper of arbitrary OpenGL textures.

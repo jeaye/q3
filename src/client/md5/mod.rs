@@ -22,7 +22,7 @@ extern mod stb_image;
 extern mod log;
 extern mod math;
 extern mod console;
-extern mod gl;
+extern mod gfx;
 
 /* Model */
 pub use self::model::Model;

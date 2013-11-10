@@ -23,7 +23,7 @@ extern mod glfw;
 extern mod log;
 extern mod console;
 extern mod math;
-extern mod gl;
+extern mod gfx;
 extern mod ui;
 extern mod obj;
 

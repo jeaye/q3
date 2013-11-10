@@ -16,7 +16,7 @@
 use super::{ State, Game_Renderer };
 use std::mem;
 use gl2 = opengles::gl2;
-use gl;
+use gfx;
 use glfw;
 use ui;
 use math;
@@ -28,7 +28,7 @@ use log::Log;
 mod macros;
 
 #[macro_escape]
-#[path = "../../gl/check.rs"]
+#[path = "../../gfx/check.rs"]
 mod check;
 
 pub struct BSP_Renderer
@@ -38,7 +38,7 @@ pub struct BSP_Renderer
   vao: gl2::GLuint,
   vbo: gl2::GLuint, 
 
-  shader: @mut gl::Shader,
+  shader: @mut gfx::Shader,
   proj_loc: gl2::GLint,
   world_loc: gl2::GLint,
 }
@@ -54,7 +54,7 @@ impl BSP_Renderer
       vao: 0,
       vbo: 0,
 
-      shader: gl::Shader_Builder::new_with_files("data/shaders/color.vert", "data/shaders/color.frag"),
+      shader: gfx::Shader_Builder::new_with_files("data/shaders/color.vert", "data/shaders/color.frag"),
       proj_loc: 0,
       world_loc: 0,
     };

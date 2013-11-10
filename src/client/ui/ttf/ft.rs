@@ -3,7 +3,7 @@
     See licensing in LICENSE file, or at:
         http://www.opensource.org/licenses/BSD-3-Clause
 
-    File: client/gl/ttf/ft.rs
+    File: client/gfx/ttf/ft.rs
     Author: Jesse 'Jeaye' Wilkerson
     Description:
       Wrappers for Freetype2 font loading.

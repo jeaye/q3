@@ -11,7 +11,7 @@
 */
 
 use gl2 = opengles::gl2;
-use gl;
+use gfx;
 use glfw;
 use ui;
 use math;
@@ -32,9 +32,9 @@ struct Console_Renderer
 
   font: ui::Font,
 
-  tex_left: gl::Texture,
-  tex_middle: gl::Texture,
-  tex_right: gl::Texture,
+  tex_left: gfx::Texture,
+  tex_middle: gfx::Texture,
+  tex_right: gfx::Texture,
 }
 
 impl Console_Renderer
@@ -50,9 +50,9 @@ impl Console_Renderer
 
       font: ui::Font::new("data/fonts/test.ttf", 16),
 
-      tex_left: gl::Texture::new(gl2::TEXTURE_2D, "data/img/console/left.png"),
-      tex_right: gl::Texture::new(gl2::TEXTURE_2D, "data/img/console/right.png"),
-      tex_middle: gl::Texture::new(gl2::TEXTURE_2D, "data/img/console/middle.png"),
+      tex_left: gfx::Texture::new(gl2::TEXTURE_2D, "data/img/console/left.png"),
+      tex_right: gfx::Texture::new(gl2::TEXTURE_2D, "data/img/console/right.png"),
+      tex_middle: gfx::Texture::new(gl2::TEXTURE_2D, "data/img/console/middle.png"),
     };
 
     c

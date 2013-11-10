@@ -11,7 +11,7 @@
 
 use std::local_data;
 use glfw;
-use gl;
+use gfx;
 use gl2 = opengles::gl2;
 use math;
 use TTF_Renderer = super::ttf::Renderer;
@@ -19,7 +19,7 @@ use TTF_Font = super::ttf::Font;
 use log::Log;
 
 #[macro_escape]
-#[path = "../gl/check.rs"]
+#[path = "../gfx/check.rs"]
 mod check;
 
 #[macro_escape]
@@ -34,7 +34,7 @@ struct Renderer
   vbo: gl2::GLuint,
 
   /* Shader uniforms. */
-  shader: @mut gl::Shader,
+  shader: @mut gfx::Shader,
   world: math::Mat4x4,
   tex_world: math::Mat4x4,
 
@@ -61,7 +61,7 @@ impl Renderer
       vao: 0,
       vbo: 0,
 
-      shader: gl::Shader_Builder::new_with_files("data/shaders/ui.vert", "data/shaders/ui.frag"),
+      shader: gfx::Shader_Builder::new_with_files("data/shaders/ui.vert", "data/shaders/ui.frag"),
       world: math::Mat4x4::new(),
       tex_world: math::Mat4x4::new(),
 
@@ -166,7 +166,7 @@ impl Renderer
     check!(gl2::disable(gl2::BLEND));
   }
 
-  pub fn render_texture(&mut self, tex: &gl::Texture, pos: &math::Vec2f)
+  pub fn render_texture(&mut self, tex: &gfx::Texture, pos: &math::Vec2f)
   {
     self.world = math::Mat4x4::new_scale(tex.size.x as f32, tex.size.y as f32, 1.0);
     self.world = self.world * math::Mat4x4::new_translation(pos.x, pos.y, 0.0);
@@ -178,7 +178,7 @@ impl Renderer
     self.render(tex);
   }
 
-  pub fn render_texture_scale_clamp(&mut self, tex: &gl::Texture, pos: &math::Vec2f, scale: &math::Vec2f)
+  pub fn render_texture_scale_clamp(&mut self, tex: &gfx::Texture, pos: &math::Vec2f, scale: &math::Vec2f)
   {
     self.world = math::Mat4x4::new_scale(scale.x, scale.y, 1.0);
     self.world = self.world * math::Mat4x4::new_translation(pos.x, pos.y, 0.0);
@@ -197,7 +197,7 @@ impl Renderer
     self.shader.bind();
   }
 
-  fn render(&mut self, tex: &gl::Texture)
+  fn render(&mut self, tex: &gfx::Texture)
   {
     tex.bind(0);
 
