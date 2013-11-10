@@ -10,7 +10,8 @@
 */
 
 use std::{ vec, cast };
-use gl2 = opengles::gl2;
+use gl;
+use gl::types::*;
 use stb_image;
 use math;
 use log::Log;
@@ -24,8 +25,8 @@ mod macros;
 
 pub struct Texture
 {
-  target: gl2::GLenum,
-  obj: gl2::GLuint,
+  target: GLenum,
+  obj: GLuint,
   filename: @str,
   size: math::Vec2i,
 }
@@ -33,7 +34,7 @@ pub struct Texture
 impl Texture
 {
   #[fixed_stack_segment]
-  pub fn new(targ: gl2::GLenum, file: &str) -> Texture
+  pub fn new(targ: GLenum, file: &str) -> Texture
   {
     let mut tex = Texture
     {
@@ -43,16 +44,15 @@ impl Texture
       size: math::Vec2i::zero(),
     };
 
-    let name = check!(gl2::gen_textures(1));
-    log_assert!(name.len() == 1);
-    tex.obj = name[0];
+    check_unsafe!(gl::GenTextures(1, &mut tex.obj));
+    log_assert!(tex.obj > 0);
     tex.bind(0);
 
-    check!(gl2::pixel_store_i(gl2::UNPACK_ALIGNMENT, 4));
-    check!(gl2::tex_parameter_i(gl2::TEXTURE_2D, gl2::TEXTURE_MIN_FILTER, gl2::LINEAR as gl2::GLint));
-    check!(gl2::tex_parameter_i(gl2::TEXTURE_2D, gl2::TEXTURE_MAG_FILTER, gl2::LINEAR as gl2::GLint));
-    check!(gl2::tex_parameter_i(gl2::TEXTURE_2D, gl2::TEXTURE_WRAP_S, gl2::CLAMP_TO_EDGE as gl2::GLint));
-    check!(gl2::tex_parameter_i(gl2::TEXTURE_2D, gl2::TEXTURE_WRAP_T, gl2::CLAMP_TO_EDGE as gl2::GLint));
+    check!(gl::PixelStorei(gl::UNPACK_ALIGNMENT, 4));
+    check!(gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR as GLint));
+    check!(gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as GLint));
+    check!(gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_S, gl::CLAMP_TO_EDGE as GLint));
+    check!(gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, gl::CLAMP_TO_EDGE as GLint));
 
     match stb_image::image::load(file.to_owned())
     {
@@ -64,22 +64,22 @@ impl Texture
         tex.size = math::Vec2i::new(image.width as i32, image.height as i32);
         let format = match image.depth
         {
-          3 => { gl2::RGB },
-          4 => { gl2::RGBA },
-          x => { log_error!("Invalid texture depth {}", x); gl2::RGBA }
+          3 => { gl::RGB },
+          4 => { gl::RGBA },
+          x => { log_error!("Invalid texture depth {}", x); gl::RGBA }
         };
 
         let data = image.data.clone();
         unsafe {
-          check!(gl2::glTexImage2D
+          check!(gl::TexImage2D
           (
-            /* target */ gl2::TEXTURE_2D, 
+            /* target */ gl::TEXTURE_2D, 
             /* mipmap */ 0, 
-            /* internal */ gl2::RGBA8 as gl2::GLint, 
-            /* size */ tex.size.x as gl2::GLsizei, tex.size.y as gl2::GLsizei, 
+            /* internal */ gl::RGBA8 as GLint, 
+            /* size */ tex.size.x as GLsizei, tex.size.y as GLsizei, 
             /* border */ 0, 
             /* external */ format, 
-            /* size type */ gl2::UNSIGNED_BYTE, 
+            /* size type */ gl::UNSIGNED_BYTE, 
             /* data */ cast::transmute(vec::raw::to_ptr(data))
           ));
         }
@@ -90,22 +90,17 @@ impl Texture
     tex
   }
 
-  pub fn bind(&self, _unit: gl2::GLenum)
-  {
-    //check!(gl2::active_texture(gl2::TEXTURE0 + unit));
-    check!(gl2::bind_texture(gl2::TEXTURE_2D, self.obj));
-  }
+  pub fn bind(&self, _unit: GLenum)
+  { check!(gl::BindTexture(gl::TEXTURE_2D, self.obj)); }
 
   pub fn unbind(&self)
-  { check!(gl2::bind_texture(gl2::TEXTURE_2D, 0)); }
+  { check!(gl::BindTexture(gl::TEXTURE_2D, 0)); }
 }
 
 #[unsafe_destructor]
 impl Drop for Texture
 {
   fn drop(&mut self)
-  {
-    check!(gl2::delete_textures(&[self.obj]));
-  }
+  { check_unsafe!(gl::DeleteTextures(1, &self.obj)); }
 }
 

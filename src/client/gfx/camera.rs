@@ -14,7 +14,7 @@
 
 use std::local_data;
 use glfw;
-use gl2 = opengles::gl2;
+use gl;
 use math;
 use console;
 use log::Log;
@@ -125,7 +125,7 @@ impl Camera
     self.window_size.x = new_width;
     self.window_size.y = new_height;
 
-    check!(gl2::viewport(0, 0, self.window_size.x, self.window_size.y));
+    check!(gl::Viewport(0, 0, self.window_size.x, self.window_size.y));
 
     self.projection = math::Mat4x4::new_perspective(
                                       self.fov,

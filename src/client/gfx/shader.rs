@@ -17,7 +17,7 @@
 use std::str;
 use std::rt::io::Reader;
 use std::rt::io::File;
-use gl2 = opengles::gl2;
+use gl;
 use log::Log;
 use math::*;
 
@@ -43,18 +43,18 @@ mod macros;
 pub trait Shaderable
 {
   fn bind(&mut self);
-  fn get_uniform_location(&self, uniform: &str) -> gl2::GLint;
-  fn update_uniform_i32(&self, location: gl2::GLint, i: i32);
-  fn update_uniform_f32(&self, location: gl2::GLint, i: f32);
-  fn update_uniform_mat(&self, location: gl2::GLint, mat: &Mat4x4);
+  fn get_uniform_location(&self, uniform: &str) -> i32;
+  fn update_uniform_i32(&self, location: i32, i: i32);
+  fn update_uniform_f32(&self, location: i32, i: f32);
+  fn update_uniform_mat(&self, location: i32, mat: &Mat4x4);
 }
 
 #[cfg(debug_shader)]
 struct Debug_Shader
 {
-  prog: gl2::GLuint,
-  vert_obj: gl2::GLuint,
-  frag_obj: gl2::GLuint,
+  prog: u32,
+  vert_obj: u32,
+  frag_obj: u32,
   vert_file: ~str,
   frag_file: ~str,
   vert_file_time: u64,
@@ -142,16 +142,16 @@ impl Shader for Debug_Shader
     { shared::bind(self); }
   }
 
-  fn get_uniform_location(&self, uniform: &str) -> gl2::GLint
+  fn get_uniform_location(&self, uniform: &str) -> i32
   { if self.valid { return shared::get_uniform_location(self, uniform); } -1 }
 
-  fn update_uniform_i32(&self, location: gl2::GLint, i: i32)
+  fn update_uniform_i32(&self, location: i32, i: i32)
   { if self.valid { shared::update_uniform_i32(location, i); } }
 
-  fn update_uniform_f32(&self, location: gl2::GLint, i: f32)
+  fn update_uniform_f32(&self, location: i32, i: f32)
   { if self.valid { shared::update_uniform_f32(location, i); } }
 
-  fn update_uniform_mat(&self, location: gl2::GLint, mat: &Mat4x4)
+  fn update_uniform_mat(&self, location: i32, mat: &Mat4x4)
   { if self.valid { shared::update_uniform_mat(location, mat); } }
 }
 
@@ -160,18 +160,18 @@ impl Drop for Debug_Shader
 {
   fn drop(&mut self)
   {
-    check!(gl2::delete_shader(self.vert_obj));
-    check!(gl2::delete_shader(self.frag_obj));
-    check!(gl2::delete_program(self.prog));
+    check!(gl::DeleteShader(self.vert_obj));
+    check!(gl::DeleteShader(self.frag_obj));
+    check!(gl::DeleteProgram(self.prog));
   }
 }
  
 #[cfg(release_shader)]
 struct Release_Shader
 {
-  prog: gl2::GLuint,
-  vert_obj: gl2::GLuint,
-  frag_obj: gl2::GLuint,
+  prog: u32,
+  vert_obj: u32,
+  frag_obj: u32,
 }
 
 #[cfg(release_shader)]
@@ -208,16 +208,16 @@ impl Shader for Release_Shader
   fn bind(&mut self)
   { shared::bind(self); }
 
-  fn get_uniform_location(&self, uniform: &str) -> gl2::GLint
+  fn get_uniform_location(&self, uniform: &str) -> i32
   { shared::get_uniform_location(self, uniform) }
 
-  fn update_uniform_i32(&self, location: gl2::GLint, i: i32)
+  fn update_uniform_i32(&self, location: i32, i: i32)
   { shared::update_uniform_i32(location, i) }
 
-  fn update_uniform_f32(&self, location: gl2::GLint, i: f32)
+  fn update_uniform_f32(&self, location: i32, i: f32)
   { shared::update_uniform_f32(location, i); }
 
-  fn update_uniform_mat(&self, location: gl2::GLint, mat: &Mat4x4)
+  fn update_uniform_mat(&self, location: i32, mat: &Mat4x4)
   { shared::update_uniform_mat(location, mat) }
 }
 
@@ -226,16 +226,17 @@ impl Drop for Release_Shader
 {
   fn drop(&mut self)
   {
-    check!(gl2::delete_shader(self.vert_obj));
-    check!(gl2::delete_shader(self.frag_obj));
-    check!(gl2::delete_program(self.prog));
+    check!(gl::DeleteShader(self.vert_obj));
+    check!(gl::DeleteShader(self.frag_obj));
+    check!(gl::DeleteProgram(self.prog));
   }
 }
 
 pub mod shared
 {
-  use gl2 = opengles::gl2;
-  use std::cast;
+  use gl;
+  use gl::types::*;
+  use std::{ str, vec, ptr, cast };
   use log::Log;
   use math::*;
 
@@ -249,19 +250,26 @@ pub mod shared
 
   pub fn load(shader: &mut super::Shader_Builder, vert_src: &str, frag_src: &str) -> bool
   {
-    if check!(gl2::is_program(shader.prog))
-    { check!(gl2::delete_program(shader.prog)); }
+    if check!(gl::IsProgram(shader.prog)) != 0
+    { check!(gl::DeleteProgram(shader.prog)); }
 
-    shader.prog = check!(gl2::create_program());
+    shader.prog = check!(gl::CreateProgram());
 
     let compile_check = |obj| -> bool
     {
       /* Error check. */
-      let result = check!(gl2::get_shader_iv(obj, gl2::COMPILE_STATUS));
-      if result == 0 as gl2::GLint
+      let mut result: GLint = 0;
+      check_unsafe!(gl::GetShaderiv(obj, gl::COMPILE_STATUS, &mut result));
+      if result == 0
       {
-        let err = check!(gl2::get_shader_info_log(obj));
-        log_error!(err);
+        let mut len = 0;
+        check_unsafe!(gl::GetShaderiv(obj, gl::INFO_LOG_LENGTH, &mut len));
+
+        /* Subtract one to ignore the trailing null. */
+        let mut buf = vec::from_elem(len as uint - 1, 0u8); 
+        check_unsafe!(gl::GetShaderInfoLog(obj, len, ptr::mut_null(),
+                                           vec::raw::to_mut_ptr(buf) as *mut GLchar));
+        log_error!(unsafe { str::raw::from_utf8(buf) });
       }
       result != 0
     };
@@ -269,54 +277,59 @@ pub mod shared
     /* Compile the provided shaders. */
     if vert_src.len() > 0
     {
-      shader.vert_obj = check!(gl2::create_shader(gl2::VERTEX_SHADER));
+      shader.vert_obj = check!(gl::CreateShader(gl::VERTEX_SHADER));
       log_assert!(shader.vert_obj != 0);
 
-      let src = [vert_src];
-      check!(gl2::shader_source(shader.vert_obj, src.map(|x| (*x).as_bytes().to_owned())));
-      check!(gl2::compile_shader(shader.vert_obj));
+      vert_src.with_c_str(|ptr| check_unsafe!(gl::ShaderSource(shader.vert_obj, 1, &ptr, ptr::null())));
+      check!(gl::CompileShader(shader.vert_obj));
 
       /* Error checking. */
       if !compile_check(shader.vert_obj)
-      { check!(gl2::delete_shader(shader.vert_obj)); return false; }
+      { check!(gl::DeleteShader(shader.vert_obj)); return false; }
     }
     if frag_src.len() > 0
     {
-      shader.frag_obj = check!(gl2::create_shader(gl2::FRAGMENT_SHADER));
+      shader.frag_obj = check!(gl::CreateShader(gl::FRAGMENT_SHADER));
       log_assert!(shader.frag_obj != 0);
 
-      let src = [frag_src];
-      check!(gl2::shader_source(shader.frag_obj, src.map(|x| (*x).as_bytes().to_owned())));
-      check!(gl2::compile_shader(shader.frag_obj));
+      frag_src.with_c_str(|ptr| check_unsafe!(gl::ShaderSource(shader.frag_obj, 1, &ptr, ptr::null())));
+      check!(gl::CompileShader(shader.frag_obj));
 
       /* Error checking. */
       if !compile_check(shader.frag_obj)
-      { check!(gl2::delete_shader(shader.frag_obj)); return false; }
+      { check!(gl::DeleteShader(shader.frag_obj)); return false; }
     }
 
     /* Check if one of the shaders was properly compiled. */
     if shader.vert_obj > 0 
-    { check!(gl2::attach_shader(shader.prog, shader.vert_obj)); }
+    { check!(gl::AttachShader(shader.prog, shader.vert_obj)); }
     if shader.frag_obj > 0
-    { check!(gl2::attach_shader(shader.prog, shader.frag_obj)); }
+    { check!(gl::AttachShader(shader.prog, shader.frag_obj)); }
 
-    check!(gl2::link_program(shader.prog));
+    check!(gl::LinkProgram(shader.prog));
 
     /* Error check. */
-    let result = check!(gl2::get_program_iv(shader.prog, gl2::LINK_STATUS));
-    if result == 0 as gl2::GLint
+    let mut result: GLint = 0;
+    check_unsafe!(gl::GetProgramiv(shader.prog, gl::LINK_STATUS, &mut result));
+    if result == 0
     {
-      let err = check!(gl2::get_program_info_log(shader.prog));
-      log_error!(err);
+      let mut len = 0;
+      check_unsafe!(gl::GetShaderiv(shader.prog, gl::INFO_LOG_LENGTH, &mut len));
+
+      /* Subtract one to ignore the trailing null. */
+      let mut buf = vec::from_elem(len as uint - 1, 0u8); 
+      check_unsafe!(gl::GetShaderInfoLog(shader.prog, len, ptr::mut_null(),
+      vec::raw::to_mut_ptr(buf) as *mut GLchar));
+      log_error!(unsafe { str::raw::from_utf8(buf) });
 
       /* Delete shaders. */
-      check!(gl2::detach_shader(shader.prog, shader.vert_obj));
-      check!(gl2::delete_shader(shader.vert_obj));
+      check!(gl::DetachShader(shader.prog, shader.vert_obj));
+      check!(gl::DeleteShader(shader.vert_obj));
 
-      check!(gl2::detach_shader(shader.prog, shader.frag_obj));
-      check!(gl2::delete_shader(shader.frag_obj));
+      check!(gl::DetachShader(shader.prog, shader.frag_obj));
+      check!(gl::DeleteShader(shader.frag_obj));
 
-      check!(gl2::delete_program(shader.prog));
+      check!(gl::DeleteProgram(shader.prog));
 
       return false;
     }
@@ -325,11 +338,11 @@ pub mod shared
   }
 
   pub fn bind(shader: &mut super::Shader_Builder)
-  { check!(gl2::use_program(shader.prog)); }
+  { check!(gl::UseProgram(shader.prog)); }
 
-  pub fn get_uniform_location(shader: &super::Shader_Builder, uniform: &str) -> gl2::GLint
+  pub fn get_uniform_location(shader: &super::Shader_Builder, uniform: &str) -> i32
   {
-    let name = check!(gl2::get_uniform_location(shader.prog, uniform.to_owned()));
+    let name = uniform.with_c_str(|ptr| check_unsafe!(gl::GetUniformLocation(shader.prog, ptr)));
     match name
     {
       -1 => { log_error!("Uniform '{}' not found!", uniform); name }
@@ -337,21 +350,19 @@ pub mod shared
     }
   }
 
-  pub fn update_uniform_i32(location: gl2::GLint, i: i32)
-  { check!(gl2::uniform_1i(location, i)); }
+  pub fn update_uniform_i32(location: i32, i: i32)
+  { check!(gl::Uniform1i(location, i)); }
 
-  pub fn update_uniform_f32(location: gl2::GLint, i: f32)
-  { check!(gl2::uniform_1f(location, i)); }
+  pub fn update_uniform_f32(location: i32, i: f32)
+  { check!(gl::Uniform1f(location, i)); }
 
-  pub fn update_uniform_mat(location: gl2::GLint, mat: &Mat4x4)
+  pub fn update_uniform_mat(location: i32, mat: &Mat4x4)
   { 
-    unsafe
-    {
-      check!(gl2::uniform_matrix_4fv(
-                   location, 
-                   false, 
-                   cast::transmute::<[[f32, ..4], ..4], [f32, ..16]>(mat.data))) 
-    }; 
+    check_unsafe!(gl::UniformMatrix4fv(
+                 location, 
+                 1,
+                 0u8, 
+                 cast::transmute(vec::raw::to_ptr(mat.data))))
   }
 }
 

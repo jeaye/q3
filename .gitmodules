@@ -18,3 +18,7 @@
 	path = lib/ncurses-rs
 	url = git://github.com/jeaye/ncurses-rs.git
   ignore = dirty
+[submodule "lib/gl-rs"]
+	path = lib/gl-rs
+	url = https://github.com/bjz/gl-rs.git
+  ignore = dirty

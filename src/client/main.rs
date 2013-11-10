@@ -17,6 +17,7 @@
 
 extern mod extra;
 extern mod opengles;
+extern mod gl;
 extern mod glfw;
 extern mod stb_image;
 
@@ -33,7 +34,6 @@ extern mod state;
 use std::{ comm, rt };
 use std::unstable::finally::Finally;
 
-use gl2 = opengles::gl2;
 use log::Log;
 
 #[macro_escape]
@@ -108,6 +108,7 @@ impl Client
   {
     log_debug!("Binding GL context");
     self.main_window.make_context_current();
+    gl::load_with(glfw::get_proc_address);
 
     let _ui_renderer = ui::Renderer::new(self.main_window);
 
@@ -164,7 +165,7 @@ impl Client
       state::Director::update(delta);
       _model_renderer.update(delta);
 
-      check!(gl2::clear(gl2::COLOR_BUFFER_BIT | gl2::DEPTH_BUFFER_BIT));
+      check!(gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT));
       {
         state::Director::render();
         _model_renderer.render();

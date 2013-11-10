@@ -12,7 +12,7 @@
 
 use std::{ comm, task, local_data };
 use glfw;
-use gl2 = opengles::gl2;
+use gl;
 use log;
 use log::Log;
 
@@ -84,6 +84,7 @@ impl Worker
   {
     let (task_port, exit_channel, window) = data;
     window.make_context_current();
+    gl::load_with(glfw::get_proc_address);
     log::Log::initialize(); /* Done for every thread. */
 
     loop
@@ -96,7 +97,7 @@ impl Worker
       if ret
       { break; }
 
-      check!(gl2::flush());
+      check!(gl::Flush());
     }
 
     /* Let the main thread know we're done. */

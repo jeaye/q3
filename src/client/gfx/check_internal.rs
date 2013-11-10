@@ -45,3 +45,10 @@ macro_rules! check
   });
 )
 
+macro_rules! check_unsafe
+(
+  ($func:expr) => 
+  ({
+    unsafe { check!($func) }
+  });
+)

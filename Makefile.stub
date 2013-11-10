@@ -50,7 +50,7 @@ else
 endif
 
 SHARED_LIBS=-L. -Lbuild/q3/shared
-CLIENT_LIBS=${SHARED_LIBS} -Lbuild/q3/client -Lbuild/glfw_static -Lbuild/glfw-rs -Lbuild/rust-opengles -Lbuild/stb-image -L/opt/local/lib
+CLIENT_LIBS=${SHARED_LIBS} -Lbuild/q3/client -Lbuild/glfw_static -Lbuild/glfw-rs -Lbuild/rust-opengles -Lbuild/stb-image -Lbuild/gl-rs -L/opt/local/lib
 SERVER_LIBS=${SHARED_LIBS} -Lbuild/q3/server -Lbuild/ncurses-rs -L/opt/local/lib
 
 # Shared

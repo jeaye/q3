@@ -172,6 +172,28 @@ pushd rust-opengles
   make -B
 popd
 
+## Rust OpenGL
+log "Building gl-rs"
+mkdir -p gl-rs
+pushd $SWD/lib/gl-rs
+  rustpkg build --opt-level=3 gl
+  if [ "0" -eq "$UNAME_LINUX" -o "0" -eq "$UNAME_CYGWIN" ];
+  then
+    # Linux
+    rm -f $BWD/../libgl-*.so
+    for file in `find build -name '*.so'`; do
+      cp $file $BWD/../
+    done
+  elif [ "0" -eq "$UNAME_OSX" ];
+  then
+    # Mac
+    rm -f $BWD/../libgl-*.dylib
+    for file in `find build -name '*.dylib'`; do
+      cp $file $BWD/../
+    done
+  fi
+popd
+
 ## STB-Image
 log "Building stb-image"
 mkdir -p stb-image
