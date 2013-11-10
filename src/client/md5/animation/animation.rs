@@ -11,10 +11,8 @@
 
 use super::{ Joint_Info, Bound, Base_Frame, Frame_Data, Frame_Skeleton, Skeleton_Joint };
 use std::char;
-use std::rt::io;
-use std::rt::io::Reader;
 use std::rt::io::buffered::BufferedReader;
-use std::rt::io::file::FileInfo;
+use std::rt::io::{ Reader, File };
 use log::Log;
 
 #[macro_escape]
@@ -89,7 +87,7 @@ impl Animation
 
   fn load(&mut self, file: ~str) -> bool
   {
-    let fior = Path::new(file.clone()).open_reader(io::Open);
+    let fior = File::open(&Path::new(file.clone()));
     if fior.is_none()
     { log_error!("Failed to open animation file {}", file); return false; }
 

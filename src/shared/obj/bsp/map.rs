@@ -12,7 +12,7 @@
 use std::{ vec, cmp, ptr, mem, cast };
 use std::rt::io;
 use std::rt::io::{ Reader, Seek };
-use std::rt::io::file::{ FileReader, FileInfo };
+use std::rt::io::File;
 use math;
 use super::lump;
 use primitive::{ Triangle, Vertex_PC };
@@ -52,7 +52,7 @@ impl Map
       error: ~"",
     };
 
-    let fio = Path::new(file).open_reader(io::Open);
+    let fio = File::open(&Path::new(file));
     if fio.is_none()
     { return Err(format!("Failed to read file: {}", file)); }
     let mut fio = fio.unwrap();
@@ -82,7 +82,7 @@ impl Map
     Ok(map)
   }
 
-  fn read_verts(&mut self, fio: &mut io::file::FileReader) -> bool
+  fn read_verts(&mut self, fio: &mut io::File) -> bool
   {
     fio.seek(self.header.lumps[lump::Vertex_Type as int].offset as i64, io::SeekSet);
     let num_verts = (self.header.lumps[lump::Vertex_Type as int].length) /
@@ -178,7 +178,7 @@ impl Map
     true
   }
 
-  fn read_faces(&mut self, fio: &mut io::file::FileReader) -> bool
+  fn read_faces(&mut self, fio: &mut io::File) -> bool
   {
     fio.seek(self.header.lumps[lump::Face_Type as int].offset as i64, io::SeekSet);
     let num_faces = (self.header.lumps[lump::Face_Type as int].length) /
@@ -203,7 +203,7 @@ impl Map
     true
   }
 
-  fn read_mesh_verts(&mut self, fio: &mut io::file::FileReader) -> bool
+  fn read_mesh_verts(&mut self, fio: &mut io::File) -> bool
   {
     fio.seek(self.header.lumps[lump::Mesh_Vert_Type as int].offset as i64, io::SeekSet);
     let num_obj = (self.header.lumps[lump::Mesh_Vert_Type as int].length) /

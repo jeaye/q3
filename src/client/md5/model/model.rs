@@ -13,10 +13,8 @@
 
 use super::{ Joint, Vertex, Triangle, Weight, Mesh, Animation };
 use std::{ vec, char, str };
-use std::rt::io;
-use std::rt::io::Reader;
 use std::rt::io::buffered::BufferedReader;
-use std::rt::io::file::FileInfo;
+use std::rt::io::{ Reader, File };
 use math;
 use log::Log;
 
@@ -71,7 +69,7 @@ impl Model
 
   fn load(&mut self, file: ~str) -> bool
   {
-    let fior = Path::new(file.clone()).open_reader(io::Open);
+    let fior = File::open(&Path::new(file.clone()));
     if fior.is_none()
     { log_error!("Failed to open model file {}", file); return false; }
 

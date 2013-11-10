@@ -15,9 +15,8 @@
 */
 
 use std::str;
-use std::rt::io;
 use std::rt::io::Reader;
-use std::rt::io::file::FileInfo;
+use std::rt::io::File;
 use gl2 = opengles::gl2;
 use log::Log;
 use math::*;
@@ -99,21 +98,13 @@ impl Debug_Shader
       frag_file_time: 0,
       valid: false,
     };
-    shader.vert_file_time = match Path::new(new_vert_file).stat()
-    {
-      Some(ref st) => st.modified,
-      None => 0
-    };
-    shader.frag_file_time = match Path::new(new_frag_file).stat()
-    {
-      Some(ref st) => st.modified,
-      None => 0
-    };
+    shader.vert_file_time = Path::new(new_vert_file).stat().modified;
+    shader.frag_file_time = Path::new(new_frag_file).stat().modified;
 
-    let mut fio = Path::new(new_vert_file).open_reader(io::Open).expect("Unable to open reader");
+    let mut fio = File::open(&Path::new(new_vert_file)).expect("Unable to open reader");
     let vert_src = str::from_utf8(fio.read_to_end());
 
-    let mut fio = Path::new(new_frag_file).open_reader(io::Open).expect("Unable to open reader");
+    let mut fio = File::open(&Path::new(new_frag_file)).expect("Unable to open reader");
     let frag_src = str::from_utf8(fio.read_to_end());
 
     log_assert!(shared::load(shader, vert_src, frag_src));
@@ -129,24 +120,16 @@ impl Shader for Debug_Shader
   fn bind(&mut self)
   {
     /* Get the time stamp on the files. */
-    let vert_time = match Path::new(self.vert_file.clone()).stat()
-    {
-      Some(ref st) => st.modified,
-      None => 0
-    };
-    let frag_time = match Path::new(self.frag_file.clone()).stat()
-    {
-      Some(ref st) => st.modified,
-      None => 0
-    };
+    let vert_time = Path::new(self.vert_file.clone()).stat().modified;
+    let frag_time = Path::new(self.frag_file.clone()).stat().modified;
 
     /* Check if the files are newer than before. */
     if vert_time > self.vert_file_time || frag_time > self.frag_file_time
     {
-      let mut fio = Path::new(self.vert_file.clone()).open_reader(io::Open).expect("Unable to open reader");
+      let mut fio = File::open(&Path::new(self.vert_file.clone())).expect("Unable to open reader");
       let vert_src = str::from_utf8(fio.read_to_end());
 
-      let mut fio = Path::new(self.frag_file.clone()).open_reader(io::Open).expect("Unable to open reader");
+      let mut fio = File::open(&Path::new(self.frag_file.clone())).expect("Unable to open reader");
       let frag_src = str::from_utf8(fio.read_to_end());
 
       self.valid = shared::load(self, vert_src, frag_src);
@@ -207,10 +190,10 @@ impl Release_Shader
   {
     let shader = @mut Release_Shader{ prog: 0, vert_obj: 0, frag_obj: 0 };
 
-    let mut fio = Path::new(vert_file).open_reader(io::Open).expect("Unable to open reader");
+    let mut fio = File::open(&Path::new(vert_file)).expect("Unable to open reader");
     let vert_src = str::from_utf8(fio.read_to_end());
 
-    let mut fio = Path::new(frag_file).open_reader(io::Open).expect("Unable to open reader");
+    let mut fio = File::open(&Path::new(frag_file)).expect("Unable to open reader");
     let frag_src = str::from_utf8(fio.read_to_end());
 
     log_assert!(shared::load(shader, vert_src, frag_src));
