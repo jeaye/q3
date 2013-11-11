@@ -17,6 +17,7 @@
 #[feature(managed_boxes)];
 
 extern mod opengles;
+extern mod gl;
 extern mod stb_image;
 
 extern mod log;

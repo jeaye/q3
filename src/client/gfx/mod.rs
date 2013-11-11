@@ -29,9 +29,12 @@ pub use self::camera::Camera;
 pub use self::shader::{ Shader, Shader_Builder };
 pub use self::texture::Texture;
 pub use self::worker::Worker;
+pub use self::vbo::VBO;
+pub use self::vao::VAO;
 
 pub mod camera;
 pub mod shader;
 pub mod texture;
 pub mod worker;
-
+pub mod vbo;
+pub mod vao;

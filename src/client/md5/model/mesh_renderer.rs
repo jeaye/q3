@@ -9,33 +9,28 @@
       Renders an MD5 mesh.
 */
 
-use std::mem;
-use gl2 = opengles::gl2;
+use std::{ mem, ptr };
+use gl, gl::types::*;
 use gfx;
 use math;
 use super::Mesh;
-use log::Log;
 
 #[macro_escape]
 #[path = "../../gfx/check.rs"]
 mod check;
 
-#[macro_escape]
-#[path = "../../../shared/log/macros.rs"]
-mod macros;
-
 struct Mesh_Renderer<'self>
 {
-  mesh: &'self Mesh,
+  priv mesh: &'self Mesh,
 
-  vao: gl2::GLuint,
-  position_vbo: gl2::GLuint, 
-  tex_vbo: gl2::GLuint, 
-  ibo: gl2::GLuint, 
-  tex0_loc: gl2::GLint,
+  priv vao: gfx::VAO,
+  priv position_vbo: gfx::VBO,
+  priv tex_vbo: gfx::VBO,
+  priv ibo: gfx::VBO,
+  priv tex0_loc: GLint,
 
-  shader: @mut gfx::Shader, 
-  texture: Option<gfx::Texture>,
+  priv shader: @mut gfx::Shader, 
+  priv texture: Option<gfx::Texture>,
 }
 
 impl<'self> Mesh_Renderer<'self>
@@ -46,10 +41,10 @@ impl<'self> Mesh_Renderer<'self>
     {
       mesh: m,
 
-      vao: 0,
-      position_vbo: 0,
-      tex_vbo: 0,
-      ibo: 0,
+      vao: gfx::VAO::zero(),
+      position_vbo: gfx::VBO::zero(),
+      tex_vbo: gfx::VBO::zero(),
+      ibo: gfx::VBO::zero(),
       tex0_loc: 0,
 
       shader: sh,
@@ -57,7 +52,7 @@ impl<'self> Mesh_Renderer<'self>
     };
 
     if m.texture.len() > 0
-    { mr.texture = Some(gfx::Texture::new(gl2::TEXTURE_2D, m.texture)); }
+    { mr.texture = Some(gfx::Texture::new(gl::TEXTURE_2D, m.texture)); }
 
     mr.shader.bind();
     mr.tex0_loc = mr.shader.get_uniform_location("tex0");
@@ -70,70 +65,56 @@ impl<'self> Mesh_Renderer<'self>
 
   fn upload(&mut self)
   {
-    let name = check!(gl2::gen_vertex_arrays(1));
-    log_assert!(name.len() == 1);
-    self.vao = name[0];
+    self.vao = gfx::VAO::new();
 
-    let name = check!(gl2::gen_buffers(3));
-    log_assert!(name.len() == 3);
-    self.position_vbo = name[0];
-    self.tex_vbo = name[1];
-    self.ibo = name[2];
+    self.position_vbo = gfx::VBO::new(gl::ARRAY_BUFFER);
+    self.tex_vbo = gfx::VBO::new(gl::ARRAY_BUFFER);
+    self.ibo = gfx::VBO::new(gl::ELEMENT_ARRAY_BUFFER);
 
     /* Upload data. */
-    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.position_vbo));
-    check!(gl2::buffer_data(gl2::ARRAY_BUFFER, self.mesh.positions, gl2::DYNAMIC_DRAW));
+    self.position_vbo.bind();
+    self.position_vbo.buffer_data(self.mesh.positions, gl::DYNAMIC_DRAW);
 
-    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.tex_vbo));
-    check!(gl2::buffer_data(gl2::ARRAY_BUFFER, self.mesh.tex_coords, gl2::STATIC_DRAW));
+    self.tex_vbo.bind();
+    self.tex_vbo.buffer_data(self.mesh.tex_coords, gl::DYNAMIC_DRAW);
 
-    check!(gl2::bind_buffer(gl2::ELEMENT_ARRAY_BUFFER, self.ibo));
-    check!(gl2::buffer_data(gl2::ELEMENT_ARRAY_BUFFER, self.mesh.indices, gl2::STATIC_DRAW));
+    self.ibo.bind();
+    self.ibo.buffer_data(self.mesh.indices, gl::STATIC_DRAW);
 
     /* Setup vertex attribs. */
-    check!(gl2::bind_vertex_array(self.vao));
+    self.vao.bind();
 
-    check!(gl2::enable_vertex_attrib_array(0));
-    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.position_vbo));
-    check!(gl2::vertex_attrib_pointer_f32(0, 3, false, mem::size_of::<math::Vec3f>() as i32, 0));
+    self.vao.enable_vertex_attrib_array(0);
+    self.position_vbo.bind();
+    self.vao.vertex_attrib_pointer_f32(0, 3, false, mem::size_of::<math::Vec3f>() as i32, ptr::null());
 
-    check!(gl2::enable_vertex_attrib_array(1));
-    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.tex_vbo));
-    check!(gl2::vertex_attrib_pointer_f32(1, 2, false, mem::size_of::<math::Vec2f>() as i32, 0));
+    self.vao.enable_vertex_attrib_array(1);
+    self.tex_vbo.bind();
+    self.vao.vertex_attrib_pointer_f32(1, 2, false, mem::size_of::<math::Vec2f>() as i32, ptr::null());
 
   }
 
   pub fn update(&mut self, _dt: f32)
   {
-    check!(gl2::bind_buffer(gl2::ARRAY_BUFFER, self.position_vbo));
-    check!(gl2::buffer_sub_data(gl2::ARRAY_BUFFER, 0, self.mesh.positions));
+    self.position_vbo.bind();
+    self.position_vbo.buffer_sub_data(0, self.mesh.positions);
   }
 
   pub fn render(&self)
   {
     match self.texture
     {
-      Some(ref tex) => { tex.bind(gl2::TEXTURE_2D); },
+      Some(ref tex) => { tex.bind(gl::TEXTURE_2D); },
       None => { }
     }
 
-    check!(gl2::bind_vertex_array(self.vao));
+    self.vao.bind();
 
-    check!(gl2::bind_buffer(gl2::ELEMENT_ARRAY_BUFFER, self.ibo));
-    check!(gl2::draw_elements(gl2::TRIANGLES, self.mesh.indices.len() as i32, gl2::UNSIGNED_INT, None));
+    self.ibo.bind();
+    check_unsafe!(gl::DrawElements(gl::TRIANGLES, self.mesh.indices.len() as GLsizei,
+                                   gl::UNSIGNED_INT, ptr::null()));
 
-    check!(gl2::bind_buffer(gl2::ELEMENT_ARRAY_BUFFER, 0));
-    check!(gl2::bind_vertex_array(0));
+    self.ibo.unbind();
+    self.vao.unbind();
   }
 }
-
-#[unsafe_destructor]
-impl<'self> Drop for Mesh_Renderer<'self>
-{
-  fn drop(&mut self)
-  {
-    check!(gl2::delete_vertex_arrays(&[self.vao]));
-    check!(gl2::delete_buffers(&[self.position_vbo, self.tex_vbo, self.ibo]));
-  }
-}
-

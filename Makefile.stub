@@ -166,5 +166,6 @@ server: setup_server ${SHARED_MODULES} ${SERVER_MODULES}
 clean:
 	${ECHO} "${ECHO_PREFIX} Cleaning"
 	-rm -f bin/client bin/server
+	-rm -rf build/q3
 	-rm -f ${SHARED_MODULES} ${CLIENT_MODULES} ${SERVER_MODULES}
 
