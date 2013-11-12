@@ -143,6 +143,7 @@ pushd glfw-rs
     ln -sf $BWD/glfw_static/libglfw* ./
     ln -sf $SWD/lib/glfw/src/libglfw* ./
     touch src/glfw/lib.rs
+    rustpkg clean glfw
     rustpkg build glfw
 
     if [ "0" -eq "$UNAME_LINUX" -o "0" -eq "$UNAME_CYGWIN" ];
@@ -176,6 +177,7 @@ popd
 log "Building gl-rs"
 mkdir -p gl-rs
 pushd $SWD/lib/gl-rs
+  rustpkg clean gl
   rustpkg build --opt-level=3 gl
   if [ "0" -eq "$UNAME_LINUX" -o "0" -eq "$UNAME_CYGWIN" ];
   then
