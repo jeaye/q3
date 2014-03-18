@@ -22,3 +22,6 @@
 	path = lib/gl-rs
 	url = https://github.com/bjz/gl-rs.git
   ignore = dirty
+[submodule "lib/rust"]
+	path = lib/rust
+	url = https://github.com/mozilla/rust.git
