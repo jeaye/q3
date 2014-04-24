@@ -59,6 +59,8 @@ fi
 log() { $ECHO "$@" 1>&2; }
 
 log "Configuring Q³"
+log "WARNING: This project is not actively under development"
+log "WARNING: This script will build an old Rust version to run Q³"
 
 if [ "1" -eq "$UNAME_LINUX" ];
 then
@@ -95,6 +97,15 @@ popd
 rm -rf build
 mkdir -p build
 cd build
+
+## Rust
+log "Building rust (will be a while)"
+mkdir -p rust
+pushd rust
+  sh $SWD/lib/rust/configure --prefix=$SWD/bin
+  make -j8 && make install
+popd
+PATH=$SWD/bin:$PATH
 
 ## Build GLFW3 (doesn't support out of source builds)
 mkdir -p glfw_static glfw_shared
@@ -143,8 +154,8 @@ pushd glfw-rs
     ln -sf $BWD/glfw_static/libglfw* ./
     ln -sf $SWD/lib/glfw/src/libglfw* ./
     touch src/glfw/lib.rs
-    rustpkg clean glfw
-    rustpkg build glfw
+    $SWD/bin/rustpkg clean glfw
+    $SWD/bin/rustpkg build glfw
 
     if [ "0" -eq "$UNAME_LINUX" -o "0" -eq "$UNAME_CYGWIN" ];
     then
