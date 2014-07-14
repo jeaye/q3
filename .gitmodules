@@ -8,7 +8,7 @@
   ignore = dirty
 [submodule "lib/glfw-rs"]
 	path = lib/glfw-rs
-	url = git://github.com/jeaye/glfw-rs.git
+	url = git://github.com/bjz/glfw-rs.git
   ignore = dirty
 [submodule "lib/stb-image"]
 	path = lib/stb-image
