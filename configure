@@ -102,7 +102,7 @@ cd build
 log "Building rust (will be a while)"
 mkdir -p rust
 pushd rust
-  sh $SWD/lib/rust/configure --prefix=$SWD/bin
+  sh $SWD/lib/rust/configure --prefix=$SWD
   make -j8 && make install
 popd
 PATH=$SWD/bin:$PATH
