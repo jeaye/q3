@@ -1,8 +1,9 @@
+language: rust
+sudo: true
 before_install:
   - yes | sudo add-apt-repository ppa:hansjorg/rust
   - sudo apt-get update
 install:
-  - sudo apt-get install rust-nightly
   - sudo apt-get install libXxf86vm-dev
 script:
   - ./configure
