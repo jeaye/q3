@@ -1,6 +1,6 @@
 Q³ ![Build Status](https://travis-ci.org/jeaye/q3.png)
 ===
-(**NOTE**: I'm trying to get q3 building with an older Rust version -- submodules should be correct, but the Rust commit on which all this code depends eludes me)
+(**NOTE**: q3 should build on Rust f4bedde)
 ![Screenshot](pics/012_1_no_wire.png)
 
 ### What is Q³?
