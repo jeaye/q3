@@ -50,13 +50,3 @@ make MODE=debug # Debug symbols and faster compilation
 **NOTE:** Ensure that you have Freetype2 installed.  
 **NOTE:** I don't have access to a Windows machine at the moment, so I'm not sure yet what will go into building 
 this under something like MinGW. This should be coming with r0.3, as per [#26](https://github.com/jeaye/q3/issues/26).
-
-
-### Who're you?
-Hi! I'm Jeaye, a C++ software engineer.  
-* **Website:**
-  * http://www.jeaye.com
-* **IRC:**
-  * #rust on irc.mozilla.org:6697 
-  * #q3 on irc.freenode.net:6667 
-
